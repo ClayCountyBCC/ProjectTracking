@@ -4,6 +4,7 @@ var ProjectTracking;
     "use strict";
     ProjectTracking.projects = [];
     function Start() {
+        ProjectTracking.DataValue.GetDepartments();
         //GetDepartmentList()
         //GetDefaultProjectList()
     }

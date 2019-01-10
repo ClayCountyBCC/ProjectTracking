@@ -211,7 +211,9 @@
     <Content Include="bower_components\promise-polyfill\LICENSE" />
     <Content Include="bower_components\promise-polyfill\package.json" />
     <Content Include="bower_components\promise-polyfill\README.md" />
-    <Content Include="ConnectionStrings.config" />
+    <Content Include="ConnectionStrings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="css\Main.scss" />
     <None Include="bower_components\bulma\myBulma.sass" />
     <None Include="compilerconfig.json" />
@@ -247,6 +249,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="scripts\app\Comment.ts" />
+    <TypeScriptCompile Include="scripts\app\DataValue.ts" />
     <TypeScriptCompile Include="scripts\app\Milestone.ts" />
     <TypeScriptCompile Include="scripts\app\Project.ts" />
     <TypeScriptCompile Include="scripts\app\ProjectTracking.ts" />

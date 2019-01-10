@@ -11,3 +11,7 @@
 
 #projects .table tr > td, #projects .table tr > th {
   text-align: left; }
+
+td.fullcenter {
+  text-align: center;
+  vertical-align: middle; }

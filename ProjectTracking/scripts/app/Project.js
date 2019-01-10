@@ -12,6 +12,8 @@ var ProjectTracking;
             this.date_last_updated = new Date();
             this.date_completed = new Date();
             this.can_edit = false;
+            this.milestones = [];
+            this.comments = [];
         }
         return Project;
     }());

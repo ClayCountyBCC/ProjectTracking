@@ -13,6 +13,8 @@
     date_last_updated: any;
     date_completed: any;
     can_edit: boolean;
+    milestones: Array<Milestone>;
+    comments: Array<Comment>;
   }
 
   export class Project implements IProject
@@ -26,6 +28,8 @@
     public date_last_updated: any = new Date();
     public date_completed: any = new Date();
     public can_edit: boolean = false;
+    public milestones: Array<Milestone> = [];
+    public comments: Array<Comment> = [];
 
     constructor()
     {

@@ -8,6 +8,7 @@ namespace ProjectTracking
 
   export function Start():void
   {
+    DataValue.GetDepartments();
     //GetDepartmentList()
     //GetDefaultProjectList()
 

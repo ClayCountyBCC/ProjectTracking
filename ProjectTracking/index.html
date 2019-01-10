@@ -98,12 +98,12 @@
       <div onclick="ProjectTracking.CloseModals();"
            class="modal-background"></div>
       <div class="modal-card container">
-        <header class="modal-card-head">
+        <!--<header class="modal-card-head">
           <p class="modal-card-title">Add Project</p>
           <button onclick="ProjectTracking.CloseModals();"
                   class="delete"
                   aria-label="close"></button>
-        </header>
+        </header>-->
         <section class="modal-card-body">
 
           <div class="field">
@@ -127,7 +127,75 @@
             </div>
           </div>
 
-
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th style="width: 5%;">
+                  Order
+                </th>
+                <th style="width: 70%;">
+                  Milestone
+                </th>
+                <th style="width: 25%;">
+                </th>
+              </tr>
+            </thead>
+            <tbody id="projectMilestones">
+              <tr>
+                <td style="text-align: center; vertical-align: middle;">
+                  1
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control is-medium">
+                      <input id="projectMilestone1"
+                             class="input is-medium"
+                             type="text"/>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="field is-grouped">
+                    <div class="control">
+                      <a style="border-radius: 99px;"
+                         aria-label="move milestone up"
+                         class="button is-medium">
+                        <span class="icon is-large">
+                          <i class="fas fa-arrow-circle-up fa-2x"></i>
+                        </span>
+                      </a>
+                    </div>
+                    <div class="control">
+                      <button style="border-radius: 99px;"
+                              aria-label="move milestone down"
+                              class="button is-medium">
+                        <span class="icon is-large">
+                          <i class="fas fa-arrow-circle-down fa-2x"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <div class="control">
+                      <button class="button is-warning is-medium"
+                              type="button">
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td>
+                  <button class="button is-primary is-medium"
+                          type="button">
+                    Add Milestone
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
 
           <div class="field">
             <label class="label">Timeline</label>
@@ -137,26 +205,31 @@
                         id="projectTimeline">
 
               </textarea>
-
-
             </div>
           </div>
           <div class="field">
             <label class="checkbox is-medium">
               <input id="projectCommissionerShare"
                      type="checkbox" />
-              Share this project with the Commissioners?
+              Add this project to the Commissioner View?
             </label>
           </div>
           <div class="field">
             <label class="checkbox is-medium">
               <input id="projectComplete"
                      type="checkbox" />
-              Is this project Complete?
+              Is this project complete?
             </label>
           </div>
 
-
+          <div class="field">
+            <label class="label">Add a Comment - Optional</label>
+            <div class="control">
+              <input id="projectComment"
+                     class="input is-medium"
+                     type="text" />
+            </div>
+          </div>
 
         </section>
         <footer style="justify-content: flex-end;"
@@ -183,11 +256,18 @@
   </div>
 
 
-
+  <script src="scripts/app/DataValue.js"></script>
   <script src="scripts/utilities/Utilities.js"></script>
   <script src="scripts/app/Comment.js"></script>
   <script src="scripts/app/Milestone.js"></script>
   <script src="scripts/app/Project.js"></script>
   <script src="scripts/app/ProjectTracking.js"></script>
+
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function (event)
+    {
+      ProjectTracking.Start();
+    });
+  </script>
 </body>
 </html>
