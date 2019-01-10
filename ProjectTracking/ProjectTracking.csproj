@@ -99,11 +99,38 @@
     <Content Include="bower_components\promise-polyfill\src\finally.js" />
     <Content Include="bower_components\promise-polyfill\src\index.js" />
     <Content Include="bower_components\promise-polyfill\src\polyfill.js" />
+    <Content Include="css\bulma.css" />
+    <Content Include="css\bulma.min.css">
+      <DependentUpon>bulma.css</DependentUpon>
+    </Content>
+    <Content Include="css\Fontawesome\css\fa-brands.css" />
+    <Content Include="css\Fontawesome\css\fa-brands.min.css" />
+    <Content Include="css\Fontawesome\css\fa-regular.css" />
+    <Content Include="css\Fontawesome\css\fa-regular.min.css" />
+    <Content Include="css\Fontawesome\css\fa-solid.css" />
+    <Content Include="css\Fontawesome\css\fa-solid.min.css" />
+    <Content Include="css\Fontawesome\css\fontawesome-all.css" />
+    <Content Include="css\Fontawesome\css\fontawesome-all.min.css" />
+    <Content Include="css\Fontawesome\css\fontawesome.css" />
+    <Content Include="css\Fontawesome\css\fontawesome.min.css" />
+    <Content Include="css\Fontawesome\webfonts\fa-brands-400.svg" />
+    <Content Include="css\Fontawesome\webfonts\fa-regular-400.svg" />
+    <Content Include="css\Fontawesome\webfonts\fa-solid-900.svg" />
     <Content Include="css\Main.css">
       <DependentUpon>Main.scss</DependentUpon>
     </Content>
     <Content Include="css\Main.min.css">
       <DependentUpon>Main.css</DependentUpon>
+    </Content>
+    <Content Include="css\myBulma.css" />
+    <Content Include="css\myBulma.min.css">
+      <DependentUpon>myBulma.css</DependentUpon>
+    </Content>
+    <Content Include="css\Utilities.css">
+      <DependentUpon>Utilities.scss</DependentUpon>
+    </Content>
+    <Content Include="css\Utilities.min.css">
+      <DependentUpon>Utilities.css</DependentUpon>
     </Content>
     <Content Include="Global.asax" />
     <Content Include="index.html" />
@@ -186,10 +213,24 @@
     <Content Include="bower_components\promise-polyfill\README.md" />
     <Content Include="ConnectionStrings.config" />
     <Content Include="css\Main.scss" />
+    <None Include="bower_components\bulma\myBulma.sass" />
     <None Include="compilerconfig.json" />
     <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>
     </None>
+    <Content Include="css\Utilities.scss" />
+    <Content Include="css\Fontawesome\webfonts\fa-brands-400.eot" />
+    <Content Include="css\Fontawesome\webfonts\fa-brands-400.ttf" />
+    <Content Include="css\Fontawesome\webfonts\fa-brands-400.woff" />
+    <Content Include="css\Fontawesome\webfonts\fa-brands-400.woff2" />
+    <Content Include="css\Fontawesome\webfonts\fa-regular-400.eot" />
+    <Content Include="css\Fontawesome\webfonts\fa-regular-400.ttf" />
+    <Content Include="css\Fontawesome\webfonts\fa-regular-400.woff" />
+    <Content Include="css\Fontawesome\webfonts\fa-regular-400.woff2" />
+    <Content Include="css\Fontawesome\webfonts\fa-solid-900.eot" />
+    <Content Include="css\Fontawesome\webfonts\fa-solid-900.ttf" />
+    <Content Include="css\Fontawesome\webfonts\fa-solid-900.woff" />
+    <Content Include="css\Fontawesome\webfonts\fa-solid-900.woff2" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -203,9 +244,12 @@
     <Folder Include="content\" />
     <Folder Include="Controllers\" />
     <Folder Include="Models\" />
-    <Folder Include="scripts\app\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="scripts\app\Comment.ts" />
+    <TypeScriptCompile Include="scripts\app\Milestone.ts" />
+    <TypeScriptCompile Include="scripts\app\Project.ts" />
+    <TypeScriptCompile Include="scripts\app\ProjectTracking.ts" />
     <TypeScriptCompile Include="scripts\utilities\MenuItem.ts" />
     <TypeScriptCompile Include="scripts\utilities\Utilities.ts" />
   </ItemGroup>

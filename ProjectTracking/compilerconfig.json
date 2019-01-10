@@ -2,5 +2,13 @@
   {
     "outputFile": "css/Main.css",
     "inputFile": "css/Main.scss"
+  },
+  {
+    "outputFile": "css/Utilities.css",
+    "inputFile": "css/Utilities.scss"
+  },
+  {
+    "outputFile": "css/myBulma.css",
+    "inputFile": "bower_components/bulma/myBulma.sass"
   }
 ]

@@ -377,7 +377,6 @@ namespace Utilities
     Set_Text("menuSubTitle", menuItem.subTitle);
     Show_Menu(menuItem.id);
     document.getElementById(menuItem.autofocusId).focus();
-    PermitSearch.selected_tab = menuItem.label;
   }
 
   export function Build_Menu_Elements(target: string, Menus: Array<MenuItem>): void

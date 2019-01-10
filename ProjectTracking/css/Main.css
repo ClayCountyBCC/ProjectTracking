@@ -1,1 +1,13 @@
-﻿
+﻿body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column; }
+
+#projects .table tr > th {
+  position: sticky;
+  background-color: white;
+  top: 0;
+  /*border-bottom: 1px dotted #333333;*/ }
+
+#projects .table tr > td, #projects .table tr > th {
+  text-align: left; }
