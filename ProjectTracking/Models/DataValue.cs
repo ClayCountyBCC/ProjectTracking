@@ -13,7 +13,7 @@ namespace ProjectTracking
     {
     }
 
-    public static List<DataValue> Get()
+    public static List<DataValue> Get(string dataType)
     {
       string sql = @"
       

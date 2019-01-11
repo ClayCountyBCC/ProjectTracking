@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Dapper;
 using System.Linq;
 using System.Web;
 using System.DirectoryServices.AccountManagement;
@@ -17,7 +18,7 @@ namespace ProjectTracking
     public string user_name { get; set; }
     public int employee_id { get; set; } = 0;
     public string display_name { get; set; } = "";
-    public List<string> DepartmentsUserCanEdit { get; set; } 
+    public List<string> DepartmentsUserCanEdit { get; set; }
 
   public enum access_type : int
     {
@@ -25,7 +26,7 @@ namespace ProjectTracking
       inspector_access = 2,
       contract_access = 3
     }
-    public access_type current_access { get; set; } = access_type.public_access; // default to public access.
+   // public access_type current_access { get; set; } = access_type.public_access; // default to public access.
 
     public UserAccess(string name)
     {
@@ -71,24 +72,32 @@ namespace ProjectTracking
           {
             employee_id = eid;
           }
-          var groups = (from g in up.GetAuthorizationGroups()
-                        select g.Name).ToList();
-          if(groups.Contains(mis_access_group) || groups.Contains(inspector_access_group))
-          {
-            current_access = access_type.inspector_access;
-          }
-          else
-          {
-            if (groups.Contains(basic_access_group))
-            {
-              current_access = access_type.basic_access;
-              return;
-            }
-            if(groups.Contains(contract_inspection_access_group))
-            {
-              current_access = access_type.contract_access;
-            }
-          }
+          //var groups = (from g in up.GetAuthorizationGroups()
+          //              select g.Name).ToList();
+
+          // TODO: Get list of departments user can edit
+          // field: timestore.dbo.Access.dept_approval_list
+          // parse list to DepartmentsUserCanEdit property; delimited by space
+          // if MIS, then all ELSE departmentsUserCanEdit List
+          
+          DepartmentsUserCanEdit = GetUserDepartmentAccess().Split(' ').ToList();
+
+          //if (groups.Contains(mis_access_group) || groups.Contains(inspector_access_group))
+          //{
+          //  //current_access = access_type.inspector_access;
+          //}
+          //else
+          //{
+          //  if (groups.Contains(basic_access_group))
+          //  {
+          //    current_access = access_type.basic_access;
+          //    return;
+          //  }
+          //  if(groups.Contains(contract_inspection_access_group))
+          //  {
+          //    current_access = access_type.contract_access;
+          //  }
+          //}
         }
       }
       catch (Exception ex)
@@ -97,57 +106,86 @@ namespace ProjectTracking
       }
     }
 
-    private static void ParseGroup(string group, ref Dictionary<string, UserAccess> d)
-    {
-      using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
-      {
-        using (GroupPrincipal gp = GroupPrincipal.FindByIdentity(pc, group))
-        {
-          if (gp != null)
-          {
-            foreach (UserPrincipal up in gp.GetMembers())
-            {
-              if (up != null)
-              {
-                if (!d.ContainsKey(up.SamAccountName.ToLower()))
-                {
-                  d.Add(up.SamAccountName.ToLower(), new UserAccess(up));
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    //private static void ParseGroup(string group, ref Dictionary<string, UserAccess> d)
+    //{
+    //  using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
+    //  {
+    //    using (GroupPrincipal gp = GroupPrincipal.FindByIdentity(pc, group))
+    //    {
+    //      if (gp != null)
+    //      {
+    //        foreach (UserPrincipal up in gp.GetMembers())
+    //        {
+    //          if (up != null)
+    //          {
+    //            if (!d.ContainsKey(up.SamAccountName.ToLower()))
+    //            {
+    //              d.Add(up.SamAccountName.ToLower(), new UserAccess(up));
+    //            }
+    //          }
+    //        }
+    //      }
+    //    }
+    //  }
+    //}
 
-    public static Dictionary<string, UserAccess> GetAllUserAccess()
-    {
-      var d = new Dictionary<string, UserAccess>();
+    //public static Dictionary<string, UserAccess> GetAllUserAccess()
+    //{
+    //  var d = new Dictionary<string, UserAccess>();
 
+    //  try
+    //  {
+    //    switch (Environment.MachineName.ToUpper())
+    //    {
+
+    //      case "CLAYBCCDMZIIS01":
+    //        d[""] = new UserAccess("");
+    //        break;
+    //      default:            
+    //        ParseGroup(inspector_access_group, ref d);
+    //        ParseGroup(mis_access_group, ref d);
+    //        ParseGroup(basic_access_group, ref d);
+    //        ParseGroup(contract_inspection_access_group, ref d);
+    //        d[""] = new UserAccess("");
+    //        break;
+
+    //    }
+    //      return d;
+    //  }
+    //  catch (Exception ex)
+    //  {
+    //    Constants.Log(ex);
+    //    return null;
+    //  }
+    //}
+
+    private string GetUserDepartmentAccess()
+    {
+
+      var param = new DynamicParameters();
+      param.Add("@employee_id", employee_id);
+
+      var query = @"
+        USE TimeStore;
+
+        SELECT dept_approval_list
+        FROM [TimeStore].[dbo].[Access]
+        WHERE employee_id = @employee_id
+
+      ";
+      
       try
       {
-        switch (Environment.MachineName.ToUpper())
-        {
 
-          case "CLAYBCCDMZIIS01":
-            d[""] = new UserAccess("");
-            break;
-          default:            
-            ParseGroup(inspector_access_group, ref d);
-            ParseGroup(mis_access_group, ref d);
-            ParseGroup(basic_access_group, ref d);
-            ParseGroup(contract_inspection_access_group, ref d);
-            d[""] = new UserAccess("");
-            break;
-
-        }
-          return d;
+        return Constants.Get_Data<string>(query, param).DefaultIfEmpty("").ToString();
+        
       }
-      catch (Exception ex)
+      catch(Exception ex)
       {
-        Constants.Log(ex);
-        return null;
+        new ErrorLog(ex, query);
       }
+
+      return "";
     }
 
     public static UserAccess GetUserAccess(string Username)
@@ -185,5 +223,7 @@ namespace ProjectTracking
     {
       return (Dictionary<string, UserAccess>)MyCache.GetItem("useraccess");
     }
+
+
   }
 }

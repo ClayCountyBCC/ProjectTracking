@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Dapper;
 using System.Linq;
 using System.Web;
 
@@ -7,6 +8,7 @@ namespace ProjectTracking
 {
   public class Project
   {
+    public int project_id { get; set; } = -1;
     public string project_name { get; set; } = "";
     public string department { get; set; } = "";
     public string timeline { get; set; } = "";
@@ -19,31 +21,81 @@ namespace ProjectTracking
 
     public Project()
     {
-
+      
+    }
+    public static List<Project> GetProjects(int project_id = -1)
+    {
+      var projectList  = GetRawProjectsList(project_id);
+      foreach(var p in projectList)
+      {
+        p.GetProjectComments();
+        p.GetProjectMilestones();
+      }
+      
+      return new List<Project>();
     }
 
-    public static List<Project> GetRawProjectList(int project_id = -1)
+    public static List<Project> GetRawProjectsList(int project_id = -1)
     {
+      var param = new DynamicParameters();
 
+      
       var query = @"
-      USE ProjectTracking;
+        USE ProjectTracking;
 
-      SELECT[id]
-        ,[project_name]
-        ,[department]
-        ,[timeline]
-        ,[commissioner_share]
-        ,[completed]
-        ,[date_completed]
-        ,[last_updated]
-      FROM[dbo].[project]
+        SELECT DISTINCT 
+           [id]
+          ,[project_name]
+          ,[department]
+          ,[timeline]
+          ,[commissioner_share]
+          ,[completed]
+          ,[date_completed]
+          ,[last_updated]
+        FROM[dbo].[project]
       ";
 
       if (project_id > 0)
       {
+        param.Add("@project_id", project_id);
         query += "\nwhere id = @project_id";
       }
       
+
+      return new List<Project>();
+
+    }
+
+
+    public void GetProjectComments()
+    {
+      
+      project_comments = new List<Comment>();
+    }
+
+    public void GetProjectMilestones()
+    {
+
+      project_milestones = new List<Milestone>();
+    }
+
+    public string Validate()
+    {
+      var existingProject = GetProjects(project_id).First();
+
+      if (existingProject == null) return "There was an error validating the project you are trying to update";
+
+      if (this == existingProject) return "Project is already up to date";
+
+      
+      else { return "There was an error validating the project you are trying to update"; }
+    }
+
+    private Project UpdateProject(Project existingProject)
+    {
+
+
+      return existingProject;
     }
   }
 }
