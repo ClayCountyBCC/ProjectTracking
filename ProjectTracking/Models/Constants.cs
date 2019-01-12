@@ -13,7 +13,7 @@ namespace ProjectTracking
   {
     public const int appId = 20038;
 
-    public enum PaymentTypes: int // This may need to be changed to reflect actual data: this is a department, not payment type.
+    public enum PaymentTypes : int // This may need to be changed to reflect actual data: this is a department, not payment type.
     {
       Building = 0,
       Rescue = 1
@@ -29,7 +29,7 @@ namespace ProjectTracking
     {
       return $"{DateTime.Now.ToString("MM/dd/yyyy hh:mm tt")} by {Username}: {FieldName} changed from {OldValue} to {NewValue}.";
     }
-    
+
     public static bool UseProduction()
     {
       switch (Environment.MachineName.ToUpper())
@@ -38,7 +38,7 @@ namespace ProjectTracking
         case "MISHL05":
         case "MISSL01":
         case "CLAYBCCIIS01":
-        //case "CLAYBCCDMZIIS01":
+          //case "CLAYBCCDMZIIS01":
           return true;
 
         default:
@@ -46,6 +46,14 @@ namespace ProjectTracking
           return false;
       }
     }
+    public static Dictionary<int, List<string>> GetUserDepartments()
+    {
+
+      
+      
+      return null;
+    }
+
 
     public static List<T> Get_Data<T>(string query)
     {
