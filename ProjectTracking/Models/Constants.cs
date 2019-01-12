@@ -61,20 +61,26 @@ namespace ProjectTracking
         FROM users
 
       ";
-      
-      var users = Get_Data<User>(query);
-
-      if (users != null)
+      try
       {
-        foreach (var u in users)
+        var users = Get_Data<User>(query);
+
+        if (users != null)
         {
-          userDictionary.Add(u.employee_id, u.departments.Split(' ').ToList());
+          foreach (var u in users)
+          {
+            userDictionary.Add(u.employee_id, u.departments.Split(' ').ToList());
+          }
+
+          return userDictionary;
         }
-
-        return userDictionary;
       }
+      catch(Exception ex)
+      {
+        new ErrorLog(ex, query);
+        return null;
 
-      return null;
+      }
     }
 
 
