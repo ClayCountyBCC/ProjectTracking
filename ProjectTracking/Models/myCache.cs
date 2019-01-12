@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Runtime.Caching;
-using ClayPay.Models.Claypay;
 
 namespace ProjectTracking
 { 
@@ -68,10 +67,7 @@ namespace ProjectTracking
       switch (key)
       {
         case "useraccess":
-          return UserAccess.GetAllUserAccess();
-
-        case "departmentsusercanedit":
-          return DataValue.Get();
+          return UserAccess.GetUserAccess();
 
         default:
           return null;

@@ -50,7 +50,7 @@ namespace ProjectTracking.Controllers
       else
       {
         var ua = UserAccess.GetUserAccess(User.Identity.Name);
-        if (!ua.DepartmentsUserCanEdit.Contains(newProject.department))
+        if (!ua.departments_can_edit.Contains(newProject.department))
         {
      
           int i = newProject.Save();
@@ -74,7 +74,7 @@ namespace ProjectTracking.Controllers
       var error = "";
 
       var ua = UserAccess.GetUserAccess(User.Identity.Name);
-      if (ua.DepartmentsUserCanEdit.Contains(existingProject.department))
+      if (ua.departments_can_edit.Contains(existingProject.department))
       {
         error = existingProject.Validate();
         if (error.Length > 0) return Ok(error);

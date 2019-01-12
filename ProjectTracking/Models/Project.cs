@@ -54,13 +54,14 @@ namespace ProjectTracking
           ,[last_updated]
         FROM[dbo].[project]
       ";
-
+      // TODO: include the user access dept_approval_list to only return those they can edit upon initial load.
       if (project_id > 0)
       {
         param.Add("@project_id", project_id);
         query += "\nwhere id = @project_id";
       }
       
+     
 
       return new List<Project>();
 
@@ -91,7 +92,7 @@ namespace ProjectTracking
       else { return "There was an error validating the project you are trying to update"; }
     }
 
-    private Project UpdateProject(Project existingProject)
+    public static Project UpdateProject(Project existingProject)
     {
 
 

@@ -18,7 +18,7 @@ namespace ProjectTracking
     public string user_name { get; set; }
     public int employee_id { get; set; } = 0;
     public string display_name { get; set; } = "";
-    public List<string> DepartmentsUserCanEdit { get; set; }
+    public List<string> departments_can_edit { get; set; }
 
   public enum access_type : int
     {
@@ -80,7 +80,7 @@ namespace ProjectTracking
           // parse list to DepartmentsUserCanEdit property; delimited by space
           // if MIS, then all ELSE departmentsUserCanEdit List
           
-          DepartmentsUserCanEdit = GetUserDepartmentAccess().Split(' ').ToList();
+          departments_can_edit = GetUserDepartmentAccess().Split(' ').ToList();
 
           //if (groups.Contains(mis_access_group) || groups.Contains(inspector_access_group))
           //{

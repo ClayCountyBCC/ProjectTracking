@@ -7,9 +7,9 @@ namespace ProjectTracking
 {
   public class Milestone
   {
-    public int project_id { get; set; } = "";
+    public int project_id { get; set; } = -1;
     public string name { get; set; } = "";
-    public int display_order { get; set; } = "";
+    public int display_order { get; set; } = -1;
 
     public Milestone()
     {
