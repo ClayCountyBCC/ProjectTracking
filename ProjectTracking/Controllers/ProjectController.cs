@@ -13,6 +13,18 @@ namespace ProjectTracking.Controllers
   public class ProjectController : ApiController
   {
     [HttpGet]
+    [Route("GetDepartments")]
+    public IHttpActionResult GetDepartments()
+    {
+      var userDepartmentDictionary = Project.GetUserAccessDictionary();
+      if (userDepartmentDictionary == null)
+      {
+        return InternalServerError();
+      }
+      return Ok(userDepartmentDictionary);
+    }
+
+    [HttpGet]
     [Route("GetList")]
     public IHttpActionResult GetProjectList()
     {

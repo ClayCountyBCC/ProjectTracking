@@ -98,5 +98,15 @@ namespace ProjectTracking
 
       return existingProject;
     }
+
+    public static Dictionary<int, List<string>> GetUserAccessDictionary()
+    {
+      return GetCachedUserAccessDictionary();
+    }
+
+    public static Dictionary<int, List<string>> GetCachedUserAccessDictionary()
+    {
+      return (Dictionary<int, List<string>>)MyCache.GetItem("useraccess");
+    }
   }
 }

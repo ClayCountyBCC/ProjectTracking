@@ -46,11 +46,34 @@ namespace ProjectTracking
           return false;
       }
     }
+
     public static Dictionary<int, List<string>> GetUserDepartments()
     {
 
+      var userDictionary = new Dictionary<int, List<string>>();
       
+      var query = @"
+        USE ProjectTracking;
+
+        SELECT 
+          employee_id, 
+          departments_can_edit
+        FROM users
+
+      ";
       
+      var users = Get_Data<User>(query);
+
+      if (users != null)
+      {
+        foreach (var u in users)
+        {
+          userDictionary.Add(u.employee_id, u.departments.Split(' ').ToList());
+        }
+
+        return userDictionary;
+      }
+
       return null;
     }
 
