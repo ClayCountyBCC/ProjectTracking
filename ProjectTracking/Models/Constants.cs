@@ -77,12 +77,40 @@ namespace ProjectTracking
       }
       catch(Exception ex)
       {
-        new ErrorLog(ex, query);
-        return null;
-
+        new ErrorLog(ex, query);      
       }
+      return null;
     }
 
+    public static int GetCountyManager()
+    {
+
+
+      var query = @"
+      
+        USE ProjectTracking;
+
+        SELECT employee_id
+        FROM county_manager
+
+      ";
+      try
+      {
+        var county_manager_employee_id = Get_Data<int>(query).First();
+        if(county_manager_employee_id > 0)
+        {
+          return county_manager_employee_id;
+        }
+
+      }
+      catch (Exception ex)
+      {
+        new ErrorLog(ex, query);
+        
+
+      }
+      return -1;
+    }
 
     public static List<T> Get_Data<T>(string query)
     {
