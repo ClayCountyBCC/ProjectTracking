@@ -7,11 +7,14 @@ using System.Web.Routing;
 
 namespace ProjectTracking
 {
-    public class WebApiApplication : System.Web.HttpApplication
+  public class WebApiApplication : System.Web.HttpApplication
+  {
+    protected void Application_Start()
     {
-        protected void Application_Start()
-        {
-            GlobalConfiguration.Configure(WebApiConfig.Register);
-        }
+      GlobalConfiguration.Configure(WebApiConfig.Register);
+      var userlist = new Dictionary<int, string>();
+      userlist.Add(1234, "ALL");
+      var test = userlist[1234];
     }
+  }
 }

@@ -27,7 +27,7 @@
           <div class="navbar-item">
             <div class="buttons">
               <a class="button is-primary"
-                 onclick="ProjectTracking.ShowAddProject();">
+                 onclick="ProjectTracking.Project.AddProject();">
                 <strong>Add Project</strong>
               </a>
             </div>
@@ -71,7 +71,7 @@
           </th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="projectList">
         <tr>
           <td>
             County Park Plan
@@ -140,55 +140,13 @@
                 </th>
               </tr>
             </thead>
-            <tbody id="projectMilestones">
-              <tr>
-                <td style="text-align: center; vertical-align: middle;">
-                  1
-                </td>
-                <td>
-                  <div class="field">
-                    <div class="control is-medium">
-                      <input id="projectMilestone1"
-                             class="input is-medium"
-                             type="text"/>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="field is-grouped">
-                    <div class="control">
-                      <a style="border-radius: 99px;"
-                         aria-label="move milestone up"
-                         class="button is-medium">
-                        <span class="icon is-large">
-                          <i class="fas fa-arrow-circle-up fa-2x"></i>
-                        </span>
-                      </a>
-                    </div>
-                    <div class="control">
-                      <button style="border-radius: 99px;"
-                              aria-label="move milestone down"
-                              class="button is-medium">
-                        <span class="icon is-large">
-                          <i class="fas fa-arrow-circle-down fa-2x"></i>
-                        </span>
-                      </button>
-                    </div>
-                    <div class="control">
-                      <button class="button is-warning is-medium"
-                              type="button">
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
+            <tbody id="projectMilestones"></tbody>
             <tfoot>
               <tr>
                 <td colspan="2"></td>
                 <td>
-                  <button class="button is-primary is-medium"
+                  <button onclick="ProjectTracking.Milestone.AddMilestone(); return false;"
+                          class="button is-primary is-medium"
                           type="button">
                     Add Milestone
                   </button>
@@ -231,13 +189,17 @@
             </div>
           </div>
 
+          <fieldset id="existingCommentsContainer"
+                    style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem; vertical-align: middle;">
+          </fieldset>
+
         </section>
         <footer style="justify-content: flex-end;"
                 class="modal-card-foot">
           <button class="button is-success"
                   onclick="ProjectTracking.SaveProject();"
                   type="button">
-            Save
+            Save & Close
           </button>
           <button type="button"
                   onclick="ProjectTracking.CloseModals();"
@@ -247,11 +209,6 @@
         </footer>
       </div>
 
-    </div>
-    <div id="editProject"
-         class="modal">
-      Edit Project Modal
-      Maybe we can reuse the Add Project Modal?
     </div>
   </div>
 
