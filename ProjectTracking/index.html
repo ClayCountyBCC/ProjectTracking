@@ -27,7 +27,7 @@
           <div class="navbar-item">
             <div class="buttons">
               <a class="button is-primary"
-                 onclick="ProjectTracking.ShowAddProject();">
+                 onclick="ProjectTracking.Project.AddProject();">
                 <strong>Add Project</strong>
               </a>
             </div>
@@ -41,15 +41,59 @@
 
   <div id="projects"
        class="container">
+    <fieldset style="width: 100%;">
+      <legend class="label">Filters</legend>
 
-    <div style="margin-bottom: 1em;">
-      Filters:
-      Department (including All)
-      Complete / Incomplete
-      Commissioner Share / true/false
-      Not updated in # Days?
 
-    </div>
+      <div style="width: 100%;"
+           class="level">
+        <div class="level-item">
+          <div class="field">
+            <div class="control">
+              <div class="select is-medium">
+                <select id="departmentFilter"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="level-item">
+          <div class="field">
+            <label class="checkbox is-medium">
+              <input id="projectCommissionerShare"
+                     type="checkbox" />
+              Commissioner View Only
+            </label>
+          </div>
+
+        </div>
+        <div class="level-item">
+          <div class="field">
+            <label class="checkbox is-medium">
+              <input id="projectComplete"
+                     type="checkbox" />
+              Completed Only
+            </label>
+          </div>
+        </div>
+
+        <div class="level-item">
+          <div class="field">
+            <div class="control">
+              <button class="button is-primary is-medium"
+                      type="button">
+                Refresh Data
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--Filters:
+        Department (including All)
+        Complete / Incomplete
+        Commissioner Share / true/false
+        Not updated in # Days?-->
+
+      </div>
+    </fieldset>
 
     <table class="table is-fullwidth">
       <thead>
@@ -63,47 +107,30 @@
           <th style="width: 25%;">
             Milestones
           </th>
-          <th style="width: 20%;">
+          <th style="width: 15%;">
             Timeline
           </th>
-          <th style="width: 30%;">
+          <th style="width: 25%;">
             Comments
+          </th>
+          <th style="width: 10%;">
+            Updated On
           </th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>
-            County Park Plan
-          </td>
-          <td>
-            I have no idea
-          </td>
-          <td>
-            <ol>
-              <li>Saftey netting - included in this year's budget</li>
-              <li>Department of Agriculture Grants for Fairgrounds improvements: submitted to DOACS (Working with our Lobbyist on this grant)</li>
-              <li>Sharing Facilities with Clay County Schools - Agreement sent to the School District Staff</li>
-              <li>Fleming Island Baseball / Softball - Staff evaluating the bids now</li>
-              <li>Omega Drainage (90%) and Concession. Completion days January 2 (does not include rain days)</li>
-            </ol>
-          </td>
-          <td></td>
-          <td></td>
-        </tr>
-      </tbody>
+      <tbody id="projectList"></tbody>
     </table>
     <div id="addProject"
          class="modal">
       <div onclick="ProjectTracking.CloseModals();"
            class="modal-background"></div>
       <div class="modal-card container">
-        <header class="modal-card-head">
+        <!--<header class="modal-card-head">
           <p class="modal-card-title">Add Project</p>
           <button onclick="ProjectTracking.CloseModals();"
                   class="delete"
                   aria-label="close"></button>
-        </header>
+        </header>-->
         <section class="modal-card-body">
 
           <div class="field">
@@ -127,7 +154,33 @@
             </div>
           </div>
 
-
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th style="width: 5%;">
+                  Order
+                </th>
+                <th style="width: 70%;">
+                  Milestone
+                </th>
+                <th style="width: 25%;">
+                </th>
+              </tr>
+            </thead>
+            <tbody id="projectMilestones"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"></td>
+                <td>
+                  <button onclick="ProjectTracking.Milestone.AddMilestone(); return false;"
+                          class="button is-primary is-medium"
+                          type="button">
+                    Add Milestone
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
 
           <div class="field">
             <label class="label">Timeline</label>
@@ -137,26 +190,33 @@
                         id="projectTimeline">
 
               </textarea>
-
-
             </div>
           </div>
           <div class="field">
             <label class="checkbox is-medium">
               <input id="projectCommissionerShare"
                      type="checkbox" />
-              Share this project with the Commissioners?
+              Add this project to the Commissioner View?
             </label>
           </div>
           <div class="field">
             <label class="checkbox is-medium">
               <input id="projectComplete"
                      type="checkbox" />
-              Is this project Complete?
+              Is this project complete?
             </label>
           </div>
 
+          <div class="field">
+            <label class="label">Add a Comment - Optional</label>
+            <div class="control">
+              <input id="projectComment"
+                     class="input is-medium"
+                     type="text" />
+            </div>
+          </div>
 
+          <fieldset id="existingCommentsContainer"></fieldset>
 
         </section>
         <footer style="justify-content: flex-end;"
@@ -164,7 +224,7 @@
           <button class="button is-success"
                   onclick="ProjectTracking.SaveProject();"
                   type="button">
-            Save
+            Save & Close
           </button>
           <button type="button"
                   onclick="ProjectTracking.CloseModals();"
@@ -175,19 +235,21 @@
       </div>
 
     </div>
-    <div id="editProject"
-         class="modal">
-      Edit Project Modal
-      Maybe we can reuse the Add Project Modal?
-    </div>
   </div>
 
 
-
+  <script src="scripts/app/DataValue.js"></script>
   <script src="scripts/utilities/Utilities.js"></script>
   <script src="scripts/app/Comment.js"></script>
   <script src="scripts/app/Milestone.js"></script>
   <script src="scripts/app/Project.js"></script>
   <script src="scripts/app/ProjectTracking.js"></script>
+
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function (event)
+    {
+      ProjectTracking.Start();
+    });
+  </script>
 </body>
 </html>

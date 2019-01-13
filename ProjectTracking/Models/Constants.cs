@@ -47,6 +47,10 @@ namespace ProjectTracking
       }
     }
 
+    public static List<DataValue> GetCachedDepartments()
+    {
+      return (List<DataValue>)MyCache.GetItem("departments");
+    }
 
     public static Dictionary<int, List<string>> GetUserAccessDictionary()
     {

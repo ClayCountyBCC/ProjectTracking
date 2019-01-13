@@ -256,12 +256,10 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="content\" />
-    <Folder Include="Controllers\" />
-    <Folder Include="Models\" />
-    <Folder Include="scripts\app\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="scripts\app\Comment.ts" />
+    <TypeScriptCompile Include="scripts\app\DataValue.ts" />
     <TypeScriptCompile Include="scripts\app\Milestone.ts" />
     <TypeScriptCompile Include="scripts\app\Project.ts" />
     <TypeScriptCompile Include="scripts\app\ProjectTracking.ts" />

@@ -13,10 +13,14 @@ namespace ProjectTracking
     {
     }
 
-    public static List<DataValue> Get(string dataType)
+    public static List<DataValue> Get()
     {
       string sql = @"
-      
+        SELECT
+          department_code Value,
+          department_description Label
+        FROM department
+        ORDER BY department_description;
       ";
       return Constants.Get_Data<DataValue>(sql);
     }

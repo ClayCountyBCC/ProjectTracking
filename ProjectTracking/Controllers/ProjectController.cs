@@ -14,15 +14,10 @@ namespace ProjectTracking.Controllers
   public class ProjectController : ApiController
   {
     [HttpGet]
-    [Route("GetDepartments")]
+    [Route("Departments")]
     public IHttpActionResult GetDepartments()
     {
-      var userDepartmentDictionary = Constants.GetUserAccessDictionary();
-      if (userDepartmentDictionary == null)
-      {
-        return InternalServerError();
-      }
-      return Ok(userDepartmentDictionary);
+      return Ok(Constants.GetCachedDepartments());
     }
 
     [HttpGet]

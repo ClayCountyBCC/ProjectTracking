@@ -66,6 +66,8 @@ namespace ProjectTracking
     {
       switch (key)
       {
+        case "departments":
+          return DataValue.Get();
         case "useraccess":
           return Constants.GetUserDepartments();
         case "currentcountymanager":
