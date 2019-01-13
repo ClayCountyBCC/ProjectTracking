@@ -14,6 +14,7 @@ namespace ProjectTracking
     public string timeline { get; set; } = "";
     public bool commissioner_share { get; set; } = false;
     public bool completed { get; set; } = false;
+    public string comment { get; set; } = "";
     public DateTime date_completed { get; set; }
     public DateTime last_updated { get; set; }
     public List<Comment> project_comments { get; set; }
@@ -99,14 +100,6 @@ namespace ProjectTracking
       return existingProject;
     }
 
-    public static Dictionary<int, List<string>> GetUserAccessDictionary()
-    {
-      return GetCachedUserAccessDictionary();
-    }
 
-    public static Dictionary<int, List<string>> GetCachedUserAccessDictionary()
-    {
-      return (Dictionary<int, List<string>>)MyCache.GetItem("useraccess");
-    }
   }
 }

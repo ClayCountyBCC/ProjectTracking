@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using ProjectTracking;
 
@@ -16,7 +17,7 @@ namespace ProjectTracking.Controllers
     [Route("GetDepartments")]
     public IHttpActionResult GetDepartments()
     {
-      var userDepartmentDictionary = Project.GetUserAccessDictionary();
+      var userDepartmentDictionary = Constants.GetUserAccessDictionary();
       if (userDepartmentDictionary == null)
       {
         return InternalServerError();
@@ -25,7 +26,7 @@ namespace ProjectTracking.Controllers
     }
 
     [HttpGet]
-    [Route("GetList")]
+    [Route("ProjectList")]
     public IHttpActionResult GetProjectList()
     {
       var projectList = Project.GetProjects();
@@ -61,8 +62,8 @@ namespace ProjectTracking.Controllers
       }
       else
       {
-        var ua = UserAccess.GetUserAccess(User.Identity.Name);
-        if (!ua.departments_can_edit.Contains(newProject.department))
+        var ua = new UserAccess(User.Identity.Name);
+        if (Constants.GetCachedUserAccessDictionary()[ua.employee_id].Contains(newProject.department))
         {
      
           int i = newProject.Save();
@@ -70,9 +71,9 @@ namespace ProjectTracking.Controllers
         }
         else
         {
-          error.Add("Project has not been saved, user has incorrect level of access.");
+          throw new HttpException(401, "Unauthorized Access");
 
-          return Ok(error);
+
         }
 
       }
@@ -85,8 +86,8 @@ namespace ProjectTracking.Controllers
     {
       var error = "";
 
-      var ua = UserAccess.GetUserAccess(User.Identity.Name);
-      if (ua.departments_can_edit.Contains(existingProject.department))
+      var ua = new UserAccess(User.Identity.Name);
+      if (Constants.GetCachedUserAccessDictionary()[ua.employee_id].Contains(existingProject.department))
       {
         error = existingProject.Validate();
         if (error.Length > 0) return Ok(error);
@@ -97,10 +98,29 @@ namespace ProjectTracking.Controllers
       }
       else
       {
-        error = "Events have not been saved, user has incorrect level of access.";
+        throw new HttpException(401, "Unauthorized Access");
       }
-      return Ok(error);
     }
+    
+    [HttpPost]
+    [Route("AddComment")]
+    public IHttpActionResult AddComment(Comment comment)
+    {
 
+      var project = Project.GetProjects(comment.project_id).FirstOrDefault();
+      var ua = new UserAccess(User.Identity.Name);
+      comment.added_by = ua.display_name;
+      comment.added_by_county_manager = Constants.GetCountyManager() == ua.employee_id;
+
+      if (Constants.GetCachedUserAccessDictionary()[ua.employee_id].Contains(project.department))
+      {
+        return Ok(comment.Save());
+      }
+      else
+      {
+        throw new HttpException(401, "Unauthorized Access");
+      }
+
+    }
   }
 } 

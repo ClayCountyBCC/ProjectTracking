@@ -47,6 +47,17 @@ namespace ProjectTracking
       }
     }
 
+
+    public static Dictionary<int, List<string>> GetUserAccessDictionary()
+    {
+      return GetCachedUserAccessDictionary();
+    }
+
+    public static Dictionary<int, List<string>> GetCachedUserAccessDictionary()
+    {
+      return (Dictionary<int, List<string>>)MyCache.GetItem("useraccess");
+    }
+
     public static Dictionary<int, List<string>> GetUserDepartments()
     {
 
@@ -84,8 +95,7 @@ namespace ProjectTracking
 
     public static int GetCountyManager()
     {
-
-
+    
       var query = @"
       
         USE ProjectTracking;
@@ -106,7 +116,6 @@ namespace ProjectTracking
       catch (Exception ex)
       {
         new ErrorLog(ex, query);
-        
 
       }
       return -1;
