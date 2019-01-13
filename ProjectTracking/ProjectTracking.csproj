@@ -61,10 +61,12 @@
     <Reference Include="NUglify, Version=1.5.12.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
       <HintPath>..\packages\NUglify.1.5.12\lib\net40\NUglify.dll</HintPath>
     </Reference>
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -138,9 +140,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\ProjectController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Constants.cs" />
+    <Compile Include="Models\DataValue.cs" />
+    <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\ErrorLog.cs" />
+    <Compile Include="Models\Milestone.cs" />
+    <Compile Include="Models\myCache.cs" />
+    <Compile Include="Models\Project.cs" />
+    <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserAccess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -211,7 +223,9 @@
     <Content Include="bower_components\promise-polyfill\LICENSE" />
     <Content Include="bower_components\promise-polyfill\package.json" />
     <Content Include="bower_components\promise-polyfill\README.md" />
-    <Content Include="ConnectionStrings.config" />
+    <Content Include="ConnectionStrings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="css\Main.scss" />
     <None Include="bower_components\bulma\myBulma.sass" />
     <None Include="compilerconfig.json" />
@@ -244,6 +258,7 @@
     <Folder Include="content\" />
     <Folder Include="Controllers\" />
     <Folder Include="Models\" />
+    <Folder Include="scripts\app\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="scripts\app\Comment.ts" />
