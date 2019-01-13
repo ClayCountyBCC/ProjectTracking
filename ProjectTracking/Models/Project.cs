@@ -100,6 +100,10 @@ namespace ProjectTracking
       return existingProject;
     }
 
+    public int Save()
+    {
+      return 0;
+    }
 
   }
 }
