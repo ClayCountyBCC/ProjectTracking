@@ -242,6 +242,7 @@
         li.appendChild(document.createTextNode(m.name));
         ol.appendChild(li);
       }
+      df.appendChild(ol);
       return df;
     }
 

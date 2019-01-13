@@ -22,3 +22,17 @@ td.fullcenter
   text-align: center;
   vertical-align: middle;
 }
+fieldset
+{
+  border: 1px solid rgba(10, 10, 10, .1);
+  border-radius: 6px;
+  padding: 1.25rem;
+  vertical-align: middle;
+  margin-bottom: 1em;
+  display: flex;
+  align-content: center;  
+}
+fieldset legend
+{
+  line-height: 0;
+}

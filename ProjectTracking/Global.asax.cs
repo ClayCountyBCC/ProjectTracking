@@ -12,9 +12,6 @@ namespace ProjectTracking
     protected void Application_Start()
     {
       GlobalConfiguration.Configure(WebApiConfig.Register);
-      var userlist = new Dictionary<int, string>();
-      userlist.Add(1234, "ALL");
-      var test = userlist[1234];
     }
   }
 }

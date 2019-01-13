@@ -14,7 +14,7 @@
     date_completed: any;
     can_edit: boolean;
     milestones: Array<Milestone>;
-    comments: Array<Comment>;
+    comments: Array<Comment>;    
   }
 
   export class Project implements IProject
@@ -131,7 +131,13 @@
       let tr = document.createElement("tr");
 
       let projectName = document.createElement("td");
-      projectName.appendChild(document.createTextNode(project.project_name));
+      let a = document.createElement("a");
+      a.appendChild(document.createTextNode(project.project_name))      
+      a.onclick = function ()
+      {
+        Project.LoadProject(project);
+      }
+      projectName.appendChild(a);
       tr.appendChild(projectName);
 
       let department = document.createElement("td");
@@ -149,8 +155,19 @@
       tr.appendChild(timeline);
 
       let comments = document.createElement("td");      
-      comments.appendChild(Comment.CommentsView(project.comments, false));
+      let df = Comment.CommentsView(project.comments, false);
+      let addComments = document.createElement("a");
+      //addComments.classList.add("button");
+      addComments.classList.add("is-primary");
+      addComments.appendChild(document.createTextNode("Add Comment"));
+      df.appendChild(addComments);
+      comments.appendChild(df);
+
       tr.appendChild(comments);
+
+      let dateUpdated = document.createElement("td");
+      dateUpdated.appendChild(document.createTextNode(Utilities.Format_Date(project.date_last_updated)));
+      tr.appendChild(dateUpdated);
       return tr;
     }
 
