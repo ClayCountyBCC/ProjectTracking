@@ -285,6 +285,29 @@ namespace Utilities
       })
   }
 
+  export function Post_Empty(url: string, data: object): Promise<Response>
+  {
+    return fetch(url,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include"
+      }).then(response =>
+      {
+        return response;
+        //console.log('Post Response', response);
+        //if (!response.ok)
+        //{
+        //  throw new Error(response.statusText)
+        //}
+        //return response;
+      })
+  }
+
   export function Format_Amount(amount: number): string
   {
     return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });

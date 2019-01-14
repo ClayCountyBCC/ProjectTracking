@@ -8,7 +8,7 @@ namespace ProjectTracking
 {
   public class Comment
   {
-
+    public int id { get; set; } = -1;
     public int project_id { get; set; } = -1;
     public string comment { get; set; } = "";
     public bool update_only { get; set; } = false;
@@ -18,41 +18,50 @@ namespace ProjectTracking
 
     public Comment()
     {
-      
     }
 
-    public string Save()
+    public static bool Save(UserAccess ua, int project_id, string commentToSave)
     {
-      var param = new DynamicParameters();
-      param.Add("@comment", comment);
+      commentToSave = commentToSave.Trim();
+      if (commentToSave.Length == 0) return true;
+
+      var cm = Constants.GetCachedCountyManager();
+
+      var c = new Comment
+      {
+        comment = commentToSave,
+        project_id = project_id,
+        added_by = ua.user_name,
+        added_by_county_manager = (ua.employee_id == cm)
+      };
 
       var query = @"
-      
         USE ProjectTracking;
 
         INSERT INTO Comment
         (project_id, comment, update_only, added_by, added_by_county_manager)
         VALUES
-        (@project_id, @comment, @update_only, @added_by, @added_by_county_manager)
+        (@project_id, @comment, @update_only, @added_by, @added_by_county_manager)";
 
-      ";
-
-      try
-      {
-        var i = Constants.Exec_Query(query, param);
-        if(i == 1)
-        {
-          return "success";
-        }
-      }
-      catch(Exception ex)
-      {
-
-        new ErrorLog(ex, query);
-      }
-      
-      return null;
-
+      return Constants.Save_Data<Comment>(query, c);
     }
+
+    public static List<Comment> GetAllComments()
+    {
+      string query = @"
+      SELECT 
+        id,
+        project_id,
+        comment,
+        update_only,
+        added_by,
+        added_on,
+        by_county_manager
+      FROM comment
+      ORDER BY project_id, id;";
+
+      return Constants.Get_Data<Comment>(query);
+    }
+
   }
 }

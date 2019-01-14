@@ -209,6 +209,26 @@ var Utilities;
         });
     }
     Utilities.Post = Post;
+    function Post_Empty(url, data) {
+        return fetch(url, {
+            method: "POST",
+            body: JSON.stringify(data),
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        }).then(function (response) {
+            return response;
+            //console.log('Post Response', response);
+            //if (!response.ok)
+            //{
+            //  throw new Error(response.statusText)
+            //}
+            //return response;
+        });
+    }
+    Utilities.Post_Empty = Post_Empty;
     function Format_Amount(amount) {
         return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     }

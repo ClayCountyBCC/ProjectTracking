@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Dapper;
 using System.Linq;
+using System.Data;
+using System.Data.SqlClient;
 using System.Web;
 
 namespace ProjectTracking
@@ -10,99 +12,190 @@ namespace ProjectTracking
   {
     public int project_id { get; set; } = -1;
     public string project_name { get; set; } = "";
-    public string department { get; set; } = "";
+    public int department_id { get; set; } = -1;
     public string timeline { get; set; } = "";
     public bool commissioner_share { get; set; } = false;
     public bool completed { get; set; } = false;
     public string comment { get; set; } = "";
-    public DateTime date_completed { get; set; }
-    public DateTime last_updated { get; set; }
-    public List<Comment> project_comments { get; set; }
-    public List<Milestone> project_milestones { get; set; }
+    public DateTime date_completed { get; set; } = DateTime.MinValue;
+    public DateTime date_last_updated { get; set; } = DateTime.MinValue;
+    public List<Comment> comments { get; set; } = new List<Comment>();
+    public List<Milestone> milestones { get; set; } = new List<Milestone>();
+    public string added_by { get; set; } = "";
+    public bool can_edit { get; set; }
 
     public Project()
     {
       
     }
-    public static List<Project> GetProjects(int project_id = -1)
+    public static List<Project> GetProjects(int employee_id)
     {
-      var projectList  = GetRawProjectsList(project_id);
-      foreach(var p in projectList)
+      var projects  = GetAllProjects(employee_id);
+      var comments = Comment.GetAllComments();
+      var milestones = Milestone.GetAllMilestones();
+      foreach(var p in projects)
       {
-        p.GetProjectComments();
-        p.GetProjectMilestones();
+        p.milestones = (from m in milestones
+                        where m.project_id == p.project_id
+                        select m).ToList();
+        p.comments = (from c in comments
+                      where c.project_id == p.project_id
+                      select c).ToList();        
       }
-      
-      return new List<Project>();
+      return projects;
     }
 
-    public static List<Project> GetRawProjectsList(int project_id = -1)
+    private static List<Project> GetAllProjects(int employee_id)
     {
       var param = new DynamicParameters();
-
+      param.Add("@employee_id", employee_id);
       
       var query = @"
         USE ProjectTracking;
 
-        SELECT DISTINCT 
-           [id]
-          ,[project_name]
-          ,[department]
-          ,[timeline]
-          ,[commissioner_share]
-          ,[completed]
-          ,[date_completed]
-          ,[last_updated]
-        FROM[dbo].[project]
-      ";
-      // TODO: include the user access dept_approval_list to only return those they can edit upon initial load.
-      if (project_id > 0)
+        WITH DateUpdated AS (
+          SELECT
+            project_id,
+            MAX(added_on) date_last_updated
+          FROM comment
+          GROUP BY project_id
+        )
+
+        SELECT
+          CASE WHEN U.department_id IS NOT NULL THEN 1 ELSE 0 END can_edit,
+          P.id project_id,
+          P.project_name,
+          P.department_id,
+          P.timeline,
+          P.commissioner_share,
+          P.completed,
+          P.date_completed,
+          ISNULL(D.date_last_updated, P.added_on) date_last_updated
+        FROM project P
+        LEFT OUTER JOIN user_department U ON 
+          P.department_id = U.department_id
+          AND U.employee_id = @employee_id
+        LEFT OUTER JOIN DateUpdated D ON 
+          D.project_id = P.id";
+      return Constants.Get_Data<Project>(query, param);
+    }
+
+    public static Project GetSpecificProject(int project_id, int employee_id)
+    {
+      var projects = GetProjects(employee_id);
+      var project = (from p in projects
+                     where p.project_id == project_id
+                     select p).ToList();
+
+
+      if (project.Count() != 1)
       {
-        param.Add("@project_id", project_id);
-        query += "\nwhere id = @project_id";
+        return null;
       }
+      return project.First();
+    }
+
+
+    public string Validate(int employee_id, Project existingProject)
+    {
+      var mydepartments = DataValue.GetMyDepartments(employee_id);
+
+      if(existingProject != null)
+      {
+        //var found = GetSpecificProject(project_id, employee_id);
+
+        if((from d in mydepartments
+           where d.Value == existingProject.department_id.ToString()
+           select d).Count() == 0)
+        {
+          return "You do not have access to this project's department.";
+        }
+      }
+
+      if ((from d in mydepartments
+           where d.Value == department_id.ToString()
+           select d).Count() == 0)
+      {
+        return "You do not have access to this project's department.";
+      }
+      return "";
+    }
+
+    public bool Save(UserAccess ua)
+    {
+      added_by = ua.user_name;
+
+      var dp = new DynamicParameters();
+      dp.Add("@project_id", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+      string query = @"
+        INSERT INTO project (
+          project_name, 
+          department_id, 
+          timeline, 
+          commissioner_share, 
+          completed, 
+          added_on, 
+          added_by
+        )
+        VALUES (
+          @project_name, 
+          @department_id, 
+          @timeline, 
+          @commissioner_share, 
+          @completed, 
+          GETDATE(), 
+          @added_by
+        );
       
-     
+        SET @project_id = @@IDENTITY";
+      int i = Constants.Exec_Query(query, dp);
+      if (i == -1) return false;
+      project_id = dp.Get<int>("@project_id");
+      // now let's add the comment / milestones
+      Comment.Save(ua, project_id, comment);
 
-      return new List<Project>();
-
+      Milestone.SaveAll(project_id, milestones);
+      return true;
     }
 
-
-    public void GetProjectComments()
+    public bool Update(UserAccess ua, Project existingProject)
     {
-      
-      project_comments = new List<Comment>();
-    }
+      string query = "";
 
-    public void GetProjectMilestones()
-    {
+      if(!existingProject.completed && completed)
+      {
+        // we need to update the completed date too.
+        query = @"
+        UPDATE project
+          SET project_name = @project_name,
+            department_id = @department_id,
+            timeline = @timeline,
+            commissioner_share = @commissioner_share,
+            completed = @completed,
+            date_completed = GETDATE()
+        WHERE 
+          project_id=@project_id";
+      }
+      else
+      {
+        query = @"
+        UPDATE project
+          SET project_name = @project_name,
+            department_id = @department_id,
+            timeline = @timeline,
+            commissioner_share = @commissioner_share,
+            completed = @completed
+        WHERE 
+          project_id=@project_id";
+      }
+      // now let's add the comment / milestones
+      Comment.Save(ua, project_id, comment);
 
-      project_milestones = new List<Milestone>();
-    }
-
-    public string Validate()
-    {
-      var existingProject = GetProjects(project_id).First();
-
-      if (existingProject == null) return "There was an error validating the project you are trying to update";
-
-      if (this == existingProject) return "Project is already up to date";
-
-      
-      else { return "There was an error validating the project you are trying to update"; }
-    }
-
-    public static Project UpdateProject(Project existingProject)
-    {
+      Milestone.SaveAll(project_id, milestones);
 
 
-      return existingProject;
-    }
-
-    public int Save()
-    {
-      return 0;
+      return Constants.Save_Data<Project>(query, this);
     }
 
   }

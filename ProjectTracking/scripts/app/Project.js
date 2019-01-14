@@ -5,19 +5,35 @@ var ProjectTracking;
         function Project() {
             this.id = -1;
             this.project_name = "";
-            this.department = "";
+            this.department_id = -1;
             this.timeline = "";
             this.commissioner_share = false;
             this.completed = false;
-            this.date_last_updated = new Date();
-            this.date_completed = new Date();
+            this.date_last_updated = null;
+            this.date_completed = null;
             this.can_edit = false;
             this.milestones = [];
             this.comments = [];
         }
+        Project.GetProjects = function () {
+            ProjectTracking.departments = [];
+            var path = ProjectTracking.GetPath();
+            Utilities.Get(path + "API/Project/List")
+                .then(function (projects) {
+                console.log("projects", projects);
+                ProjectTracking.projects = projects;
+                Project.BuildProjectTrackingList(projects);
+                //DataValue.BuildDepartmentSelect("departmentFilter", ProjectTracking.departments);
+                //Toggle_Loading_Search_Buttons(false);
+            }, function (e) {
+                console.log('error getting permits', e);
+                //Toggle_Loading_Search_Buttons(false);
+            });
+        };
         Project.AddProject = function () {
             // this function is going to reset all of the New
             // project form's values and get it ready to have a new project created.
+            ProjectTracking.selected_project = new Project(); // the object we'll be saving
             Project.UpdateProjectName("");
             Project.UpdateProjectDepartment("");
             ProjectTracking.Milestone.ClearMilestones();
@@ -33,7 +49,7 @@ var ProjectTracking;
         Project.LoadProject = function (project) {
             project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
             Project.UpdateProjectName(project.project_name);
-            Project.UpdateProjectDepartment(project.department);
+            Project.UpdateProjectDepartment(project.department_id.toString());
             ProjectTracking.Milestone.LoadMilestones(project.milestones);
             Project.UpdateProjectTimeline(project.timeline);
             Project.UpdateProjectCompleted(project.completed);
@@ -63,9 +79,9 @@ var ProjectTracking;
             var completed = document.getElementById("projectComplete");
             completed.checked = complete;
         };
-        Project.UpdateCommissionerShare = function (complete) {
-            var share = document.getElementById("projectCommissionerShare");
-            share.checked = complete;
+        Project.UpdateCommissionerShare = function (share) {
+            var shared = document.getElementById("projectCommissionerShare");
+            shared.checked = share;
         };
         Project.ClearComment = function () {
             Utilities.Set_Value("projectComment", "");
@@ -84,16 +100,31 @@ var ProjectTracking;
             project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
             var tr = document.createElement("tr");
             var projectName = document.createElement("td");
-            var a = document.createElement("a");
-            a.appendChild(document.createTextNode(project.project_name));
-            a.onclick = function () {
-                Project.LoadProject(project);
-            };
-            projectName.appendChild(a);
+            var comments = document.createElement("td");
+            var dfComments = ProjectTracking.Comment.CommentsView(project.comments, false);
+            if (project.can_edit) {
+                var a = document.createElement("a");
+                a.appendChild(document.createTextNode(project.project_name));
+                a.onclick = function () {
+                    Project.LoadProject(project);
+                    ProjectTracking.selected_project = project; // this is the project we'll be attempting to update.
+                };
+                projectName.appendChild(a);
+                // handle add comments button here
+                var addComments = document.createElement("a");
+                //addComments.classList.add("button");
+                addComments.classList.add("is-primary");
+                addComments.appendChild(document.createTextNode("Add Comment"));
+                dfComments.appendChild(addComments);
+            }
+            else {
+                projectName.appendChild(document.createTextNode(project.project_name));
+            }
+            comments.appendChild(dfComments);
             tr.appendChild(projectName);
             var department = document.createElement("td");
-            var departmentNames = ProjectTracking.departments.filter(function (d) { return d.value === project.department; });
-            var departmentName = departmentNames.length > 0 ? departmentNames[0].label : "";
+            var departmentNames = ProjectTracking.departments.filter(function (d) { return d.Value === project.department_id.toString(); });
+            var departmentName = departmentNames.length > 0 ? departmentNames[0].Label : "";
             department.appendChild(document.createTextNode(departmentName));
             tr.appendChild(department);
             var milestones = document.createElement("td");
@@ -102,19 +133,40 @@ var ProjectTracking;
             var timeline = document.createElement("td");
             timeline.appendChild(document.createTextNode(project.timeline));
             tr.appendChild(timeline);
-            var comments = document.createElement("td");
-            var df = ProjectTracking.Comment.CommentsView(project.comments, false);
-            var addComments = document.createElement("a");
-            //addComments.classList.add("button");
-            addComments.classList.add("is-primary");
-            addComments.appendChild(document.createTextNode("Add Comment"));
-            df.appendChild(addComments);
-            comments.appendChild(df);
             tr.appendChild(comments);
             var dateUpdated = document.createElement("td");
             dateUpdated.appendChild(document.createTextNode(Utilities.Format_Date(project.date_last_updated)));
             tr.appendChild(dateUpdated);
             return tr;
+        };
+        Project.Save = function () {
+            ProjectTracking.selected_project.project_name = Utilities.Get_Value("projectName");
+            ProjectTracking.selected_project.milestones = ProjectTracking.Milestone.ReadMilestones();
+            ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
+            ProjectTracking.selected_project.timeline = Utilities.Get_Value("projectTimeline");
+            ProjectTracking.selected_project.comment = Utilities.Get_Value("projectComment");
+            var completed = document.getElementById("projectComplete");
+            ProjectTracking.selected_project.completed = completed.checked;
+            var share = document.getElementById("projectCommissionerShare");
+            ProjectTracking.selected_project.commissioner_share = share.checked;
+            console.log('project we going to save', ProjectTracking.selected_project);
+            var path = ProjectTracking.GetPath();
+            var saveType = (ProjectTracking.selected_project.id > -1) ? "Update" : "Add";
+            Utilities.Post_Empty(path + "API/Project/" + saveType, ProjectTracking.selected_project)
+                .then(function (r) {
+                console.log('post response', r);
+                if (!r.ok) {
+                    // do some error stuff
+                    console.log('some errors happened with post response');
+                }
+                else {
+                    // we good
+                    console.log('post response good');
+                }
+            }, function (e) {
+                console.log('error getting permits', e);
+                //Toggle_Loading_Search_Buttons(false);
+            });
         };
         return Project;
     }());

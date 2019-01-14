@@ -9,11 +9,30 @@ namespace ProjectTracking
   {
 
     public int employee_id { get; set; }
-    public string departments { get; set; }
+    public int department_id { get; set; }
     
     public User()
     {
-      
     }
+
+
+    public static List<User> GetUserDepartments()
+    {
+      string sql = @"
+        SELECT
+          employee_id,
+          department_id
+        FROM user_department 
+        ORDER BY employee_id
+      ";
+      return Constants.Get_Data<User>(sql);
+    }
+
+    public static List<User> GetCachedUserDepartments()
+    {
+      return (List<User>)MyCache.GetItem("userdepartments");
+    }
+
+
   }
 }

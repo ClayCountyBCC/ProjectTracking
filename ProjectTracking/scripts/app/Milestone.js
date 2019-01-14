@@ -189,6 +189,26 @@ var ProjectTracking;
             df.appendChild(ol);
             return df;
         };
+        Milestone.ReadMilestones = function () {
+            var milestones = [];
+            // first let's remove any milestones that are blank
+            // in order to do this we have to work backwards
+            for (var i = 50; i > 0; i--) {
+                var e = document.getElementById("projectMilestone" + i.toString());
+                if (e !== null) {
+                    if (Utilities.Get_Value(e).trim().length === 0) {
+                        Milestone.Remove(i.toString());
+                    }
+                }
+            }
+            for (var i = 1; i <= ProjectTracking.number_of_milestones; i++) {
+                var m = new Milestone();
+                m.display_order = i;
+                m.name = Utilities.Get_Value("projectMilestone" + i.toString()).trim();
+                milestones.push(m);
+            }
+            return milestones;
+        };
         return Milestone;
     }());
     ProjectTracking.Milestone = Milestone;

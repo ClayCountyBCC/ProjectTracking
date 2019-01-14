@@ -26,13 +26,12 @@ namespace ProjectTracking
         try
         {
           var up = UserPrincipal.FindByIdentity(pc, user_name);
-
-
           ParseUser(up);
         }
         catch (Exception ex)
         {
-          Constants.Log(ex);
+          authenticated = false;
+          new ErrorLog(ex);
         }
       }
 
@@ -61,32 +60,8 @@ namespace ProjectTracking
       }
       catch (Exception ex)
       {
-        Constants.Log(ex);
+        new ErrorLog(ex);
       }
     }
-    /*
-     * build dictionary
-     * GetUserDepartments(), GetCacheUserDepartments()
-     * loop through add each to dictionary
-     * cache dictionary
-     * return dictionary
-     * 
-     * dictionary: cache {int, List<string>}
-     * 
-     * */
-
-
-    public Dictionary<int, List<string>> BuildUserAccessDictionary()
-    {
-      var userAccess = Constants.GetUserDepartments();
-      return userAccess;
-    }
-      
-    public static Dictionary<int, List<string>> GetCachedAllUserAccess()
-    {
-      return (Dictionary<int, List<string>>)MyCache.GetItem("useraccess");
-    }
-
-
   }
 }

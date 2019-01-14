@@ -246,5 +246,33 @@
       return df;
     }
 
+    public static ReadMilestones(): Array<Milestone>
+    {
+      let milestones: Array<Milestone> = [];
+      // first let's remove any milestones that are blank
+      // in order to do this we have to work backwards
+      for (var i = 50; i > 0; i--)
+      {
+        let e = <HTMLInputElement>document.getElementById("projectMilestone" + i.toString());
+        if (e !== null)
+        {
+          if (Utilities.Get_Value(e).trim().length === 0)
+          {
+            Milestone.Remove(i.toString());
+          }
+        }
+      }
+
+      for (var i = 1; i <= ProjectTracking.number_of_milestones; i++)
+      {
+        let m = new Milestone();
+        m.display_order = i;
+        m.name = Utilities.Get_Value("projectMilestone" + i.toString()).trim();
+        milestones.push(m);
+      }
+
+      return milestones;
+    }
+
   }
 }

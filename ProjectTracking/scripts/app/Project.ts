@@ -6,7 +6,7 @@
   {
     id: number;
     project_name: string;
-    department: string;
+    department_id: number;
     timeline: string;
     commissioner_share: boolean;
     completed: boolean;
@@ -15,31 +15,54 @@
     can_edit: boolean;
     milestones: Array<Milestone>;
     comments: Array<Comment>;
+    comment: string;
   }
 
   export class Project implements IProject
   {
     public id: number = -1;
     public project_name: string = "";
-    public department: string = "";
+    public department_id: number = -1;
     public timeline: string = "";
     public commissioner_share: boolean = false;
     public completed: boolean = false;
-    public date_last_updated: any = new Date();
-    public date_completed: any = new Date();
+    public date_last_updated: any = null;
+    public date_completed: any = null;
     public can_edit: boolean = false;
     public milestones: Array<Milestone> = [];
     public comments: Array<Comment> = [];
+    public comment: string;
 
     constructor()
     {
 
     }
 
+    public static GetProjects(): void
+    {
+      ProjectTracking.departments = [];
+      let path = ProjectTracking.GetPath();
+      Utilities.Get<Array<Project>>(path + "API/Project/List")
+        .then(function (projects: Array<Project>)
+        {
+          console.log("projects", projects);
+          ProjectTracking.projects = projects;
+          Project.BuildProjectTrackingList(projects);
+          //DataValue.BuildDepartmentSelect("departmentFilter", ProjectTracking.departments);
+          //Toggle_Loading_Search_Buttons(false);
+
+        }, function (e)
+          {
+            console.log('error getting permits', e);
+            //Toggle_Loading_Search_Buttons(false);
+          });
+    }
+
     public static AddProject(): void
     {
       // this function is going to reset all of the New
       // project form's values and get it ready to have a new project created.
+      ProjectTracking.selected_project = new Project(); // the object we'll be saving
       Project.UpdateProjectName("");
       Project.UpdateProjectDepartment("");
       Milestone.ClearMilestones();
@@ -58,7 +81,7 @@
       project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
 
       Project.UpdateProjectName(project.project_name);
-      Project.UpdateProjectDepartment(project.department);
+      Project.UpdateProjectDepartment(project.department_id.toString());
       Milestone.LoadMilestones(project.milestones);
       Project.UpdateProjectTimeline(project.timeline);
       Project.UpdateProjectCompleted(project.completed);
@@ -101,10 +124,10 @@
       completed.checked = complete;
     }
 
-    public static UpdateCommissionerShare(complete: boolean): void
+    public static UpdateCommissionerShare(share: boolean): void
     {
-      let share = <HTMLInputElement>document.getElementById("projectCommissionerShare");
-      share.checked = complete;
+      let shared = <HTMLInputElement>document.getElementById("projectCommissionerShare");
+      shared.checked = share;
     }
 
     public static ClearComment(): void
@@ -131,18 +154,37 @@
       let tr = document.createElement("tr");
 
       let projectName = document.createElement("td");
-      let a = document.createElement("a");
-      a.appendChild(document.createTextNode(project.project_name))
-      a.onclick = function ()
+      let comments = document.createElement("td");
+      let dfComments = Comment.CommentsView(project.comments, false);
+      if (project.can_edit)
       {
-        Project.LoadProject(project);
+        let a = document.createElement("a");
+        a.appendChild(document.createTextNode(project.project_name))
+        a.onclick = function ()
+        {
+          Project.LoadProject(project);
+          ProjectTracking.selected_project = project; // this is the project we'll be attempting to update.
+        }
+        projectName.appendChild(a);
+        // handle add comments button here
+        
+        let addComments = document.createElement("a");
+        //addComments.classList.add("button");
+        addComments.classList.add("is-primary");
+        addComments.appendChild(document.createTextNode("Add Comment"));
+        dfComments.appendChild(addComments);
       }
-      projectName.appendChild(a);
+      else
+      {
+        projectName.appendChild(document.createTextNode(project.project_name));
+      }
+
+      comments.appendChild(dfComments);
       tr.appendChild(projectName);
 
       let department = document.createElement("td");
-      let departmentNames = ProjectTracking.departments.filter(function (d) { return d.value === project.department; });
-      let departmentName = departmentNames.length > 0 ? departmentNames[0].label : "";
+      let departmentNames = ProjectTracking.departments.filter(function (d) { return d.Value === project.department_id.toString(); });
+      let departmentName = departmentNames.length > 0 ? departmentNames[0].Label : "";
       department.appendChild(document.createTextNode(departmentName));
       tr.appendChild(department);
 
@@ -153,22 +195,49 @@
       let timeline = document.createElement("td");
       timeline.appendChild(document.createTextNode(project.timeline));
       tr.appendChild(timeline);
-
-      let comments = document.createElement("td");
-      let df = Comment.CommentsView(project.comments, false);
-      let addComments = document.createElement("a");
-      //addComments.classList.add("button");
-      addComments.classList.add("is-primary");
-      addComments.appendChild(document.createTextNode("Add Comment"));
-      df.appendChild(addComments);
-      comments.appendChild(df);
-
       tr.appendChild(comments);
 
       let dateUpdated = document.createElement("td");
       dateUpdated.appendChild(document.createTextNode(Utilities.Format_Date(project.date_last_updated)));
       tr.appendChild(dateUpdated);
       return tr;
+    }
+
+    public static Save()
+    {
+      ProjectTracking.selected_project.project_name = Utilities.Get_Value("projectName");
+      ProjectTracking.selected_project.milestones = Milestone.ReadMilestones();
+      ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
+      ProjectTracking.selected_project.timeline = Utilities.Get_Value("projectTimeline");
+      ProjectTracking.selected_project.comment = Utilities.Get_Value("projectComment");
+      let completed = <HTMLInputElement>document.getElementById("projectComplete");
+      ProjectTracking.selected_project.completed = completed.checked;
+      let share = <HTMLInputElement>document.getElementById("projectCommissionerShare");
+      ProjectTracking.selected_project.commissioner_share = share.checked;
+
+      console.log('project we going to save', ProjectTracking.selected_project);
+      let path = ProjectTracking.GetPath();
+      let saveType = (ProjectTracking.selected_project.id > -1) ? "Update" : "Add";
+      Utilities.Post_Empty(path + "API/Project/" + saveType, ProjectTracking.selected_project)
+        .then(function (r: Response)
+        {
+          console.log('post response', r);
+          if (!r.ok)
+          {
+            // do some error stuff
+            console.log('some errors happened with post response');
+          }
+          else
+          {
+            // we good
+            console.log('post response good');
+          }
+        }, function (e)
+          {
+            console.log('error getting permits', e);
+            //Toggle_Loading_Search_Buttons(false);
+          });
+
     }
 
   }

@@ -59,7 +59,7 @@
         <div class="level-item">
           <div class="field">
             <label class="checkbox is-medium">
-              <input id="projectCommissionerShare"
+              <input id="projectCommissionerShareFilter"
                      type="checkbox" />
               Commissioner View Only
             </label>
@@ -69,7 +69,7 @@
         <div class="level-item">
           <div class="field">
             <label class="checkbox is-medium">
-              <input id="projectComplete"
+              <input id="projectCompleteFilter"
                      type="checkbox" />
               Completed Only
             </label>
@@ -79,19 +79,14 @@
         <div class="level-item">
           <div class="field">
             <div class="control">
-              <button class="button is-primary is-medium"
+              <button onclick="ProjectTracking.Project.GetProjects(); return false;"
+                      class="button is-primary is-medium"
                       type="button">
                 Refresh Data
               </button>
             </div>
           </div>
         </div>
-        <!--Filters:
-        Department (including All)
-        Complete / Incomplete
-        Commissioner Share / true/false
-        Not updated in # Days?-->
-
       </div>
     </fieldset>
 
@@ -118,7 +113,13 @@
           </th>
         </tr>
       </thead>
-      <tbody id="projectList"></tbody>
+      <tbody id="projectList">
+        <tr>
+          <td colspan="6">
+            Loading Data, please wait...
+          </td>
+        </tr>
+      </tbody>
     </table>
     <div id="addProject"
          class="modal">
@@ -192,21 +193,26 @@
               </textarea>
             </div>
           </div>
-          <div class="field">
-            <label class="checkbox is-medium">
-              <input id="projectCommissionerShare"
-                     type="checkbox" />
-              Add this project to the Commissioner View?
-            </label>
-          </div>
-          <div class="field">
-            <label class="checkbox is-medium">
-              <input id="projectComplete"
-                     type="checkbox" />
-              Is this project complete?
-            </label>
-          </div>
+          <form>
+            <div class="field">
 
+              <label class="checkbox is-medium">
+                <input id="projectCommissionerShare"
+                       type="checkbox">
+
+                Add this project to the Commissioner View?
+              </label>
+            </div>
+
+            <div class="field">
+              <label class="checkbox is-medium">
+                <input id="projectComplete"                       
+                       type="checkbox">
+
+                Is this project complete?
+              </label>
+            </div>
+          </form>
           <div class="field">
             <label class="label">Add a Comment - Optional</label>
             <div class="control">
@@ -222,7 +228,7 @@
         <footer style="justify-content: flex-end;"
                 class="modal-card-foot">
           <button class="button is-success"
-                  onclick="ProjectTracking.SaveProject();"
+                  onclick="ProjectTracking.Project.Save();"
                   type="button">
             Save & Close
           </button>

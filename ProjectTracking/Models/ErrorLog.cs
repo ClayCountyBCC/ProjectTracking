@@ -51,7 +51,7 @@ namespace ProjectTracking
           errorStacktrace, errorSource, query)  
           VALUES (@applicationName, @errorText, @errorMessage,
             @errorStacktrace, @errorSource, @query);";
-      var cs = ConfigurationManager.ConnectionStrings["Log"].ConnectionString;
+      var cs = ConfigurationManager.ConnectionStrings["ProductionLog"].ConnectionString;
       using (IDbConnection db = new SqlConnection(cs))
       {
         db.Execute(sql, this);
@@ -71,7 +71,7 @@ namespace ProjectTracking
         dbArgs.Add("@To", to);
         dbArgs.Add("@Subject", subject);
         dbArgs.Add("@Body", body);
-        var cs = ConfigurationManager.ConnectionStrings["Log"].ConnectionString;
+        var cs = ConfigurationManager.ConnectionStrings["ProductionLog"].ConnectionString;
         using (IDbConnection db = new SqlConnection(cs))
         {
           db.Execute(sql, dbArgs);

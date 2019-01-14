@@ -14,108 +14,86 @@ namespace ProjectTracking.Controllers
   public class ProjectController : ApiController
   {
     [HttpGet]
-    [Route("Departments")]
+    [Route("Departments/All")]
     public IHttpActionResult GetDepartments()
     {
-      return Ok(Constants.GetCachedDepartments());
+      var ua = new UserAccess(User.Identity.Name);
+      if (!ua.authenticated) return Unauthorized();
+      return Ok(DataValue.GetCachedDepartments());
     }
 
     [HttpGet]
-    [Route("ProjectList")]
-    public IHttpActionResult GetProjectList()
+    [Route("Departments/My")]
+    public IHttpActionResult GetMyDepartments()
     {
-      var projectList = Project.GetProjects();
-      if(projectList == null)
+      var ua = new UserAccess(User.Identity.Name);
+      if (!ua.authenticated) return Unauthorized();
+      return Ok(DataValue.GetMyDepartments(ua.employee_id));      
+    }
+
+    [HttpGet]
+    [Route("List")]
+    public IHttpActionResult GetProjects()
+    {
+      var ua = new UserAccess(User.Identity.Name);
+      if (!ua.authenticated) return Unauthorized();
+      var projects = Project.GetProjects(ua.employee_id);
+      if(projects == null)
       {
         return InternalServerError();
       }
-      return Ok(projectList);
+      return Ok(projects);
     }
 
     [HttpGet]
-    [Route("GetProject")]
+    [Route("Select")]
     public IHttpActionResult GetProject(int project_id)
     {
-      var thisProject = Project.GetProjects(project_id);
-      if(thisProject == null)
-      {
-        return InternalServerError();
-
-      }
-      return Ok(thisProject);
+      var ua = new UserAccess(User.Identity.Name);
+      if (!ua.authenticated) return Unauthorized();
+      var currentProject = Project.GetSpecificProject(project_id, ua.employee_id);
+      return Ok(currentProject);
     }
 
     [HttpPost]
     [Route("Add")]
     public IHttpActionResult Save(Project newProject)
     {
-      var error = new List<string>();
-      if (newProject == null)
-      {
-        error.Add("There is no project to save, please try the request again");
-        return Ok(error);
-      }
-      else
-      {
-        var ua = new UserAccess(User.Identity.Name);
-        if (Constants.GetCachedUserAccessDictionary()[ua.employee_id].Contains(newProject.department))
-        {
-     
-          int i = newProject.Save();
+      var ua = new UserAccess(User.Identity.Name);
+      if (!ua.authenticated) return Unauthorized();      
 
-        }
-        else
-        {
-          throw new HttpException(401, "Unauthorized Access");
+      string error = newProject.Validate(ua.employee_id, null);
+      if (error.Length > 0) return Ok(error);
 
+      if (newProject.Save(ua)) return Ok("");
 
-        }
-
-      }
-      return Ok(error);
+      return InternalServerError();
     }
 
     [HttpPost]
     [Route("Update")]
     public IHttpActionResult Update(Project existingProject)
     {
-      var error = "";
-
       var ua = new UserAccess(User.Identity.Name);
-      if (Constants.GetCachedUserAccessDictionary()[ua.employee_id].Contains(existingProject.department))
-      {
-        error = existingProject.Validate();
-        if (error.Length > 0) return Ok(error);
+      if (!ua.authenticated) return Unauthorized();
+      var currentProject = Project.GetSpecificProject(existingProject.project_id, ua.employee_id);
+      string error = existingProject.Validate(ua.employee_id, currentProject);
+      if (error.Length > 0) return Ok(error);
 
+      if (existingProject.Update(ua, currentProject)) return Ok();
 
-        var project = Project.UpdateProject(existingProject);
-        return Ok(project);
-      }
-      else
-      {
-        throw new HttpException(401, "Unauthorized Access");
-      }
+      return InternalServerError();
     }
     
     [HttpPost]
     [Route("AddComment")]
-    public IHttpActionResult AddComment(Comment comment)
+    public IHttpActionResult AddComment(int project_id, string comment)
     {
-
-      var project = Project.GetProjects(comment.project_id).FirstOrDefault();
       var ua = new UserAccess(User.Identity.Name);
-      comment.added_by = ua.display_name;
-      comment.added_by_county_manager = Constants.GetCountyManager() == ua.employee_id;
+      if (!ua.authenticated) return Unauthorized();
 
-      if (Constants.GetCachedUserAccessDictionary()[ua.employee_id].Contains(project.department))
-      {
-        return Ok(comment.Save());
-      }
-      else
-      {
-        throw new HttpException(401, "Unauthorized Access");
-      }
-
+      if (Comment.Save(ua, project_id, comment)) return Ok("");
+      return Ok("There was a problem saving your comment, please refresh this page and try again.");
     }
   }
 } 
