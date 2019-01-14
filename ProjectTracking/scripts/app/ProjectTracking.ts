@@ -25,6 +25,7 @@ namespace ProjectTracking
 
   export function CloseModals(): void
   {
+    Utilities.Toggle_Loading_Button("saveProject", false);
     let modals = document.querySelectorAll(".modal");
     if (modals.length > 0)
     {
@@ -46,5 +47,17 @@ namespace ProjectTracking
     }
     return path;
   }  
+
+  export function FilterProjects()
+  {
+    Project.BuildProjectTrackingList(Project.ApplyFilters(ProjectTracking.projects));
+  }
+
+  export function FinishedLoading()
+  {
+    //let button = document.getElementById("addProjectButton");
+    Utilities.Toggle_Loading_Button("addProjectButton", false);
+    Utilities.Show("filters");
+  }
 
 }

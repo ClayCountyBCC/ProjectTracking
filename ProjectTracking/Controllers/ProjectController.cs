@@ -76,7 +76,7 @@ namespace ProjectTracking.Controllers
     {
       var ua = new UserAccess(User.Identity.Name);
       if (!ua.authenticated) return Unauthorized();
-      var currentProject = Project.GetSpecificProject(existingProject.project_id, ua.employee_id);
+      var currentProject = Project.GetSpecificProject(existingProject.id, ua.employee_id);
       string error = existingProject.Validate(ua.employee_id, currentProject);
       if (error.Length > 0) return Ok(error);
 

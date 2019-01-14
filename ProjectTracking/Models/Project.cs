@@ -10,7 +10,7 @@ namespace ProjectTracking
 {
   public class Project
   {
-    public int project_id { get; set; } = -1;
+    public int id { get; set; } = -1;
     public string project_name { get; set; } = "";
     public int department_id { get; set; } = -1;
     public string timeline { get; set; } = "";
@@ -36,10 +36,10 @@ namespace ProjectTracking
       foreach(var p in projects)
       {
         p.milestones = (from m in milestones
-                        where m.project_id == p.project_id
+                        where m.project_id == p.id
                         select m).ToList();
         p.comments = (from c in comments
-                      where c.project_id == p.project_id
+                      where c.project_id == p.id
                       select c).ToList();        
       }
       return projects;
@@ -63,7 +63,7 @@ namespace ProjectTracking
 
         SELECT
           CASE WHEN U.department_id IS NOT NULL THEN 1 ELSE 0 END can_edit,
-          P.id project_id,
+          P.id id,
           P.project_name,
           P.department_id,
           P.timeline,
@@ -84,7 +84,7 @@ namespace ProjectTracking
     {
       var projects = GetProjects(employee_id);
       var project = (from p in projects
-                     where p.project_id == project_id
+                     where p.id == project_id
                      select p).ToList();
 
 
@@ -127,6 +127,12 @@ namespace ProjectTracking
 
       var dp = new DynamicParameters();
       dp.Add("@project_id", dbType: DbType.Int32, direction: ParameterDirection.Output);
+      dp.Add("@project_name", project_name);
+      dp.Add("@department_id", department_id);
+      dp.Add("@timeline", timeline);
+      dp.Add("@commissioner_share", commissioner_share);
+      dp.Add("@completed", completed);
+      dp.Add("@added_by", added_by);
 
       string query = @"
         INSERT INTO project (
@@ -148,14 +154,14 @@ namespace ProjectTracking
           @added_by
         );
       
-        SET @project_id = @@IDENTITY";
+        SET @project_id = @@IDENTITY;";
       int i = Constants.Exec_Query(query, dp);
       if (i == -1) return false;
-      project_id = dp.Get<int>("@project_id");
+      id = dp.Get<int>("@project_id");
       // now let's add the comment / milestones
-      Comment.Save(ua, project_id, comment);
+      Comment.Save(ua, id, comment);
 
-      Milestone.SaveAll(project_id, milestones);
+      Milestone.SaveAll(id, milestones);
       return true;
     }
 
@@ -175,7 +181,7 @@ namespace ProjectTracking
             completed = @completed,
             date_completed = GETDATE()
         WHERE 
-          project_id=@project_id";
+          id=@id";
       }
       else
       {
@@ -187,12 +193,12 @@ namespace ProjectTracking
             commissioner_share = @commissioner_share,
             completed = @completed
         WHERE 
-          project_id=@project_id";
+          id=@id";
       }
       // now let's add the comment / milestones
-      Comment.Save(ua, project_id, comment);
+      Comment.Save(ua, id, comment);
 
-      Milestone.SaveAll(project_id, milestones);
+      Milestone.SaveAll(id, milestones);
 
 
       return Constants.Save_Data<Project>(query, this);

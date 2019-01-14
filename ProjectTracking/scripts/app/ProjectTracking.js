@@ -19,6 +19,7 @@ var ProjectTracking;
     }
     ProjectTracking.ShowAddProject = ShowAddProject;
     function CloseModals() {
+        Utilities.Toggle_Loading_Button("saveProject", false);
         var modals = document.querySelectorAll(".modal");
         if (modals.length > 0) {
             for (var i = 0; i < modals.length; i++) {
@@ -37,5 +38,15 @@ var ProjectTracking;
         return path;
     }
     ProjectTracking.GetPath = GetPath;
+    function FilterProjects() {
+        ProjectTracking.Project.BuildProjectTrackingList(ProjectTracking.Project.ApplyFilters(ProjectTracking.projects));
+    }
+    ProjectTracking.FilterProjects = FilterProjects;
+    function FinishedLoading() {
+        //let button = document.getElementById("addProjectButton");
+        Utilities.Toggle_Loading_Button("addProjectButton", false);
+        Utilities.Show("filters");
+    }
+    ProjectTracking.FinishedLoading = FinishedLoading;
 })(ProjectTracking || (ProjectTracking = {}));
 //# sourceMappingURL=ProjectTracking.js.map

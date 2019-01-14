@@ -22,13 +22,35 @@ var ProjectTracking;
                 .then(function (projects) {
                 console.log("projects", projects);
                 ProjectTracking.projects = projects;
-                Project.BuildProjectTrackingList(projects);
-                //DataValue.BuildDepartmentSelect("departmentFilter", ProjectTracking.departments);
-                //Toggle_Loading_Search_Buttons(false);
+                Project.BuildProjectTrackingList(Project.ApplyFilters(projects));
+                ProjectTracking.FinishedLoading();
             }, function (e) {
+                var container = document.getElementById("projectList");
+                Utilities.Clear_Element(container);
+                var tr = document.createElement("tr");
+                var td = document.createElement("td");
+                td.colSpan = 6;
+                td.appendChild(document.createTextNode("There was a problem retrieving a list of projects.  Please try again. If this issue persists, please put in a help desk ticket."));
+                container.appendChild(tr);
                 console.log('error getting permits', e);
-                //Toggle_Loading_Search_Buttons(false);
             });
+        };
+        Project.ApplyFilters = function (projects) {
+            var departmentFilter = Utilities.Get_Value("departmentFilter");
+            var shareFilter = document.getElementById("projectCommissionerShareFilter").checked;
+            var completedFilter = document.getElementById("projectCompleteFilter").checked;
+            projects = projects.filter(function (j) {
+                return (departmentFilter.length === 0 ||
+                    j.department_id.toString() === departmentFilter ||
+                    (departmentFilter === "mine" && j.can_edit));
+            });
+            projects = projects.filter(function (j) {
+                return ((shareFilter && j.commissioner_share) || !shareFilter);
+            });
+            projects = projects.filter(function (j) {
+                return ((completedFilter && j.completed) || !completedFilter);
+            });
+            return projects;
         };
         Project.AddProject = function () {
             // this function is going to reset all of the New
@@ -106,13 +128,14 @@ var ProjectTracking;
                 var a = document.createElement("a");
                 a.appendChild(document.createTextNode(project.project_name));
                 a.onclick = function () {
-                    Project.LoadProject(project);
+                    console.log("update this project", project);
                     ProjectTracking.selected_project = project; // this is the project we'll be attempting to update.
+                    Project.LoadProject(project);
+                    console.log('selected_project', ProjectTracking.selected_project);
                 };
                 projectName.appendChild(a);
                 // handle add comments button here
                 var addComments = document.createElement("a");
-                //addComments.classList.add("button");
                 addComments.classList.add("is-primary");
                 addComments.appendChild(document.createTextNode("Add Comment"));
                 dfComments.appendChild(addComments);
@@ -140,6 +163,10 @@ var ProjectTracking;
             return tr;
         };
         Project.Save = function () {
+            // let's lock the button down so the user can't click it multiple times
+            // we'll also want to update it to show that it's loading
+            var saveButton = document.getElementById("saveProject");
+            Utilities.Toggle_Loading_Button("saveProject", true);
             ProjectTracking.selected_project.project_name = Utilities.Get_Value("projectName");
             ProjectTracking.selected_project.milestones = ProjectTracking.Milestone.ReadMilestones();
             ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
@@ -149,7 +176,6 @@ var ProjectTracking;
             ProjectTracking.selected_project.completed = completed.checked;
             var share = document.getElementById("projectCommissionerShare");
             ProjectTracking.selected_project.commissioner_share = share.checked;
-            console.log('project we going to save', ProjectTracking.selected_project);
             var path = ProjectTracking.GetPath();
             var saveType = (ProjectTracking.selected_project.id > -1) ? "Update" : "Add";
             Utilities.Post_Empty(path + "API/Project/" + saveType, ProjectTracking.selected_project)
@@ -162,10 +188,14 @@ var ProjectTracking;
                 else {
                     // we good
                     console.log('post response good');
+                    ProjectTracking.Project.GetProjects();
+                    ProjectTracking.CloseModals();
                 }
+                Utilities.Toggle_Loading_Button("saveProject", false);
             }, function (e) {
                 console.log('error getting permits', e);
                 //Toggle_Loading_Search_Buttons(false);
+                Utilities.Toggle_Loading_Button("saveProject", false);
             });
         };
         return Project;

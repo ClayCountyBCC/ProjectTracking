@@ -14,7 +14,7 @@ namespace ProjectTracking
     public bool update_only { get; set; } = false;
     public string added_by { get; set; } = "";
     public DateTime added_on { get; set; }
-    public bool added_by_county_manager { get; set; } = false;
+    public bool by_county_manager { get; set; } = false;
 
     public Comment()
     {
@@ -32,16 +32,16 @@ namespace ProjectTracking
         comment = commentToSave,
         project_id = project_id,
         added_by = ua.user_name,
-        added_by_county_manager = (ua.employee_id == cm)
+        by_county_manager = (ua.employee_id == cm)
       };
 
       var query = @"
         USE ProjectTracking;
 
         INSERT INTO Comment
-        (project_id, comment, update_only, added_by, added_by_county_manager)
+        (project_id, comment, update_only, added_by, by_county_manager)
         VALUES
-        (@project_id, @comment, @update_only, @added_by, @added_by_county_manager)";
+        (@project_id, @comment, @update_only, @added_by, @by_county_manager)";
 
       return Constants.Save_Data<Comment>(query, c);
     }

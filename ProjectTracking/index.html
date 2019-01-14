@@ -26,14 +26,14 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-primary"
-                 onclick="ProjectTracking.Project.AddProject();">
+              <button id="addProjectButton"
+                      disabled
+                      class="button is-primary is-loading"
+                      onclick="ProjectTracking.Project.AddProject();">
                 <strong>Add Project</strong>
-              </a>
+              </button>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>
@@ -41,7 +41,9 @@
 
   <div id="projects"
        class="container">
-    <fieldset style="width: 100%;">
+    <fieldset id="filters"
+              class="hide"
+              style="width: 100%;">
       <legend class="label">Filters</legend>
 
 
@@ -51,7 +53,8 @@
           <div class="field">
             <div class="control">
               <div class="select is-medium">
-                <select id="departmentFilter"></select>
+                <select onchange="ProjectTracking.FilterProjects();"
+                        id="departmentFilter"></select>
               </div>
             </div>
           </div>
@@ -59,7 +62,8 @@
         <div class="level-item">
           <div class="field">
             <label class="checkbox is-medium">
-              <input id="projectCommissionerShareFilter"
+              <input onchange="ProjectTracking.FilterProjects();"
+                     id="projectCommissionerShareFilter"
                      type="checkbox" />
               Commissioner View Only
             </label>
@@ -69,7 +73,8 @@
         <div class="level-item">
           <div class="field">
             <label class="checkbox is-medium">
-              <input id="projectCompleteFilter"
+              <input onchange="ProjectTracking.FilterProjects();"
+                     id="projectCompleteFilter"
                      type="checkbox" />
               Completed Only
             </label>
@@ -227,7 +232,8 @@
         </section>
         <footer style="justify-content: flex-end;"
                 class="modal-card-foot">
-          <button class="button is-success"
+          <button id="saveProject"
+                  class="button is-success"
                   onclick="ProjectTracking.Project.Save();"
                   type="button">
             Save & Close
