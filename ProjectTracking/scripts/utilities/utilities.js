@@ -212,7 +212,7 @@ var Utilities;
     function Post_Empty(url, data) {
         return fetch(url, {
             method: "POST",
-            body: JSON.stringify(data),
+            body: data !== null ? JSON.stringify(data) : "",
             cache: "no-cache",
             headers: {
                 "Content-Type": "application/json"

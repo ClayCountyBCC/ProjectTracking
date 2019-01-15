@@ -246,6 +246,7 @@
     <Content Include="css\Fontawesome\webfonts\fa-solid-900.woff" />
     <Content Include="css\Fontawesome\webfonts\fa-solid-900.woff2" />
     <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\Production.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

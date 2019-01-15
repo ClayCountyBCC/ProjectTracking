@@ -40,6 +40,8 @@
 
     public static GetProjects(): void
     {
+      let buttonId = "filterRefreshButton";
+      Utilities.Toggle_Loading_Button(buttonId, true);
       ProjectTracking.departments = [];
       let path = ProjectTracking.GetPath();
       Utilities.Get<Array<Project>>(path + "API/Project/List")
@@ -49,7 +51,7 @@
           ProjectTracking.projects = projects;
           Project.BuildProjectTrackingList(Project.ApplyFilters(projects));
           ProjectTracking.FinishedLoading();
-
+          Utilities.Toggle_Loading_Button(buttonId, false);
         }, function (e)
           {
             let container = document.getElementById("projectList");
@@ -60,6 +62,7 @@
             td.appendChild(document.createTextNode("There was a problem retrieving a list of projects.  Please try again. If this issue persists, please put in a help desk ticket."));
             container.appendChild(tr);
             console.log('error getting permits', e);
+            Utilities.Toggle_Loading_Button(buttonId, false);
           });
     }
 
@@ -89,6 +92,7 @@
     {
       // this function is going to reset all of the New
       // project form's values and get it ready to have a new project created.
+      Utilities.Hide("updateProjectAsUpToDate");
       ProjectTracking.selected_project = new Project(); // the object we'll be saving
       Project.UpdateProjectName("");
       Project.UpdateProjectDepartment("");
@@ -105,6 +109,7 @@
 
     public static LoadProject(project: Project): void
     {
+      Utilities.Show("updateProjectAsUpToDate");
       project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
 
       Project.UpdateProjectName(project.project_name);
@@ -189,7 +194,6 @@
         a.appendChild(document.createTextNode(project.project_name))
         a.onclick = function ()
         {
-          console.log("update this project", project);
           ProjectTracking.selected_project = project; // this is the project we'll be attempting to update.
           Project.LoadProject(project);
           console.log('selected_project', ProjectTracking.selected_project);
@@ -197,10 +201,10 @@
         projectName.appendChild(a);
         // handle add comments button here
         
-        let addComments = document.createElement("a");
-        addComments.classList.add("is-primary");
-        addComments.appendChild(document.createTextNode("Add Comment"));
-        dfComments.appendChild(addComments);
+        //let addComments = document.createElement("a");
+        //addComments.classList.add("is-primary");
+        //addComments.appendChild(document.createTextNode("Add Comment"));
+        //dfComments.appendChild(addComments);
       }
       else
       {

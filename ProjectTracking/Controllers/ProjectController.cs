@@ -86,13 +86,13 @@ namespace ProjectTracking.Controllers
     }
     
     [HttpPost]
-    [Route("AddComment")]
-    public IHttpActionResult AddComment(int project_id, string comment)
+    [Route("AddUpdateComment")]
+    public IHttpActionResult AddComment(int project_id)
     {
       var ua = new UserAccess(User.Identity.Name);
       if (!ua.authenticated) return Unauthorized();
 
-      if (Comment.Save(ua, project_id, comment)) return Ok("");
+      if (Comment.UpdateOnly(ua, project_id)) return Ok("");
       return Ok("There was a problem saving your comment, please refresh this page and try again.");
     }
   }

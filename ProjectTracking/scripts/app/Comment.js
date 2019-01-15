@@ -11,6 +11,35 @@ var ProjectTracking;
             this.added_on = new Date(); // Date
             this.by_county_manager = false;
         }
+        Comment.UpdateOnly = function () {
+            var buttonId = "updateProjectAsUpToDate";
+            Utilities.Toggle_Loading_Button(buttonId, true);
+            console.log('current project', ProjectTracking.selected_project);
+            if (ProjectTracking.selected_project.id === -1) {
+                return;
+            }
+            var path = ProjectTracking.GetPath();
+            Utilities.Post_Empty(path + "API/Project/AddUpdateComment?project_id=" + ProjectTracking.selected_project.id.toString(), null)
+                .then(function (r) {
+                console.log('post response', r);
+                if (!r.ok) {
+                    // do some error stuff
+                    console.log('some errors happened with post response');
+                    alert("There was an issue saving this update.  Please try again, and put in a help desk ticket if the issue persists.");
+                }
+                else {
+                    // we good
+                    //console.log('post response good');
+                    ProjectTracking.Project.GetProjects();
+                    ProjectTracking.CloseModals();
+                }
+                Utilities.Toggle_Loading_Button(buttonId, false);
+            }, function (e) {
+                console.log('error getting permits', e);
+                //Toggle_Loading_Search_Buttons(false);
+                Utilities.Toggle_Loading_Button(buttonId, false);
+            });
+        };
         Comment.CommentsView = function (comments, full) {
             //comments = comments.filter(function (j) { return j.comment.length > 0; });
             comments.sort(function (a, b) { return a.id - b.id; });
@@ -23,7 +52,13 @@ var ProjectTracking;
                 var c = comments_1[_i];
                 var li = document.createElement("li");
                 var comment = full ? c.added_by + ' - ' + c.comment : c.comment;
-                li.appendChild(document.createTextNode(comment));
+                var span = document.createElement("span");
+                span.appendChild(document.createTextNode(comment));
+                if (c.by_county_manager) {
+                    span.style.color = "red";
+                    span.style.fontWeight = "bold";
+                }
+                li.appendChild(span);
                 ol.appendChild(li);
             }
             df.appendChild(ol);

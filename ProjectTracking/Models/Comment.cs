@@ -46,6 +46,30 @@ namespace ProjectTracking
       return Constants.Save_Data<Comment>(query, c);
     }
 
+    public static bool UpdateOnly(UserAccess ua, int project_id)
+    {
+      var cm = Constants.GetCachedCountyManager();
+
+      var c = new Comment
+      {
+        comment = "",
+        update_only = true,
+        project_id = project_id,
+        added_by = ua.user_name,
+        by_county_manager = (ua.employee_id == cm)
+      };
+
+      var query = @"
+        USE ProjectTracking;
+
+        INSERT INTO Comment
+        (project_id, comment, update_only, added_by, by_county_manager)
+        VALUES
+        (@project_id, @comment, @update_only, @added_by, @by_county_manager)";
+
+      return Constants.Save_Data<Comment>(query, c);
+    }
+
     public static List<Comment> GetAllComments()
     {
       string query = @"
