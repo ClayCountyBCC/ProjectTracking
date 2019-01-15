@@ -184,6 +184,7 @@
       project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
 
       let tr = document.createElement("tr");
+      tr.classList.add("pagebreak");
 
       let projectName = document.createElement("td");
       let comments = document.createElement("td");

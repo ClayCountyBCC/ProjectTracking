@@ -228,6 +228,7 @@
     </Content>
     <Content Include="css\Main.scss" />
     <None Include="bower_components\bulma\myBulma.sass" />
+    <None Include="bundleconfig.json" />
     <None Include="compilerconfig.json" />
     <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>

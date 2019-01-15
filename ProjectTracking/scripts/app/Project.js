@@ -127,6 +127,7 @@ var ProjectTracking;
         Project.CreateProjectRow = function (project) {
             project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
             var tr = document.createElement("tr");
+            tr.classList.add("pagebreak");
             var projectName = document.createElement("td");
             var comments = document.createElement("td");
             var dfComments = ProjectTracking.Comment.CommentsView(project.comments, false);

@@ -50,7 +50,7 @@ namespace ProjectTracking
         {
           user_name = up.SamAccountName.ToLower();
           authenticated = true;
-          display_name = up.DisplayName;
+          display_name = up.DisplayName.Replace("CLAYBCC\\", "");
           if (int.TryParse(up.EmployeeId, out int eid))
           {
             employee_id = eid;

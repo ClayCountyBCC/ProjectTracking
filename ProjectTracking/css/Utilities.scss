@@ -36,8 +36,7 @@
     color: black;
   }
   .print-title-size{
-    font-size: 24px;
-    line-height: 2em;
+    line-height: 1em;
   }
   table.print-with-no-border {
     align-self: center;
@@ -54,12 +53,12 @@
 
   }
   .pagebreak {
-    page-break-before: always;
+    page-break-before: always !important;
   }
 
   
   table.pagebreak td {
-    font-size: smaller;
+
     line-height:1em;
     text-align: left;
     width: auto;
@@ -73,5 +72,9 @@
   .hide-for-print 
   {
     display: none;
+  }
+
+  body {
+    font-size: 16px !important;
   }
 }

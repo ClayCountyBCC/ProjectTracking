@@ -5,14 +5,18 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <title>Clay County Project Tracking Application</title>
+
   <link href="css/myBulma.min.css" rel="stylesheet" />
-  <link href="css/Utilities.min.css" rel="stylesheet" />
+
   <link href="css/Fontawesome/css/fontawesome-all.min.css" rel="stylesheet" />
   <link href="css/Main.css" rel="stylesheet" />
+  <link href="css/Utilities.min.css" rel="stylesheet" />
+
+
 </head>
 <body>
   <nav style="margin-bottom: 1em;"
-       class="navbar is-light" role="navigation" aria-label="main navigation">
+       class="navbar is-light hide-for-print" role="navigation" aria-label="main navigation">
     <div class="container">
       <div class="navbar-brand">
         <a class="navbar-item has-text-weight-bold is-size-4"
@@ -32,6 +36,12 @@
                       onclick="ProjectTracking.Project.AddProject();">
                 <strong>Add Project</strong>
               </button>
+              <button id="printButton"
+                      
+                      class="button is-info"
+                      onclick="window.print();">
+                <strong>Print</strong>
+              </button>
             </div>
           </div>
         </div>
@@ -42,7 +52,7 @@
   <div id="projects"
        class="container">
     <fieldset id="filters"
-              class="hide"
+              class="hide hide-for-print"
               style="width: 100%;">
       <legend class="label">Filters</legend>
 
