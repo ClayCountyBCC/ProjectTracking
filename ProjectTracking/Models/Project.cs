@@ -15,6 +15,7 @@ namespace ProjectTracking
     public int department_id { get; set; } = -1;
     public string timeline { get; set; } = "";
     public bool commissioner_share { get; set; } = false;
+    public bool infrastructure_share { get; set; } = false;
     public bool completed { get; set; } = false;
     public string comment { get; set; } = "";
     public DateTime date_completed { get; set; } = DateTime.MinValue;
@@ -68,6 +69,7 @@ namespace ProjectTracking
           P.department_id,
           P.timeline,
           P.commissioner_share,
+          P.infrastructure_share,
           P.completed,
           P.date_completed,
           ISNULL(D.date_last_updated, P.added_on) date_last_updated
@@ -131,6 +133,7 @@ namespace ProjectTracking
       dp.Add("@department_id", department_id);
       dp.Add("@timeline", timeline);
       dp.Add("@commissioner_share", commissioner_share);
+      dp.Add("@infrastructure_share", infrastructure_share);
       dp.Add("@completed", completed);
       dp.Add("@added_by", added_by);
 
@@ -140,6 +143,7 @@ namespace ProjectTracking
           department_id, 
           timeline, 
           commissioner_share, 
+          infrastructure_share,
           completed, 
           added_on, 
           added_by
@@ -149,6 +153,7 @@ namespace ProjectTracking
           @department_id, 
           @timeline, 
           @commissioner_share, 
+          @infrastructure_share,
           @completed, 
           GETDATE(), 
           @added_by
@@ -178,6 +183,7 @@ namespace ProjectTracking
             department_id = @department_id,
             timeline = @timeline,
             commissioner_share = @commissioner_share,
+            infrastructure_share = @infrastructure_share,
             completed = @completed,
             date_completed = GETDATE()
         WHERE 
@@ -191,6 +197,7 @@ namespace ProjectTracking
             department_id = @department_id,
             timeline = @timeline,
             commissioner_share = @commissioner_share,
+            infrastructure_share = @infrastructure_share,
             completed = @completed
         WHERE 
           id=@id";

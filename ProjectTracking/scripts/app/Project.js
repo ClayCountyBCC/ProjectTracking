@@ -8,6 +8,7 @@ var ProjectTracking;
             this.department_id = -1;
             this.timeline = "";
             this.commissioner_share = false;
+            this.infrastructure_share = false;
             this.completed = false;
             this.date_last_updated = null;
             this.date_completed = null;
@@ -43,6 +44,7 @@ var ProjectTracking;
             var departmentFilter = Utilities.Get_Value("departmentFilter");
             var shareFilter = document.getElementById("projectCommissionerShareFilter").checked;
             var completedFilter = document.getElementById("projectCompleteFilter").checked;
+            var infrastructureFilter = document.getElementById("projectInfrastructureFilter").checked;
             projects = projects.filter(function (j) {
                 return (departmentFilter.length === 0 ||
                     j.department_id.toString() === departmentFilter ||
@@ -52,7 +54,13 @@ var ProjectTracking;
                 return ((shareFilter && j.commissioner_share) || !shareFilter);
             });
             projects = projects.filter(function (j) {
+                return ((shareFilter && j.commissioner_share) || !shareFilter);
+            });
+            projects = projects.filter(function (j) {
                 return ((completedFilter && j.completed) || !completedFilter);
+            });
+            projects = projects.filter(function (j) {
+                return ((infrastructureFilter && j.infrastructure_share) || !infrastructureFilter);
             });
             return projects;
         };
@@ -67,6 +75,7 @@ var ProjectTracking;
             Project.UpdateProjectTimeline("");
             Project.UpdateProjectCompleted(false);
             Project.UpdateCommissionerShare(false);
+            Project.UpdateInfrastructureShare(false);
             var commentsContainer = document.getElementById("existingCommentsContainer");
             Utilities.Hide(commentsContainer);
             Utilities.Clear_Element(commentsContainer);
@@ -82,6 +91,7 @@ var ProjectTracking;
             Project.UpdateProjectTimeline(project.timeline);
             Project.UpdateProjectCompleted(project.completed);
             Project.UpdateCommissionerShare(project.commissioner_share);
+            Project.UpdateInfrastructureShare(project.infrastructure_share);
             var commentsContainer = document.getElementById("existingCommentsContainer");
             Utilities.Clear_Element(commentsContainer);
             if (project.comments.length > 0) {
@@ -106,6 +116,10 @@ var ProjectTracking;
         Project.UpdateProjectCompleted = function (complete) {
             var completed = document.getElementById("projectComplete");
             completed.checked = complete;
+        };
+        Project.UpdateInfrastructureShare = function (infrastructure) {
+            var ifshare = document.getElementById("projectInfrastructureShare");
+            ifshare.checked = infrastructure;
         };
         Project.UpdateCommissionerShare = function (share) {
             var shared = document.getElementById("projectCommissionerShare");
@@ -182,6 +196,8 @@ var ProjectTracking;
             ProjectTracking.selected_project.completed = completed.checked;
             var share = document.getElementById("projectCommissionerShare");
             ProjectTracking.selected_project.commissioner_share = share.checked;
+            var ifshare = document.getElementById("projectInfrastructureShare");
+            ProjectTracking.selected_project.infrastructure_share = ifshare.checked;
             var path = ProjectTracking.GetPath();
             var saveType = (ProjectTracking.selected_project.id > -1) ? "Update" : "Add";
             Utilities.Post_Empty(path + "API/Project/" + saveType, ProjectTracking.selected_project)

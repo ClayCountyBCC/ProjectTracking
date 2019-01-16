@@ -36,12 +36,6 @@
                       onclick="ProjectTracking.Project.AddProject();">
                 <strong>Add Project</strong>
               </button>
-              <button id="printButton"
-                      
-                      class="button is-info"
-                      onclick="window.print();">
-                <strong>Print</strong>
-              </button>
             </div>
           </div>
         </div>
@@ -84,12 +78,24 @@
           <div class="field">
             <label class="checkbox is-medium">
               <input onchange="ProjectTracking.FilterProjects();"
+                     id="projectInfrastructureFilter"
+                     type="checkbox" />
+              Infrastructure View Only
+            </label>
+          </div>
+        </div>
+        <div class="level-item">
+          <div class="field">
+            <label class="checkbox is-medium">
+              <input onchange="ProjectTracking.FilterProjects();"
                      id="projectCompleteFilter"
                      type="checkbox" />
               Completed Only
             </label>
           </div>
         </div>
+
+
 
         <div class="level-item">
           <div class="field">
@@ -211,12 +217,20 @@
           </div>
           <form>
             <div class="field">
-
               <label class="checkbox is-medium">
                 <input id="projectCommissionerShare"
                        type="checkbox">
 
                 Add this project to the Commissioner View?
+              </label>
+            </div>
+
+            <div class="field">
+              <label class="checkbox is-medium">
+                <input id="projectInfrastructureShare"
+                       type="checkbox">
+
+                Add this project to the Infrastructure Committee View?
               </label>
             </div>
 

@@ -9,6 +9,7 @@
     department_id: number;
     timeline: string;
     commissioner_share: boolean;
+    infrastructure_share: boolean;
     completed: boolean;
     date_last_updated: any;
     date_completed: any;
@@ -25,6 +26,7 @@
     public department_id: number = -1;
     public timeline: string = "";
     public commissioner_share: boolean = false;
+    public infrastructure_share: boolean = false;
     public completed: boolean = false;
     public date_last_updated: any = null;
     public date_completed: any = null;
@@ -71,6 +73,7 @@
       let departmentFilter = Utilities.Get_Value("departmentFilter");
       let shareFilter = (<HTMLInputElement>document.getElementById("projectCommissionerShareFilter")).checked;
       let completedFilter = (<HTMLInputElement>document.getElementById("projectCompleteFilter")).checked;      
+      let infrastructureFilter = (<HTMLInputElement>document.getElementById("projectInfrastructureFilter")).checked;      
       projects = projects.filter(function (j)
       {
         return (departmentFilter.length === 0 ||
@@ -81,10 +84,20 @@
       {
         return ((shareFilter && j.commissioner_share) || !shareFilter);
       });
+
+      projects = projects.filter(function (j)
+      {
+        return ((shareFilter && j.commissioner_share) || !shareFilter);
+      });
       projects = projects.filter(function (j)
       {
         return ((completedFilter && j.completed) || !completedFilter);
       });
+      projects = projects.filter(function (j)
+      {
+        return ((infrastructureFilter && j.infrastructure_share) || !infrastructureFilter);
+      });
+
       return projects;
     }
 
@@ -100,6 +113,7 @@
       Project.UpdateProjectTimeline("");
       Project.UpdateProjectCompleted(false);
       Project.UpdateCommissionerShare(false);
+      Project.UpdateInfrastructureShare(false);
       let commentsContainer = document.getElementById("existingCommentsContainer");
       Utilities.Hide(commentsContainer);
       Utilities.Clear_Element(commentsContainer);
@@ -118,6 +132,7 @@
       Project.UpdateProjectTimeline(project.timeline);
       Project.UpdateProjectCompleted(project.completed);
       Project.UpdateCommissionerShare(project.commissioner_share);
+      Project.UpdateInfrastructureShare(project.infrastructure_share);
       let commentsContainer = document.getElementById("existingCommentsContainer");
       Utilities.Clear_Element(commentsContainer);
       if (project.comments.length > 0)
@@ -154,6 +169,12 @@
     {
       let completed = <HTMLInputElement>document.getElementById("projectComplete");
       completed.checked = complete;
+    }
+
+    public static UpdateInfrastructureShare(infrastructure: boolean): void
+    {
+      let ifshare = <HTMLInputElement>document.getElementById("projectInfrastructureShare");
+      ifshare.checked = infrastructure;
     }
 
     public static UpdateCommissionerShare(share: boolean): void
@@ -252,6 +273,8 @@
       ProjectTracking.selected_project.completed = completed.checked;
       let share = <HTMLInputElement>document.getElementById("projectCommissionerShare");
       ProjectTracking.selected_project.commissioner_share = share.checked;
+      let ifshare = <HTMLInputElement>document.getElementById("projectInfrastructureShare");
+      ProjectTracking.selected_project.infrastructure_share = ifshare.checked;
 
       let path = ProjectTracking.GetPath();
       let saveType = (ProjectTracking.selected_project.id > -1) ? "Update" : "Add";
