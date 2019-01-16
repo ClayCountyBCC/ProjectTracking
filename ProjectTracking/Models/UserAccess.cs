@@ -18,21 +18,28 @@ namespace ProjectTracking
 
     public UserAccess(string name)
     {
-      user_name = name;
-
-      display_name = name;
-      using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
+      if(name.Length > 0)
       {
-        try
+        user_name = name;
+        display_name = name;
+        using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
         {
-          var up = UserPrincipal.FindByIdentity(pc, user_name);
-          ParseUser(up);
+          try
+          {
+            var up = UserPrincipal.FindByIdentity(pc, user_name);
+            ParseUser(up);
+          }
+          catch (Exception ex)
+          {
+            authenticated = false;
+            new ErrorLog(ex);
+          }
         }
-        catch (Exception ex)
-        {
-          authenticated = false;
-          new ErrorLog(ex);
-        }
+      }
+      else
+      {
+        user_name = "Anonymous";
+        authenticated = false;
       }
 
     }

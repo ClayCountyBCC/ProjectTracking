@@ -53,18 +53,26 @@
           ProjectTracking.projects = projects;
           Project.BuildProjectTrackingList(Project.ApplyFilters(projects));
           ProjectTracking.FinishedLoading();
-          Utilities.Toggle_Loading_Button(buttonId, false);
-        }, function (e)
+          if (projects.length === 0)
           {
-            let container = document.getElementById("projectList");
-            Utilities.Clear_Element(container);
-            let tr = document.createElement("tr");
-            let td = document.createElement("td");
-            td.colSpan = 6;
-            td.appendChild(document.createTextNode("There was a problem retrieving a list of projects.  Please try again. If this issue persists, please put in a help desk ticket."));
-            container.appendChild(tr);
-            console.log('error getting permits', e);
-            Utilities.Toggle_Loading_Button(buttonId, false);
+            ProjectTracking.AddProjectResultsMessage("No projects were found. You can use the Add Project button to add a new project.");
+          }
+          Utilities.Toggle_Loading_Button(buttonId, false);
+        }, function (e: Error)
+        {
+          if (e.message.trim().toLowerCase() === "unauthorized")
+          {
+            ProjectTracking.AddProjectResultsMessage("You do not currently have access to the Project Tracking application.");
+          }
+          else
+          {
+            if (e)
+            {
+              ProjectTracking.AddProjectResultsMessage("There was a problem retrieving a list of projects.  Please try again. If this issue persists, please put in a help desk ticket.");
+              console.log('error getting permits', e);
+            }
+          }
+          Utilities.Toggle_Loading_Button(buttonId, false);
           });
     }
 

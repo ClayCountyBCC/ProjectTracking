@@ -184,6 +184,7 @@ var Utilities;
             credentials: "include"
         })
             .then(function (response) {
+            console.log('get response', response);
             if (!response.ok) {
                 throw new Error(response.statusText);
             }

@@ -48,5 +48,16 @@ var ProjectTracking;
         Utilities.Show("filters");
     }
     ProjectTracking.FinishedLoading = FinishedLoading;
+    function AddProjectResultsMessage(message) {
+        var container = document.getElementById("projectList");
+        Utilities.Clear_Element(container);
+        var tr = document.createElement("tr");
+        var td = document.createElement("td");
+        td.colSpan = 6;
+        td.appendChild(document.createTextNode(message));
+        tr.appendChild(td);
+        container.appendChild(tr);
+    }
+    ProjectTracking.AddProjectResultsMessage = AddProjectResultsMessage;
 })(ProjectTracking || (ProjectTracking = {}));
 //# sourceMappingURL=ProjectTracking.js.map

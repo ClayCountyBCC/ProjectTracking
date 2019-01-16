@@ -60,4 +60,16 @@ namespace ProjectTracking
     Utilities.Show("filters");
   }
 
+  export function AddProjectResultsMessage(message: string):void
+  {
+    let container = document.getElementById("projectList");
+    Utilities.Clear_Element(container);
+    let tr = document.createElement("tr");
+    let td = document.createElement("td");
+    td.colSpan = 6;
+    td.appendChild(document.createTextNode(message));
+    tr.appendChild(td);
+    container.appendChild(tr);
+  }
+
 }
