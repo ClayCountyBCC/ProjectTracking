@@ -19,11 +19,11 @@
   display: flex;
 }
 
-@media print {
+@media print and (orientation:landscape) {
   @page {
     margin: .5em;
+    size: ledger !important;
   }
-
 
   a {
     text-decoration: none;
@@ -68,8 +68,8 @@
   body {
     font-size: 11px !important;
   }
-  .pagebreak {
-    page-break-inside:avoid !important;
-  }
 
+  .pagebreak {
+    page-break-inside: avoid !important;
+  }
 }
