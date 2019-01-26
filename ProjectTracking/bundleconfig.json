@@ -4,5 +4,17 @@
     "inputFiles": [
       "css/Utilities.css"
     ]
+  },
+  {
+    "outputFileName": "scripts/app/bundle.js",
+    "inputFiles": [
+      "scripts/app/DataValue.js",
+      "scripts/utilities/utilities.js",
+      "scripts/app/Comment.js",
+      "scripts/app/Milestone.js",
+      "scripts/app/Project.js",
+      "scripts/app/ProjectTracking.js"
+
+    ]
   }
 ]

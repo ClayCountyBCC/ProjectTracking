@@ -9,11 +9,13 @@ namespace ProjectTracking
   export let filtered_projects: Array<Project> = [];
   export let departments: Array<DataValue> = [];
   export let my_departments: Array<DataValue> = [];
+  export let funding_sources: Array<DataValue> = [];
   export let number_of_milestones: number = 0;
 
   export function Start(): void
   {
     DataValue.GetDepartments();
+    DataValue.GetFunding();
     DataValue.GetMyDepartments();
     Project.GetProjects();
   }

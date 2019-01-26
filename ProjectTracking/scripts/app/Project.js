@@ -6,6 +6,7 @@ var ProjectTracking;
             this.id = -1;
             this.project_name = "";
             this.department_id = -1;
+            this.funding_id = -1;
             this.timeline = "";
             this.commissioner_share = false;
             this.infrastructure_share = false;
@@ -19,7 +20,6 @@ var ProjectTracking;
         Project.GetProjects = function () {
             var buttonId = "filterRefreshButton";
             Utilities.Toggle_Loading_Button(buttonId, true);
-            ProjectTracking.departments = [];
             var path = ProjectTracking.GetPath();
             Utilities.Get(path + "API/Project/List")
                 .then(function (projects) {
@@ -75,6 +75,7 @@ var ProjectTracking;
             ProjectTracking.selected_project = new Project(); // the object we'll be saving
             Project.UpdateProjectName("");
             Project.UpdateProjectDepartment("");
+            Project.UpdateProjectFunding("-1");
             ProjectTracking.Milestone.ClearMilestones();
             Project.UpdateProjectTimeline("");
             Project.UpdateProjectCompleted(false);
@@ -91,6 +92,7 @@ var ProjectTracking;
             project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
             Project.UpdateProjectName(project.project_name);
             Project.UpdateProjectDepartment(project.department_id.toString());
+            Project.UpdateProjectFunding(project.funding_id.toString());
             ProjectTracking.Milestone.LoadMilestones(project.milestones);
             Project.UpdateProjectTimeline(project.timeline);
             Project.UpdateProjectCompleted(project.completed);
@@ -113,6 +115,9 @@ var ProjectTracking;
         };
         Project.UpdateProjectDepartment = function (departmentId) {
             Utilities.Set_Value("projectDepartment", departmentId);
+        };
+        Project.UpdateProjectFunding = function (sourceId) {
+            Utilities.Set_Value("projectFunding", sourceId);
         };
         Project.UpdateProjectTimeline = function (timeline) {
             Utilities.Set_Value("projectTimeline", timeline);
@@ -158,11 +163,6 @@ var ProjectTracking;
                     console.log('selected_project', ProjectTracking.selected_project);
                 };
                 projectName.appendChild(a);
-                // handle add comments button here
-                //let addComments = document.createElement("a");
-                //addComments.classList.add("is-primary");
-                //addComments.appendChild(document.createTextNode("Add Comment"));
-                //dfComments.appendChild(addComments);
             }
             else {
                 projectName.appendChild(document.createTextNode(project.project_name));
@@ -174,6 +174,11 @@ var ProjectTracking;
             var departmentName = departmentNames.length > 0 ? departmentNames[0].Label : "";
             department.appendChild(document.createTextNode(departmentName));
             tr.appendChild(department);
+            var funding = document.createElement("td");
+            var fundingNames = ProjectTracking.funding_sources.filter(function (d) { return d.Value === project.funding_id.toString(); });
+            var fundingName = departmentNames.length > 0 && project.funding_id !== -1 ? fundingNames[0].Label : "";
+            funding.appendChild(document.createTextNode(fundingName));
+            tr.appendChild(funding);
             var milestones = document.createElement("td");
             milestones.appendChild(ProjectTracking.Milestone.MilestonesView(project.milestones));
             tr.appendChild(milestones);
@@ -189,11 +194,12 @@ var ProjectTracking;
         Project.Save = function () {
             // let's lock the button down so the user can't click it multiple times
             // we'll also want to update it to show that it's loading
-            var saveButton = document.getElementById("saveProject");
+            //let saveButton = document.getElementById("saveProject");
             Utilities.Toggle_Loading_Button("saveProject", true);
             ProjectTracking.selected_project.project_name = Utilities.Get_Value("projectName");
             ProjectTracking.selected_project.milestones = ProjectTracking.Milestone.ReadMilestones();
             ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
+            ProjectTracking.selected_project.funding_id = parseInt(Utilities.Get_Value("projectFunding"));
             ProjectTracking.selected_project.timeline = Utilities.Get_Value("projectTimeline");
             ProjectTracking.selected_project.comment = Utilities.Get_Value("projectComment");
             var completed = document.getElementById("projectComplete");

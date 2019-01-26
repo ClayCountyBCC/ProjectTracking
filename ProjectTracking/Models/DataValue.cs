@@ -42,6 +42,24 @@ namespace ProjectTracking
               select d).ToList();
     }
 
+    public static List<DataValue> GetCachedFunding()
+    {
+      return (List<DataValue>)MyCache.GetItem("funding");
+    }
+
+
+    public static List<DataValue> GetFunding()
+    {
+      string sql = @"
+        SELECT
+          id Value,
+          funding_source Label
+        FROM funding
+        ORDER BY funding_source;
+      ";
+      return Constants.Get_Data<DataValue>(sql);
+    }
+
 
   }
 }

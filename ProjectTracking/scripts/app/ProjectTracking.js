@@ -7,9 +7,11 @@ var ProjectTracking;
     ProjectTracking.filtered_projects = [];
     ProjectTracking.departments = [];
     ProjectTracking.my_departments = [];
+    ProjectTracking.funding_sources = [];
     ProjectTracking.number_of_milestones = 0;
     function Start() {
         ProjectTracking.DataValue.GetDepartments();
+        ProjectTracking.DataValue.GetFunding();
         ProjectTracking.DataValue.GetMyDepartments();
         ProjectTracking.Project.GetProjects();
     }

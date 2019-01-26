@@ -13,6 +13,7 @@ namespace ProjectTracking
     public int id { get; set; } = -1;
     public string project_name { get; set; } = "";
     public int department_id { get; set; } = -1;
+    public int funding_id { get; set; } = -1;
     public string timeline { get; set; } = "";
     public bool commissioner_share { get; set; } = false;
     public bool infrastructure_share { get; set; } = false;
@@ -67,6 +68,7 @@ namespace ProjectTracking
           P.id id,
           P.project_name,
           P.department_id,
+          P.funding_id,
           P.timeline,
           P.commissioner_share,
           P.infrastructure_share,
@@ -131,6 +133,7 @@ namespace ProjectTracking
       dp.Add("@project_id", dbType: DbType.Int32, direction: ParameterDirection.Output);
       dp.Add("@project_name", project_name);
       dp.Add("@department_id", department_id);
+      dp.Add("@funding_id", funding_id);
       dp.Add("@timeline", timeline);
       dp.Add("@commissioner_share", commissioner_share);
       dp.Add("@infrastructure_share", infrastructure_share);
@@ -141,6 +144,7 @@ namespace ProjectTracking
         INSERT INTO project (
           project_name, 
           department_id, 
+          funding_id,
           timeline, 
           commissioner_share, 
           infrastructure_share,
@@ -151,6 +155,7 @@ namespace ProjectTracking
         VALUES (
           @project_name, 
           @department_id, 
+          @funding_id,
           @timeline, 
           @commissioner_share, 
           @infrastructure_share,
@@ -181,6 +186,7 @@ namespace ProjectTracking
         UPDATE project
           SET project_name = @project_name,
             department_id = @department_id,
+            funding_id = @funding_id,
             timeline = @timeline,
             commissioner_share = @commissioner_share,
             infrastructure_share = @infrastructure_share,
@@ -195,6 +201,7 @@ namespace ProjectTracking
         UPDATE project
           SET project_name = @project_name,
             department_id = @department_id,
+            funding_id = @funding_id,
             timeline = @timeline,
             commissioner_share = @commissioner_share,
             infrastructure_share = @infrastructure_share,

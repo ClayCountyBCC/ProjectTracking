@@ -7,6 +7,7 @@
     id: number;
     project_name: string;
     department_id: number;
+    funding_id: number;
     timeline: string;
     commissioner_share: boolean;
     infrastructure_share: boolean;
@@ -24,6 +25,7 @@
     public id: number = -1;
     public project_name: string = "";
     public department_id: number = -1;
+    public funding_id: number = -1;
     public timeline: string = "";
     public commissioner_share: boolean = false;
     public infrastructure_share: boolean = false;
@@ -44,7 +46,6 @@
     {
       let buttonId = "filterRefreshButton";
       Utilities.Toggle_Loading_Button(buttonId, true);
-      ProjectTracking.departments = [];
       let path = ProjectTracking.GetPath();
       Utilities.Get<Array<Project>>(path + "API/Project/List")
         .then(function (projects: Array<Project>)
@@ -117,6 +118,7 @@
       ProjectTracking.selected_project = new Project(); // the object we'll be saving
       Project.UpdateProjectName("");
       Project.UpdateProjectDepartment("");
+      Project.UpdateProjectFunding("-1");
       Milestone.ClearMilestones();
       Project.UpdateProjectTimeline("");
       Project.UpdateProjectCompleted(false);
@@ -136,6 +138,7 @@
 
       Project.UpdateProjectName(project.project_name);
       Project.UpdateProjectDepartment(project.department_id.toString());
+      Project.UpdateProjectFunding(project.funding_id.toString());
       Milestone.LoadMilestones(project.milestones);
       Project.UpdateProjectTimeline(project.timeline);
       Project.UpdateProjectCompleted(project.completed);
@@ -166,6 +169,11 @@
     public static UpdateProjectDepartment(departmentId: string): void
     {
       Utilities.Set_Value("projectDepartment", departmentId);
+    }
+
+    public static UpdateProjectFunding(sourceId: string): void
+    {
+      Utilities.Set_Value("projectFunding", sourceId);
     }
 
     public static UpdateProjectTimeline(timeline: string): void
@@ -229,12 +237,6 @@
           console.log('selected_project', ProjectTracking.selected_project);
         }
         projectName.appendChild(a);
-        // handle add comments button here
-        
-        //let addComments = document.createElement("a");
-        //addComments.classList.add("is-primary");
-        //addComments.appendChild(document.createTextNode("Add Comment"));
-        //dfComments.appendChild(addComments);
       }
       else
       {
@@ -249,6 +251,12 @@
       let departmentName = departmentNames.length > 0 ? departmentNames[0].Label : "";
       department.appendChild(document.createTextNode(departmentName));
       tr.appendChild(department);
+
+      let funding = document.createElement("td");
+      let fundingNames = ProjectTracking.funding_sources.filter(function (d) { return d.Value === project.funding_id.toString(); });
+      let fundingName = departmentNames.length > 0 && project.funding_id !== -1 ? fundingNames[0].Label : "";
+      funding.appendChild(document.createTextNode(fundingName));
+      tr.appendChild(funding);
 
       let milestones = document.createElement("td");
       milestones.appendChild(Milestone.MilestonesView(project.milestones));
@@ -269,12 +277,13 @@
     {
       // let's lock the button down so the user can't click it multiple times
       // we'll also want to update it to show that it's loading
-      let saveButton = document.getElementById("saveProject");
+      //let saveButton = document.getElementById("saveProject");
       Utilities.Toggle_Loading_Button("saveProject", true);
 
       ProjectTracking.selected_project.project_name = Utilities.Get_Value("projectName");
       ProjectTracking.selected_project.milestones = Milestone.ReadMilestones();
       ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
+      ProjectTracking.selected_project.funding_id = parseInt(Utilities.Get_Value("projectFunding"));
       ProjectTracking.selected_project.timeline = Utilities.Get_Value("projectTimeline");
       ProjectTracking.selected_project.comment = Utilities.Get_Value("projectComment");
       let completed = <HTMLInputElement>document.getElementById("projectComplete");

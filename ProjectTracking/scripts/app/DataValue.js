@@ -7,14 +7,6 @@ var ProjectTracking;
             this.Value = Value;
             this.selected = selected;
         }
-        //public static GetDepartments(): void
-        //{
-        //  ProjectTracking.departments = [];
-        //  departments.push(new DataValue("MIS", "0107"));
-        //  departments.push(new DataValue("Fire", "1703"));
-        //  departments.push(new DataValue("PS Admin", "2103"));
-        //  departments.push(new DataValue("Parks & Rec", "3201"));
-        //}
         DataValue.GetDepartments = function () {
             ProjectTracking.departments = [];
             var path = ProjectTracking.GetPath();
@@ -27,7 +19,7 @@ var ProjectTracking;
                     var d = departments_1[_i];
                     ProjectTracking.departments.push(d);
                 }
-                DataValue.BuildDepartmentSelect("departmentFilter", ProjectTracking.departments);
+                DataValue.BuildDataValueSelect("departmentFilter", ProjectTracking.departments);
                 //Toggle_Loading_Search_Buttons(false);
             }, function (e) {
                 console.log('error getting permits', e);
@@ -41,24 +33,42 @@ var ProjectTracking;
                 .then(function (departments) {
                 console.log("my departments", departments);
                 ProjectTracking.my_departments = departments;
-                DataValue.BuildDepartmentSelect("projectDepartment", departments);
+                DataValue.BuildDataValueSelect("projectDepartment", departments);
                 //Toggle_Loading_Search_Buttons(false);
             }, function (e) {
                 console.log('error getting permits', e);
                 //Toggle_Loading_Search_Buttons(false);
             });
         };
-        DataValue.BuildDepartmentSelect = function (elementId, departments) {
-            var departmentSelect = document.getElementById(elementId);
-            Utilities.Clear_Element(departmentSelect);
+        DataValue.BuildDataValueSelect = function (elementId, departments) {
+            var select = document.getElementById(elementId);
+            Utilities.Clear_Element(select);
             for (var _i = 0, departments_2 = departments; _i < departments_2.length; _i++) {
                 var d = departments_2[_i];
                 var o = document.createElement("option");
                 o.value = d.Value;
                 o.selected = d.selected;
                 o.appendChild(document.createTextNode(d.Label));
-                departmentSelect.add(o, null);
+                select.add(o, null);
             }
+        };
+        DataValue.GetFunding = function () {
+            ProjectTracking.funding_sources = [];
+            var path = ProjectTracking.GetPath();
+            Utilities.Get(path + "API/Project/Funding")
+                .then(function (funding) {
+                console.log("all funding", funding);
+                ProjectTracking.funding_sources.push(new DataValue("Select Funding", "-1", true));
+                for (var _i = 0, funding_1 = funding; _i < funding_1.length; _i++) {
+                    var d = funding_1[_i];
+                    ProjectTracking.funding_sources.push(d);
+                }
+                DataValue.BuildDataValueSelect("projectFunding", ProjectTracking.funding_sources);
+                //Toggle_Loading_Search_Buttons(false);
+            }, function (e) {
+                console.log('error getting funding', e);
+                //Toggle_Loading_Search_Buttons(false);
+            });
         };
         return DataValue;
     }());

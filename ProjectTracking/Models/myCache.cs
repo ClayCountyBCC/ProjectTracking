@@ -68,6 +68,8 @@ namespace ProjectTracking
       {
         case "departments":
           return DataValue.GetDepartments();
+        case "funding":
+          return DataValue.GetFunding();
         case "userdepartments":
           return User.GetUserDepartments();
         case "countymanager":

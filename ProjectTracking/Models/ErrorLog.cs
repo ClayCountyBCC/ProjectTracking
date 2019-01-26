@@ -12,7 +12,7 @@ namespace ProjectTracking
   public class ErrorLog
   {
     public int AppId { get; set; } = Constants.appId;
-    public string ApplicationName { get; set; } = "ProjectTracing";
+    public string ApplicationName { get; set; } = "ProjectTracking";
     public string ErrorText { get; set; }
     public string ErrorMessage { get; set; }
     public string ErrorStacktrace { get; set; }

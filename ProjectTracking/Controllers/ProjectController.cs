@@ -32,6 +32,15 @@ namespace ProjectTracking.Controllers
     }
 
     [HttpGet]
+    [Route("Funding")]
+    public IHttpActionResult GetFunding()
+    {
+      var ua = new UserAccess(User.Identity.Name);
+      if (!ua.authenticated) return Unauthorized();
+      return Ok(DataValue.GetCachedFunding());
+    }
+
+    [HttpGet]
     [Route("List")]
     public IHttpActionResult GetProjects()
     {

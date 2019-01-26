@@ -121,13 +121,16 @@
           <th style="width: 10%;">
             Department
           </th>
-          <th style="width: 25%;">
+          <th style="width: 10%;">
+            Funding
+          </th>
+          <th style="width: 20%;">
             Milestones
           </th>
           <th style="width: 15%;">
             Timeline
           </th>
-          <th style="width: 25%;">
+          <th style="width: 20%;">
             Comments
           </th>
           <th style="width: 10%;">
@@ -148,12 +151,6 @@
       <div onclick="ProjectTracking.CloseModals();"
            class="modal-background"></div>
       <div class="modal-card container">
-        <!--<header class="modal-card-head">
-        <p class="modal-card-title">Add Project</p>
-        <button onclick="ProjectTracking.CloseModals();"
-                class="delete"
-                aria-label="close"></button>
-      </header>-->
         <section class="modal-card-body">
 
           <div class="field">
@@ -172,6 +169,16 @@
             <div class="control">
               <div class="select is-medium">
                 <select id="projectDepartment"></select>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Funding Source</label>
+            <div class="control">
+              <div class="select is-medium">
+                <select id="projectFunding"></select>
               </div>
 
             </div>
@@ -282,13 +289,13 @@
 
 
 
-  <script src="scripts/app/DataValue.js"></script>
+  <!--<script src="scripts/app/DataValue.js"></script>
   <script src="scripts/utilities/Utilities.js"></script>
   <script src="scripts/app/Comment.js"></script>
   <script src="scripts/app/Milestone.js"></script>
   <script src="scripts/app/Project.js"></script>
-  <script src="scripts/app/ProjectTracking.js"></script>
-
+  <script src="scripts/app/ProjectTracking.js"></script>-->
+  <script src="scripts/app/bundle.min.js?20190125-2358"></script>
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function (event)
     {
