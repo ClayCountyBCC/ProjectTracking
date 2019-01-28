@@ -13,7 +13,7 @@
 .show-flex {
   display: flex; }
 
-@media print and (orientation: landscape) {
+@media print {
   @page {
     margin: 2em;
     size: ledger !important; }
