@@ -13,7 +13,7 @@ namespace ProjectTracking
     public int id { get; set; } = -1;
     public string project_name { get; set; } = "";
     public int department_id { get; set; } = -1;
-    public int funding_id { get; set; } = -1;
+    public int funding_id { get; set; } = 1;
     public string timeline { get; set; } = "";
     public bool commissioner_share { get; set; } = false;
     public bool infrastructure_share { get; set; } = false;
