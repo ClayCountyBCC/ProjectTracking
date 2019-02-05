@@ -78,7 +78,7 @@
         .then(function (funding: Array<DataValue>)
         {
           console.log("all funding", funding);
-          ProjectTracking.funding_sources.push(new DataValue("Select Funding", "-1", true));          
+          //ProjectTracking.funding_sources.push(new DataValue("Select Funding", "0", true));          
           for (let d of funding)
           {
             ProjectTracking.funding_sources.push(d);

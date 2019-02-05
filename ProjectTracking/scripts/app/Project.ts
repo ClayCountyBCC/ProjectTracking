@@ -25,7 +25,7 @@
     public id: number = -1;
     public project_name: string = "";
     public department_id: number = -1;
-    public funding_id: number = -1;
+    public funding_id: number = 1;
     public timeline: string = "";
     public commissioner_share: boolean = false;
     public infrastructure_share: boolean = false;
@@ -100,7 +100,7 @@
       });
       projects = projects.filter(function (j)
       {
-        return ((completedFilter && j.completed) || !completedFilter);
+        return ((completedFilter && !j.completed) || !completedFilter);
       });
       projects = projects.filter(function (j)
       {
@@ -118,7 +118,7 @@
       ProjectTracking.selected_project = new Project(); // the object we'll be saving
       Project.UpdateProjectName("");
       Project.UpdateProjectDepartment("");
-      Project.UpdateProjectFunding("-1");
+      Project.UpdateProjectFunding("0");
       Milestone.ClearMilestones();
       Project.UpdateProjectTimeline("");
       Project.UpdateProjectCompleted(false);

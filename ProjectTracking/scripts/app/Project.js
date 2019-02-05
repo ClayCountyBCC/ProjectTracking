@@ -6,7 +6,7 @@ var ProjectTracking;
             this.id = -1;
             this.project_name = "";
             this.department_id = -1;
-            this.funding_id = -1;
+            this.funding_id = 1;
             this.timeline = "";
             this.commissioner_share = false;
             this.infrastructure_share = false;
@@ -61,7 +61,7 @@ var ProjectTracking;
                 return ((shareFilter && j.commissioner_share) || !shareFilter);
             });
             projects = projects.filter(function (j) {
-                return ((completedFilter && j.completed) || !completedFilter);
+                return ((completedFilter && !j.completed) || !completedFilter);
             });
             projects = projects.filter(function (j) {
                 return ((infrastructureFilter && j.infrastructure_share) || !infrastructureFilter);
@@ -75,7 +75,7 @@ var ProjectTracking;
             ProjectTracking.selected_project = new Project(); // the object we'll be saving
             Project.UpdateProjectName("");
             Project.UpdateProjectDepartment("");
-            Project.UpdateProjectFunding("-1");
+            Project.UpdateProjectFunding("0");
             ProjectTracking.Milestone.ClearMilestones();
             Project.UpdateProjectTimeline("");
             Project.UpdateProjectCompleted(false);

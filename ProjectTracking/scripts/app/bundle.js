@@ -58,7 +58,7 @@ var ProjectTracking;
             Utilities.Get(path + "API/Project/Funding")
                 .then(function (funding) {
                 console.log("all funding", funding);
-                ProjectTracking.funding_sources.push(new DataValue("Select Funding", "-1", true));
+                //ProjectTracking.funding_sources.push(new DataValue("Select Funding", "0", true));          
                 for (var _i = 0, funding_1 = funding; _i < funding_1.length; _i++) {
                     var d = funding_1[_i];
                     ProjectTracking.funding_sources.push(d);
@@ -716,7 +716,7 @@ var ProjectTracking;
             this.id = -1;
             this.project_name = "";
             this.department_id = -1;
-            this.funding_id = -1;
+            this.funding_id = 1;
             this.timeline = "";
             this.commissioner_share = false;
             this.infrastructure_share = false;
@@ -771,7 +771,7 @@ var ProjectTracking;
                 return ((shareFilter && j.commissioner_share) || !shareFilter);
             });
             projects = projects.filter(function (j) {
-                return ((completedFilter && j.completed) || !completedFilter);
+                return ((completedFilter && !j.completed) || !completedFilter);
             });
             projects = projects.filter(function (j) {
                 return ((infrastructureFilter && j.infrastructure_share) || !infrastructureFilter);
@@ -785,7 +785,7 @@ var ProjectTracking;
             ProjectTracking.selected_project = new Project(); // the object we'll be saving
             Project.UpdateProjectName("");
             Project.UpdateProjectDepartment("");
-            Project.UpdateProjectFunding("-1");
+            Project.UpdateProjectFunding("0");
             ProjectTracking.Milestone.ClearMilestones();
             Project.UpdateProjectTimeline("");
             Project.UpdateProjectCompleted(false);

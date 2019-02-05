@@ -58,7 +58,7 @@ var ProjectTracking;
             Utilities.Get(path + "API/Project/Funding")
                 .then(function (funding) {
                 console.log("all funding", funding);
-                ProjectTracking.funding_sources.push(new DataValue("Select Funding", "-1", true));
+                //ProjectTracking.funding_sources.push(new DataValue("Select Funding", "0", true));          
                 for (var _i = 0, funding_1 = funding; _i < funding_1.length; _i++) {
                     var d = funding_1[_i];
                     ProjectTracking.funding_sources.push(d);
