@@ -11,6 +11,7 @@ namespace ProjectTracking
   export let my_departments: Array<DataValue> = [];
   export let funding_sources: Array<DataValue> = [];
   export let number_of_milestones: number = 0;
+  export let project_name_filter = '';
 
   export function Start(): void
   {
@@ -52,6 +53,13 @@ namespace ProjectTracking
 
   export function FilterProjects()
   {
+    Project.BuildProjectTrackingList(Project.ApplyFilters(ProjectTracking.projects));
+  }
+
+  export function FilterProjectNames(input: HTMLInputElement)
+  {
+    let v = input.value.trim();
+    project_name_filter = v.length > 2 ? v : '';    
     Project.BuildProjectTrackingList(Project.ApplyFilters(ProjectTracking.projects));
   }
 

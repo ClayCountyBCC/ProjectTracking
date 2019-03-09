@@ -11,6 +11,7 @@
     timeline: string;
     commissioner_share: boolean;
     infrastructure_share: boolean;
+    legislative_tracking: boolean;
     completed: boolean;
     date_last_updated: any;
     date_completed: any;
@@ -29,6 +30,7 @@
     public timeline: string = "";
     public commissioner_share: boolean = false;
     public infrastructure_share: boolean = false;
+    public legislative_tracking: boolean = false;
     public completed: boolean = false;
     public date_last_updated: any = null;
     public date_completed: any = null;
@@ -80,9 +82,11 @@
     public static ApplyFilters(projects: Array<Project>): Array<Project>
     {
       let departmentFilter = Utilities.Get_Value("departmentFilter");
+      let projectNameFilter = ProjectTracking.project_name_filter.toUpperCase();
       let shareFilter = (<HTMLInputElement>document.getElementById("projectCommissionerShareFilter")).checked;
       let completedFilter = (<HTMLInputElement>document.getElementById("projectCompleteFilter")).checked;      
       let infrastructureFilter = (<HTMLInputElement>document.getElementById("projectInfrastructureFilter")).checked;      
+      let legislativeFilter = (<HTMLInputElement>document.getElementById("projectLegislativeFilter")).checked;      
       projects = projects.filter(function (j)
       {
         return (departmentFilter.length === 0 ||
@@ -100,13 +104,21 @@
       });
       projects = projects.filter(function (j)
       {
+        return ((legislativeFilter && j.legislative_tracking) || !legislativeFilter);
+      });
+
+      projects = projects.filter(function (j)
+      {
         return ((completedFilter && !j.completed) || !completedFilter);
       });
       projects = projects.filter(function (j)
       {
         return ((infrastructureFilter && j.infrastructure_share) || !infrastructureFilter);
       });
-
+      projects = projects.filter(function (j)
+      {
+        return (projectNameFilter.length > 0 && j.project_name.toUpperCase().indexOf(projectNameFilter) > -1 || projectNameFilter.length === 0);
+      });
       return projects;
     }
 
@@ -124,6 +136,7 @@
       Project.UpdateProjectCompleted(false);
       Project.UpdateCommissionerShare(false);
       Project.UpdateInfrastructureShare(false);
+      Project.UpdateLegislativeTracking(false);
       let commentsContainer = document.getElementById("existingCommentsContainer");
       Utilities.Hide(commentsContainer);
       Utilities.Clear_Element(commentsContainer);
@@ -144,6 +157,7 @@
       Project.UpdateProjectCompleted(project.completed);
       Project.UpdateCommissionerShare(project.commissioner_share);
       Project.UpdateInfrastructureShare(project.infrastructure_share);
+      Project.UpdateLegislativeTracking(project.legislative_tracking);
       let commentsContainer = document.getElementById("existingCommentsContainer");
       Utilities.Clear_Element(commentsContainer);
       if (project.comments.length > 0)
@@ -155,8 +169,6 @@
       {
         Utilities.Hide(commentsContainer);
       }
-
-
       Project.ClearComment();
       ProjectTracking.ShowAddProject();
     }
@@ -191,6 +203,12 @@
     {
       let ifshare = <HTMLInputElement>document.getElementById("projectInfrastructureShare");
       ifshare.checked = infrastructure;
+    }
+
+    public static UpdateLegislativeTracking(legislative: boolean): void
+    {
+      let tracking = <HTMLInputElement>document.getElementById("projectLegislativeTracking");
+      tracking.checked = legislative;
     }
 
     public static UpdateCommissionerShare(share: boolean): void
@@ -279,19 +297,34 @@
       // we'll also want to update it to show that it's loading
       //let saveButton = document.getElementById("saveProject");
       Utilities.Toggle_Loading_Button("saveProject", true);
-
-      ProjectTracking.selected_project.project_name = Utilities.Get_Value("projectName");
+      let projectName = Utilities.Get_Value("projectName").trim();
+      if (projectName.length === 0)
+      {
+        //alert("You must have a project name in order to save, or you can click the Cancel button to exit without saving any changes.");
+        let projectNameInput = document.getElementById("projectName");
+        let e = document.getElementById("projectNameEmpty");
+        Utilities.Error_Show(e, "", true);
+        projectNameInput.focus();
+        projectNameInput.scrollTo();
+        Utilities.Toggle_Loading_Button("saveProject", false);
+        return;
+      }
+      ProjectTracking.selected_project.project_name = projectName;
       ProjectTracking.selected_project.milestones = Milestone.ReadMilestones();
       ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
       ProjectTracking.selected_project.funding_id = parseInt(Utilities.Get_Value("projectFunding"));
       ProjectTracking.selected_project.timeline = Utilities.Get_Value("projectTimeline");
       ProjectTracking.selected_project.comment = Utilities.Get_Value("projectComment");
+
       let completed = <HTMLInputElement>document.getElementById("projectComplete");
       ProjectTracking.selected_project.completed = completed.checked;
       let share = <HTMLInputElement>document.getElementById("projectCommissionerShare");
       ProjectTracking.selected_project.commissioner_share = share.checked;
       let ifshare = <HTMLInputElement>document.getElementById("projectInfrastructureShare");
       ProjectTracking.selected_project.infrastructure_share = ifshare.checked;
+      
+      let legislative = <HTMLInputElement>document.getElementById("projectLegislativeTracking");
+      ProjectTracking.selected_project.legislative_tracking = legislative.checked;
 
       let path = ProjectTracking.GetPath();
       let saveType = (ProjectTracking.selected_project.id > -1) ? "Update" : "Add";

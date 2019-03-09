@@ -10,6 +10,7 @@ var ProjectTracking;
             this.timeline = "";
             this.commissioner_share = false;
             this.infrastructure_share = false;
+            this.legislative_tracking = false;
             this.completed = false;
             this.date_last_updated = null;
             this.date_completed = null;
@@ -46,9 +47,11 @@ var ProjectTracking;
         };
         Project.ApplyFilters = function (projects) {
             var departmentFilter = Utilities.Get_Value("departmentFilter");
+            var projectNameFilter = ProjectTracking.project_name_filter.toUpperCase();
             var shareFilter = document.getElementById("projectCommissionerShareFilter").checked;
             var completedFilter = document.getElementById("projectCompleteFilter").checked;
             var infrastructureFilter = document.getElementById("projectInfrastructureFilter").checked;
+            var legislativeFilter = document.getElementById("projectLegislativeFilter").checked;
             projects = projects.filter(function (j) {
                 return (departmentFilter.length === 0 ||
                     j.department_id.toString() === departmentFilter ||
@@ -61,10 +64,16 @@ var ProjectTracking;
                 return ((shareFilter && j.commissioner_share) || !shareFilter);
             });
             projects = projects.filter(function (j) {
+                return ((legislativeFilter && j.legislative_tracking) || !legislativeFilter);
+            });
+            projects = projects.filter(function (j) {
                 return ((completedFilter && !j.completed) || !completedFilter);
             });
             projects = projects.filter(function (j) {
                 return ((infrastructureFilter && j.infrastructure_share) || !infrastructureFilter);
+            });
+            projects = projects.filter(function (j) {
+                return (projectNameFilter.length > 0 && j.project_name.toUpperCase().indexOf(projectNameFilter) > -1 || projectNameFilter.length === 0);
             });
             return projects;
         };
@@ -81,6 +90,7 @@ var ProjectTracking;
             Project.UpdateProjectCompleted(false);
             Project.UpdateCommissionerShare(false);
             Project.UpdateInfrastructureShare(false);
+            Project.UpdateLegislativeTracking(false);
             var commentsContainer = document.getElementById("existingCommentsContainer");
             Utilities.Hide(commentsContainer);
             Utilities.Clear_Element(commentsContainer);
@@ -98,6 +108,7 @@ var ProjectTracking;
             Project.UpdateProjectCompleted(project.completed);
             Project.UpdateCommissionerShare(project.commissioner_share);
             Project.UpdateInfrastructureShare(project.infrastructure_share);
+            Project.UpdateLegislativeTracking(project.legislative_tracking);
             var commentsContainer = document.getElementById("existingCommentsContainer");
             Utilities.Clear_Element(commentsContainer);
             if (project.comments.length > 0) {
@@ -129,6 +140,10 @@ var ProjectTracking;
         Project.UpdateInfrastructureShare = function (infrastructure) {
             var ifshare = document.getElementById("projectInfrastructureShare");
             ifshare.checked = infrastructure;
+        };
+        Project.UpdateLegislativeTracking = function (legislative) {
+            var tracking = document.getElementById("projectLegislativeTracking");
+            tracking.checked = legislative;
         };
         Project.UpdateCommissionerShare = function (share) {
             var shared = document.getElementById("projectCommissionerShare");
@@ -196,7 +211,18 @@ var ProjectTracking;
             // we'll also want to update it to show that it's loading
             //let saveButton = document.getElementById("saveProject");
             Utilities.Toggle_Loading_Button("saveProject", true);
-            ProjectTracking.selected_project.project_name = Utilities.Get_Value("projectName");
+            var projectName = Utilities.Get_Value("projectName").trim();
+            if (projectName.length === 0) {
+                //alert("You must have a project name in order to save, or you can click the Cancel button to exit without saving any changes.");
+                var projectNameInput = document.getElementById("projectName");
+                var e = document.getElementById("projectNameEmpty");
+                Utilities.Error_Show(e, "", true);
+                projectNameInput.focus();
+                projectNameInput.scrollTo();
+                Utilities.Toggle_Loading_Button("saveProject", false);
+                return;
+            }
+            ProjectTracking.selected_project.project_name = projectName;
             ProjectTracking.selected_project.milestones = ProjectTracking.Milestone.ReadMilestones();
             ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
             ProjectTracking.selected_project.funding_id = parseInt(Utilities.Get_Value("projectFunding"));
@@ -208,6 +234,8 @@ var ProjectTracking;
             ProjectTracking.selected_project.commissioner_share = share.checked;
             var ifshare = document.getElementById("projectInfrastructureShare");
             ProjectTracking.selected_project.infrastructure_share = ifshare.checked;
+            var legislative = document.getElementById("projectLegislativeTracking");
+            ProjectTracking.selected_project.legislative_tracking = legislative.checked;
             var path = ProjectTracking.GetPath();
             var saveType = (ProjectTracking.selected_project.id > -1) ? "Update" : "Add";
             Utilities.Post_Empty(path + "API/Project/" + saveType, ProjectTracking.selected_project)

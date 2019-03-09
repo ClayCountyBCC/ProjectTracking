@@ -17,6 +17,7 @@ namespace ProjectTracking
     public string timeline { get; set; } = "";
     public bool commissioner_share { get; set; } = false;
     public bool infrastructure_share { get; set; } = false;
+    public bool legislative_tracking { get; set; } = false;
     public bool completed { get; set; } = false;
     public string comment { get; set; } = "";
     public DateTime date_completed { get; set; } = DateTime.MinValue;
@@ -72,6 +73,7 @@ namespace ProjectTracking
           P.timeline,
           P.commissioner_share,
           P.infrastructure_share,
+          P.legislative_tracking,
           P.completed,
           P.date_completed,
           ISNULL(D.date_last_updated, P.added_on) date_last_updated
@@ -137,6 +139,7 @@ namespace ProjectTracking
       dp.Add("@timeline", timeline);
       dp.Add("@commissioner_share", commissioner_share);
       dp.Add("@infrastructure_share", infrastructure_share);
+      dp.Add("@legislative_tracking", legislative_tracking);
       dp.Add("@completed", completed);
       dp.Add("@added_by", added_by);
 
@@ -148,6 +151,7 @@ namespace ProjectTracking
           timeline, 
           commissioner_share, 
           infrastructure_share,
+          legislative_tracking,
           completed, 
           added_on, 
           added_by
@@ -159,6 +163,7 @@ namespace ProjectTracking
           @timeline, 
           @commissioner_share, 
           @infrastructure_share,
+          @legislative_tracking,
           @completed, 
           GETDATE(), 
           @added_by
@@ -190,6 +195,7 @@ namespace ProjectTracking
             timeline = @timeline,
             commissioner_share = @commissioner_share,
             infrastructure_share = @infrastructure_share,
+            legislative_tracking = @legislative_tracking,
             completed = @completed,
             date_completed = GETDATE()
         WHERE 
@@ -205,6 +211,7 @@ namespace ProjectTracking
             timeline = @timeline,
             commissioner_share = @commissioner_share,
             infrastructure_share = @infrastructure_share,
+            legislative_tracking = @legislative_tracking,
             completed = @completed
         WHERE 
           id=@id";

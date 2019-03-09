@@ -84,6 +84,17 @@
             </label>
           </div>
         </div>
+        
+        <div class="level-item">
+          <div class="field">
+            <label class="checkbox is-medium">
+              <input onchange="ProjectTracking.FilterProjects();"
+                     id="projectLegislativeFilter"                     
+                     type="checkbox" />
+              Legislative Tracking
+            </label>
+          </div>
+        </div>
         <div class="level-item">
           <div class="field">
             <label class="checkbox is-medium">
@@ -117,7 +128,16 @@
       <thead>
         <tr>
           <th style="width: 15%;">
-            Project Name
+            <div class="field">
+              <div class="control">
+                <input onkeyup="ProjectTracking.FilterProjectNames(this);"
+                       class="input"
+                       value=""
+                       placeholder="Project Name Filter" />
+              </div>
+
+            </div>
+
           </th>
           <th style="width: 10%;">
             Department
@@ -161,8 +181,10 @@
                      autofocus
                      class="input is-medium"
                      maxlength="100"
+                     required
                      type="text" />
-
+              <p id="projectNameEmpty"
+                 class="help is-danger hide">The Project Name field is required in order to save.</p>
             </div>
           </div>
           <div class="field">
@@ -239,6 +261,15 @@
                        type="checkbox">
 
                 Add this project to the Infrastructure Committee View?
+              </label>
+            </div>
+
+            <div class="field">
+              <label class="checkbox is-medium">
+                <input id="projectLegislativeTracking"
+                       type="checkbox">
+
+                Add this project to the Legislative Tracking View?
               </label>
             </div>
 

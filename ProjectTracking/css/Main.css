@@ -7,6 +7,7 @@
   position: sticky;
   background-color: white;
   top: 0;
+  vertical-align: middle;
   /*border-bottom: 1px dotted #333333;*/ }
 
 #projects .table tr > td, #projects .table tr > th {
