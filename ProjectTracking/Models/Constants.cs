@@ -108,6 +108,22 @@ namespace ProjectTracking
       }
     }
 
+    public static T Exec_Scalar<T>(string query, DynamicParameters dbA)
+    {
+      try
+      {
+        using (IDbConnection db = new SqlConnection(Get_CS("Production")))
+        {
+          return db.ExecuteScalar<T>(query, dbA);
+        }
+      }
+      catch (Exception ex)
+      {
+        new ErrorLog(ex, query);
+        return default(T);
+      }
+    }
+
     public static bool Save_Data<T>(string Query, T item)
     {
       try

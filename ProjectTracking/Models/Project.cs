@@ -82,7 +82,10 @@ namespace ProjectTracking
           P.department_id = U.department_id
           AND U.employee_id = @employee_id
         LEFT OUTER JOIN DateUpdated D ON 
-          D.project_id = P.id";
+          D.project_id = P.id
+        INNER JOIN department DEP ON P.department_id = DEP.id
+        ORDER BY DEP.department, P.id
+";
       return Constants.Get_Data<Project>(query, param);
     }
 
@@ -223,6 +226,21 @@ namespace ProjectTracking
 
 
       return Constants.Save_Data<Project>(query, this);
+    }
+
+    public static int GetProjectDepartment(int project_id)
+    {
+      // this function is going to return the department id
+      // associated to this comment's project.
+      var dp = new DynamicParameters();
+      dp.Add("@project_id", project_id);
+
+      string query = @"
+        SELECT
+          department_id
+        FROM project
+        WHERE id=@project_id";
+      return Constants.Exec_Scalar<int>(query, dp);
     }
 
   }

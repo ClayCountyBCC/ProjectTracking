@@ -101,8 +101,34 @@ namespace ProjectTracking.Controllers
       var ua = new UserAccess(User.Identity.Name);
       if (!ua.authenticated) return Unauthorized();
 
+      var errorText = Comment.ValidateCommentAddAccess(ua.employee_id, project_id);
+      if(errorText.Length > 0)
+      {
+        return Ok(errorText);
+      }
       if (Comment.UpdateOnly(ua, project_id)) return Ok("");
       return Ok("There was a problem saving your comment, please refresh this page and try again.");
     }
+
+    [HttpPost]
+    [Route("DeleteComment")]
+    public IHttpActionResult DeleteComment(int comment_id)
+    {
+      var ua = new UserAccess(User.Identity.Name);
+      if (!ua.authenticated) return Unauthorized();
+
+      var errorText = Comment.ValidateDeleteCommentAccess(ua.employee_id, comment_id);
+      if (errorText.Length > 0)        
+      {
+        return Ok(errorText);
+      }
+      if (Comment.DeleteComment(comment_id, ua.user_name))
+      {
+        return Ok("");
+      }
+      return Ok("There was a problem deleting this comment, please refresh this page and try again.  IF this issue persists, please contact the help desk.");
+
+    }
+
   }
 } 

@@ -85,6 +85,71 @@
           span.style.fontWeight = "bold";
         }
         li.appendChild(span);
+        if (full)
+        {
+          let deletebutton = document.createElement("button");
+          deletebutton.classList.add("delete");
+          li.appendChild(deletebutton);
+          let deletecontainer = document.createElement("div");
+          deletecontainer.style.display = "none";
+          deletecontainer.classList.add("notification");
+          deletecontainer.classList.add("is-danger");
+          li.appendChild(deletecontainer);
+          let questioncontainer = document.createElement("span");
+          questioncontainer.appendChild(document.createTextNode("Are you sure you want to delete this comment?"));
+          deletecontainer.appendChild(questioncontainer);
+          let yespleasedeletebutton = document.createElement("button");
+          yespleasedeletebutton.appendChild(document.createTextNode("Delete"));
+          yespleasedeletebutton.classList.add("button");
+          yespleasedeletebutton.style.marginRight = "1em";
+          yespleasedeletebutton.style.marginLeft = "1em";
+          yespleasedeletebutton.onclick = function ()
+          {
+            // do actual delete stuff here
+            Utilities.Toggle_Loading_Button(yespleasedeletebutton, true);
+            Utilities.Toggle_Loading_Button(cancelbutton, true);
+
+            let path = ProjectTracking.GetPath();
+            Utilities.Post_Empty(path + "API/Project/DeleteComment?comment_id=" + c.id.toString(), null)
+              .then(function (r: Response)
+              {
+                console.log('post response', r);
+                if (!r.ok)
+                {
+                  // do some error stuff
+                  console.log('some errors happened with post response');
+                  alert("There was an issue deleting this comment.  Please try again, and put in a help desk ticket if the issue persists.");
+                }
+                Utilities.Toggle_Loading_Button(yespleasedeletebutton, false);
+                Utilities.Toggle_Loading_Button(cancelbutton, false);
+                deletecontainer.style.display = "none";
+                li.style.display = "none";
+              }, function (e)
+                {
+                  console.log('error getting delete comment', e);
+                  Utilities.Toggle_Loading_Button(yespleasedeletebutton, false);
+                  Utilities.Toggle_Loading_Button(cancelbutton, false);
+                });
+
+
+          }
+          deletecontainer.appendChild(yespleasedeletebutton);
+          let cancelbutton = document.createElement("button");
+          cancelbutton.classList.add("button");
+          cancelbutton.appendChild(document.createTextNode("Cancel"));
+          cancelbutton.onclick = function ()
+          {
+            deletecontainer.style.display = "none";
+          }
+          deletecontainer.appendChild(cancelbutton);
+          deletebutton.onclick = function ()
+          {
+            // show the delete container
+            deletecontainer.style.display = "block";
+          }
+        }
+
+
         ol.appendChild(li);
       }
       df.appendChild(ol);

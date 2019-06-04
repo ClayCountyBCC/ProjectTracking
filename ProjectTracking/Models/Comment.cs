@@ -82,9 +82,72 @@ namespace ProjectTracking
         added_on,
         by_county_manager
       FROM comment
+      WHERE is_deleted=0
       ORDER BY project_id, id;";
 
       return Constants.Get_Data<Comment>(query);
+    }
+
+    public static string ValidateDeleteCommentAccess(int employee_id, int comment_id)
+    {
+      var mydepartments = DataValue.GetMyDepartments(employee_id);
+      int commentDepartment = Comment.GetCommentDepartment(comment_id);
+
+      if ((from d in mydepartments
+           where d.Value == commentDepartment.ToString()
+           select d).Count() == 0)
+      {
+        return "You do not have access to this project's department.";
+      }
+      return "";
+    }
+
+    public static string ValidateCommentAddAccess(int employee_id, int project_id)
+    {
+      var mydepartments = DataValue.GetMyDepartments(employee_id);
+      int projectDepartment = Project.GetProjectDepartment(project_id);
+
+      if ((from d in mydepartments
+           where d.Value == projectDepartment.ToString()
+           select d).Count() == 0)
+      {
+        return "You do not have access to this project's department.";
+      }
+      return "";
+    }
+
+    public static bool DeleteComment(int comment_id, string username)
+    {
+      var dp = new DynamicParameters();
+      dp.Add("@comment_id", comment_id);
+      dp.Add("@deleted_by", username);
+
+      string query = @"
+        USE ProjectTracking;
+        UPDATE comment
+          SET 
+            is_deleted=1
+            ,deleted_by=@deleted_by
+            ,deleted_on=GETDATE()
+        WHERE id = @comment_id;";
+      return Constants.Exec_Query(query, dp) != -1;
+    }
+
+    public static int GetCommentDepartment(int comment_id)
+    {
+      // this function is going to return the department id
+      // associated to this comment's project.
+      var dp = new DynamicParameters();
+      dp.Add("@comment_id", comment_id);
+
+      string query = @"
+        USE ProjectTracking;
+        SELECT
+          P.department_id
+        FROM comment C
+        INNER JOIN project P ON C.project_id = P.id
+        WHERE C.id=@comment_id";
+      return Constants.Exec_Scalar<int>(query, dp);
     }
 
   }
