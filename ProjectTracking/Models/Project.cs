@@ -82,7 +82,9 @@ namespace ProjectTracking
           P.department_id = U.department_id
           AND U.employee_id = @employee_id
         LEFT OUTER JOIN DateUpdated D ON 
-          D.project_id = P.id";
+          D.project_id = P.id
+        ORDER BY P.department_id, P.id
+        ";
       return Constants.Get_Data<Project>(query, param);
     }
 
