@@ -15,6 +15,7 @@ var ProjectTracking;
         ProjectTracking.DataValue.GetFunding();
         ProjectTracking.DataValue.GetMyDepartments();
         ProjectTracking.Project.GetProjects();
+        ProjectTracking.Project.PopulatePriorities();
     }
     ProjectTracking.Start = Start;
     function ShowAddProject() {

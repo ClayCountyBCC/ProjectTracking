@@ -10,6 +10,13 @@ namespace ProjectTracking
 {
   public class Project
   {
+    public enum PriorityLevel: int
+    {
+      Low = 0,
+      Normal = 1,
+      High = 2
+    }
+
     public int id { get; set; } = -1;
     public string project_name { get; set; } = "";
     public int department_id { get; set; } = -1;
@@ -26,6 +33,9 @@ namespace ProjectTracking
     public List<Milestone> milestones { get; set; } = new List<Milestone>();
     public string added_by { get; set; } = "";
     public bool can_edit { get; set; }
+    public bool needs_attention { get; set; } = false;
+    public DateTime estimated_completion_date { get; set; } = DateTime.MinValue;
+    public PriorityLevel priority { get; set; } = PriorityLevel.Normal;
 
     public Project()
     {
@@ -68,6 +78,9 @@ namespace ProjectTracking
           CASE WHEN U.department_id IS NOT NULL THEN 1 ELSE 0 END can_edit,
           P.id id,
           P.project_name,
+          P.priority,
+          P.needs_attention,
+          P.estimated_completion_date,
           P.department_id,
           P.funding_id,
           P.timeline,
@@ -138,6 +151,9 @@ namespace ProjectTracking
       dp.Add("@project_id", dbType: DbType.Int32, direction: ParameterDirection.Output);
       dp.Add("@project_name", project_name);
       dp.Add("@department_id", department_id);
+      dp.Add("@priority", priority);
+      dp.Add("@needs_attention", needs_attention);
+      dp.Add("@estimated_completion_date", estimated_completion_date == DateTime.MinValue ? (DateTime?)null : estimated_completion_date);
       dp.Add("@funding_id", funding_id);
       dp.Add("@timeline", timeline);
       dp.Add("@commissioner_share", commissioner_share);
@@ -149,6 +165,9 @@ namespace ProjectTracking
       string query = @"
         INSERT INTO project (
           project_name, 
+          priority,
+          needs_attention,
+          estimated_completion_date,
           department_id, 
           funding_id,
           timeline, 
@@ -161,6 +180,9 @@ namespace ProjectTracking
         )
         VALUES (
           @project_name, 
+          @priority,
+          @needs_attention,
+          @estimated_completion_date,
           @department_id, 
           @funding_id,
           @timeline, 
@@ -192,7 +214,11 @@ namespace ProjectTracking
         // we need to update the completed date too.
         query = @"
         UPDATE project
-          SET project_name = @project_name,
+          SET 
+            project_name = @project_name,
+            priority = @priority,
+            needs_attention = @needs_attention,
+            estimated_completion_date = @estimated_completion_date,
             department_id = @department_id,
             funding_id = @funding_id,
             timeline = @timeline,
@@ -208,14 +234,18 @@ namespace ProjectTracking
       {
         query = @"
         UPDATE project
-          SET project_name = @project_name,
+          SET 
+            project_name = @project_name,
             department_id = @department_id,
             funding_id = @funding_id,
             timeline = @timeline,
             commissioner_share = @commissioner_share,
             infrastructure_share = @infrastructure_share,
             legislative_tracking = @legislative_tracking,
-            completed = @completed
+            completed = @completed,
+            priority = @priority,
+            needs_attention = @needs_attention,
+            estimated_completion_date = @estimated_completion_date            
         WHERE 
           id=@id";
       }

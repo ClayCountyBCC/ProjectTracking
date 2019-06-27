@@ -2,6 +2,13 @@
 {
   "use strict";
 
+  export enum PriorityLevel
+  {
+    Low = 0,
+    Normal = 1,
+    High = 2
+  }
+
   interface IProject
   {
     id: number;
@@ -19,6 +26,9 @@
     milestones: Array<Milestone>;
     comments: Array<Comment>;
     comment: string;
+    needs_attention: boolean;
+    priority: PriorityLevel;
+    estimated_completion_date: any;
   }
 
   export class Project implements IProject
@@ -38,6 +48,9 @@
     public milestones: Array<Milestone> = [];
     public comments: Array<Comment> = [];
     public comment: string;
+    public needs_attention: boolean;
+    public priority: PriorityLevel;
+    public estimated_completion_date: any;
 
     constructor()
     {
@@ -86,7 +99,9 @@
       let shareFilter = (<HTMLInputElement>document.getElementById("projectCommissionerShareFilter")).checked;
       let completedFilter = (<HTMLInputElement>document.getElementById("projectCompleteFilter")).checked;      
       let infrastructureFilter = (<HTMLInputElement>document.getElementById("projectInfrastructureFilter")).checked;      
-      let legislativeFilter = (<HTMLInputElement>document.getElementById("projectLegislativeFilter")).checked;      
+      let legislativeFilter = (<HTMLInputElement>document.getElementById("projectLegislativeFilter")).checked;
+      let highpriorityFilter = (<HTMLInputElement>document.getElementById("projectHighPriorityFilter")).checked;
+      let needsAttentionFilter = (<HTMLInputElement>document.getElementById("projectNeedsAttentionFilter")).checked;
       projects = projects.filter(function (j)
       {
         return (departmentFilter.length === 0 ||
@@ -111,6 +126,17 @@
       {
         return ((completedFilter && !j.completed) || !completedFilter);
       });
+
+      projects = projects.filter(function (j)
+      {
+        return ((needsAttentionFilter && j.needs_attention) || !needsAttentionFilter);
+      });
+
+      projects = projects.filter(function (j)
+      {
+        return ((highpriorityFilter && j.priority === PriorityLevel.High) || !highpriorityFilter);
+      });
+
       projects = projects.filter(function (j)
       {
         return ((infrastructureFilter && j.infrastructure_share) || !infrastructureFilter);
@@ -134,9 +160,12 @@
       Milestone.ClearMilestones();
       Project.UpdateProjectTimeline("");
       Project.UpdateProjectCompleted(false);
+      Project.UpdateNeedsAttention(false);
+      Project.UpdateProjectPriority(1);
       Project.UpdateCommissionerShare(false);
       Project.UpdateInfrastructureShare(false);
       Project.UpdateLegislativeTracking(false);
+      Project.UpdateProjectEstimatedCompletionDate("");
       let commentsContainer = document.getElementById("existingCommentsContainer");
       Utilities.Hide(commentsContainer);
       Utilities.Clear_Element(commentsContainer);
@@ -158,6 +187,11 @@
       Project.UpdateCommissionerShare(project.commissioner_share);
       Project.UpdateInfrastructureShare(project.infrastructure_share);
       Project.UpdateLegislativeTracking(project.legislative_tracking);
+
+      Project.UpdateNeedsAttention(project.needs_attention);
+      Project.UpdateProjectEstimatedCompletionDate(Utilities.Format_Date(project.estimated_completion_date));
+      Project.UpdateProjectPriority(project.priority);
+
       let commentsContainer = document.getElementById("existingCommentsContainer");
       Utilities.Clear_Element(commentsContainer);
       if (project.comments.length > 0)
@@ -181,6 +215,18 @@
     public static UpdateProjectDepartment(departmentId: string): void
     {
       Utilities.Set_Value("projectDepartment", departmentId);
+    }
+
+    public static UpdateProjectPriority(priority: number): void
+    {
+      Utilities.Set_Value("projectPriority", priority.toString());
+    }
+
+    public static UpdateProjectEstimatedCompletionDate(estimatedDate: any):void
+    {
+      console.log("estimated date", estimatedDate);
+      (<HTMLInputElement>document.getElementById("projectEstimatedCompletionDate")).valueAsDate = new Date(estimatedDate);
+      //Utilities.Set_Value("projectEstimatedCompletionDate", estimatedDate);
     }
 
     public static UpdateProjectFunding(sourceId: string): void
@@ -217,6 +263,12 @@
       shared.checked = share;
     }
 
+    public static UpdateNeedsAttention(share: boolean): void
+    {
+      let shared = <HTMLInputElement>document.getElementById("projectNeedsAttention");
+      shared.checked = share;
+    }
+
     public static ClearComment(): void
     {
       Utilities.Set_Value("projectComment", "");
@@ -239,9 +291,22 @@
       project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
 
       let tr = document.createElement("tr");
+      if (project.needs_attention)
+      {
+        tr.classList.add("needs-attention");
+      }
+      else
+      {
+        if (project.completed)
+        {
+          tr.classList.add("completed");          
+        }
+      }
       tr.classList.add("pagebreak");
 
       let projectName = document.createElement("td");
+      let projectNameContainer = document.createElement("div");
+      projectName.appendChild(projectNameContainer);
       let comments = document.createElement("td");
       let dfComments = Comment.CommentsView(project.comments, false);
       if (project.can_edit)
@@ -254,11 +319,24 @@
           Project.LoadProject(project);
           console.log('selected_project', ProjectTracking.selected_project);
         }
-        projectName.appendChild(a);
+        projectNameContainer.appendChild(a);
       }
       else
       {
-        projectName.appendChild(document.createTextNode(project.project_name));
+        projectNameContainer.appendChild(document.createTextNode(project.project_name));
+      }
+      if (project.priority !== PriorityLevel.Normal)
+      {
+        let p = document.createElement("p");
+        p.appendChild(document.createTextNode(PriorityLevel[project.priority].toString() + " priority"));
+        projectNameContainer.appendChild(p);
+      }
+
+      if (project.needs_attention)
+      {
+        let p = document.createElement("p");
+        p.appendChild(document.createTextNode("Needs Attention"));
+        projectNameContainer.appendChild(p);
       }
 
       comments.appendChild(dfComments);
@@ -285,8 +363,20 @@
       tr.appendChild(timeline);
       tr.appendChild(comments);
 
-      let dateUpdated = document.createElement("td");
-      dateUpdated.appendChild(document.createTextNode(Utilities.Format_Date(project.date_last_updated)));
+      let dateUpdated = document.createElement("td");      
+      let dateUpdatedContainer = document.createElement("div");
+      dateUpdatedContainer.classList.add("has-text-centered");
+      dateUpdated.appendChild(dateUpdatedContainer);
+      dateUpdatedContainer.appendChild(document.createTextNode(Utilities.Format_Date(project.date_last_updated)));
+      if (new Date(project.estimated_completion_date.toString()).getFullYear() > 1000)
+      {
+        let hr = document.createElement("hr");
+        dateUpdatedContainer.appendChild(hr);
+        let p = document.createElement("p");
+        p.appendChild(document.createTextNode(Utilities.Format_Date(project.estimated_completion_date)));
+
+        dateUpdatedContainer.appendChild(p);
+      }
       tr.appendChild(dateUpdated);
       return tr;
     }
@@ -315,6 +405,8 @@
       ProjectTracking.selected_project.funding_id = parseInt(Utilities.Get_Value("projectFunding"));
       ProjectTracking.selected_project.timeline = Utilities.Get_Value("projectTimeline");
       ProjectTracking.selected_project.comment = Utilities.Get_Value("projectComment");
+      ProjectTracking.selected_project.priority = PriorityLevel[Utilities.Get_Value("projectPriority")];
+      ProjectTracking.selected_project.estimated_completion_date = Utilities.Get_Value("projectEstimatedCompletionDate");
 
       let completed = <HTMLInputElement>document.getElementById("projectComplete");
       ProjectTracking.selected_project.completed = completed.checked;
@@ -326,6 +418,9 @@
       let legislative = <HTMLInputElement>document.getElementById("projectLegislativeTracking");
       ProjectTracking.selected_project.legislative_tracking = legislative.checked;
 
+      let needsattention = <HTMLInputElement>document.getElementById("projectNeedsAttention");
+      ProjectTracking.selected_project.needs_attention = needsattention.checked;
+      console.log("project to save", ProjectTracking.selected_project);
       let path = ProjectTracking.GetPath();
       let saveType = (ProjectTracking.selected_project.id > -1) ? "Update" : "Add";
       Utilities.Post_Empty(path + "API/Project/" + saveType, ProjectTracking.selected_project)
@@ -352,6 +447,24 @@
           Utilities.Toggle_Loading_Button("saveProject", false);
           });
 
+    }
+
+    public static PopulatePriorities()
+    {
+      let priorities = <HTMLSelectElement>document.getElementById("projectPriority");
+      Utilities.Clear_Element(priorities);
+      console.log("prioritylevel", PriorityLevel);
+      for (let level in PriorityLevel)
+      {
+        if (level.length < 3)
+        {
+          let option = document.createElement("option");
+          option.value = level.toString();
+          option.appendChild(document.createTextNode(PriorityLevel[level].toString()));
+          if (level === PriorityLevel.Normal.toString()) option.selected = true;
+          priorities.appendChild(option);
+        }
+      }
     }
 
   }

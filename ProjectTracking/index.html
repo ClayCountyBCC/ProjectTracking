@@ -9,8 +9,8 @@
   <link href="css/myBulma.min.css" rel="stylesheet" />
 
   <link href="css/Fontawesome/css/fontawesome-all.min.css" rel="stylesheet" />
-  <link href="css/Main.css?201904231546" rel="stylesheet" />
-  <link href="css/Utilities.min.css?201904231546" rel="stylesheet" />
+  <link href="css/Main.css?201906270201" rel="stylesheet" />
+  <link href="css/Utilities.min.css?201906270201" rel="stylesheet" />
 
 
 </head>
@@ -63,51 +63,72 @@
             </div>
           </div>
         </div>
+
+        <div class="level-item">
+
+          <div class="field">
+            <div class="control">
+              <label class="checkbox is-medium">
+                <input onchange="ProjectTracking.FilterProjects();"
+                       id="projectCommissionerShareFilter"
+                       type="checkbox" />
+                Commissioner View Only
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox is-medium">
+                <input onchange="ProjectTracking.FilterProjects();"
+                       id="projectInfrastructureFilter"
+                       type="checkbox" />
+                Infrastructure View Only
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div class="level-item">
           <div class="field">
-            <label class="checkbox is-medium">
-              <input onchange="ProjectTracking.FilterProjects();"
-                     id="projectCommissionerShareFilter"
-                     type="checkbox" />
-              Commissioner View Only
-            </label>
+            <div class="control">
+              <label class="checkbox is-medium">
+                <input onchange="ProjectTracking.FilterProjects();"
+                       id="projectHighPriorityFilter"
+                       type="checkbox" />
+                High Priority Only
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox is-medium">
+                <input onchange="ProjectTracking.FilterProjects();"
+                       id="projectNeedsAttentionFilter"
+                       type="checkbox" />
+                Needs Attention Only
+              </label>
+            </div>
           </div>
 
         </div>
         <div class="level-item">
           <div class="field">
-            <label class="checkbox is-medium">
-              <input onchange="ProjectTracking.FilterProjects();"
-                     id="projectInfrastructureFilter"
-                     type="checkbox" />
-              Infrastructure View Only
-            </label>
+            <div class="control">
+              <label class="checkbox is-medium">
+                <input onchange="ProjectTracking.FilterProjects();"
+                       id="projectLegislativeFilter"
+                       type="checkbox" />
+                Legislative Tracking
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox is-medium">
+                <input onchange="ProjectTracking.FilterProjects();"
+                       id="projectCompleteFilter"
+                       checked
+                       type="checkbox" />
+                Incomplete Only
+              </label>
+            </div>
           </div>
-        </div>
-        
-        <div class="level-item">
-          <div class="field">
-            <label class="checkbox is-medium">
-              <input onchange="ProjectTracking.FilterProjects();"
-                     id="projectLegislativeFilter"                     
-                     type="checkbox" />
-              Legislative Tracking
-            </label>
-          </div>
-        </div>
-        <div class="level-item">
-          <div class="field">
-            <label class="checkbox is-medium">
-              <input onchange="ProjectTracking.FilterProjects();"
-                     id="projectCompleteFilter"
-                     checked
-                     type="checkbox" />
-              Incomplete Only
-            </label>
-          </div>
-        </div>
 
-
+        </div>
 
         <div class="level-item">
           <div class="field">
@@ -154,8 +175,11 @@
           <th style="width: 20%;">
             Comments
           </th>
-          <th style="width: 10%;">
-            Updated
+          <th class="has-text-centered"
+              style="width: 10%;">
+            Date Updated  
+            <br />
+            Estimated Completion
           </th>
         </tr>
       </thead>
@@ -203,6 +227,27 @@
               <div class="select is-medium">
                 <select id="projectFunding"></select>
               </div>
+
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Priority</label>
+            <div class="control">
+              <div class="select is-medium">
+                <select id="projectPriority"></select>
+              </div>
+
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Estimated Completion Date</label>
+            <div class="control">
+              <input id="projectEstimatedCompletionDate"
+                     autofocus
+                     class="input is-medium"
+                     maxlength="10"                     
+                     type="date" />
 
             </div>
           </div>
@@ -272,7 +317,14 @@
                 Add this project to the Legislative Tracking View?
               </label>
             </div>
+            <div class="field">
+              <label class="checkbox is-medium">
+                <input id="projectNeedsAttention"
+                       type="checkbox">
 
+                Does this project need attention from the county manager?
+              </label>
+            </div>
             <div class="field">
               <label class="checkbox is-medium">
                 <input id="projectComplete"
@@ -327,7 +379,7 @@
   <script src="scripts/app/Milestone.js"></script>
   <script src="scripts/app/Project.js"></script>
   <script src="scripts/app/ProjectTracking.js"></script>-->
-  <script src="scripts/app/bundle.min.js?201904231546"></script>
+  <script src="scripts/app/bundle.min.js?201906270201"></script>
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function (event)
     {

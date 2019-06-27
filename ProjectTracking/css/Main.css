@@ -28,3 +28,9 @@ fieldset {
 
 fieldset legend {
   line-height: 0; }
+
+.completed {
+  background-color: grey; }
+
+.needs-attention {
+  background-color: lightyellow; }

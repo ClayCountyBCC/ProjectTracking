@@ -19,6 +19,7 @@ namespace ProjectTracking
     DataValue.GetFunding();
     DataValue.GetMyDepartments();
     Project.GetProjects();
+    Project.PopulatePriorities();
   }
 
   export function ShowAddProject(): void
