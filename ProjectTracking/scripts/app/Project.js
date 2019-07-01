@@ -127,7 +127,7 @@ var ProjectTracking;
             Project.UpdateInfrastructureShare(project.infrastructure_share);
             Project.UpdateLegislativeTracking(project.legislative_tracking);
             Project.UpdateNeedsAttention(project.needs_attention);
-            Project.UpdateProjectEstimatedCompletionDate(Utilities.Format_Date(project.estimated_completion_date));
+            Project.UpdateProjectEstimatedCompletionDate(project.estimated_completion_date);
             Project.UpdateProjectPriority(project.priority);
             var commentsContainer = document.getElementById("existingCommentsContainer");
             Utilities.Clear_Element(commentsContainer);
@@ -151,8 +151,12 @@ var ProjectTracking;
             Utilities.Set_Value("projectPriority", priority.toString());
         };
         Project.UpdateProjectEstimatedCompletionDate = function (estimatedDate) {
-            console.log("estimated date", estimatedDate);
-            document.getElementById("projectEstimatedCompletionDate").valueAsDate = new Date(estimatedDate);
+            var input = document.getElementById("projectEstimatedCompletionDate");
+            input.value = "";
+            if (new Date(estimatedDate.toString()).getFullYear() > 1000) {
+                //let formatted_date = Utilities.Format_Date(estimatedDate);
+                input.valueAsDate = new Date(estimatedDate);
+            }
             //Utilities.Set_Value("projectEstimatedCompletionDate", estimatedDate);
         };
         Project.UpdateProjectFunding = function (sourceId) {

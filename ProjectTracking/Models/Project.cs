@@ -34,7 +34,7 @@ namespace ProjectTracking
     public string added_by { get; set; } = "";
     public bool can_edit { get; set; }
     public bool needs_attention { get; set; } = false;
-    public DateTime estimated_completion_date { get; set; } = DateTime.MinValue;
+    public DateTime? estimated_completion_date { get; set; } = DateTime.MinValue;
     public PriorityLevel priority { get; set; } = PriorityLevel.Normal;
 
     public Project()
@@ -153,7 +153,8 @@ namespace ProjectTracking
       dp.Add("@department_id", department_id);
       dp.Add("@priority", priority);
       dp.Add("@needs_attention", needs_attention);
-      dp.Add("@estimated_completion_date", estimated_completion_date == DateTime.MinValue ? (DateTime?)null : estimated_completion_date);
+      //dp.Add("@estimated_completion_date", estimated_completion_date == DateTime.MinValue ? (DateTime?)null : estimated_completion_date);
+      dp.Add("@estimated_completion_date", estimated_completion_date);
       dp.Add("@funding_id", funding_id);
       dp.Add("@timeline", timeline);
       dp.Add("@commissioner_share", commissioner_share);

@@ -189,7 +189,7 @@
       Project.UpdateLegislativeTracking(project.legislative_tracking);
 
       Project.UpdateNeedsAttention(project.needs_attention);
-      Project.UpdateProjectEstimatedCompletionDate(Utilities.Format_Date(project.estimated_completion_date));
+      Project.UpdateProjectEstimatedCompletionDate(project.estimated_completion_date);
       Project.UpdateProjectPriority(project.priority);
 
       let commentsContainer = document.getElementById("existingCommentsContainer");
@@ -224,8 +224,15 @@
 
     public static UpdateProjectEstimatedCompletionDate(estimatedDate: any):void
     {
-      console.log("estimated date", estimatedDate);
-      (<HTMLInputElement>document.getElementById("projectEstimatedCompletionDate")).valueAsDate = new Date(estimatedDate);
+      let input = <HTMLInputElement>document.getElementById("projectEstimatedCompletionDate");
+      input.value = "";
+      if (new Date(estimatedDate.toString()).getFullYear() > 1000)
+      {
+        //let formatted_date = Utilities.Format_Date(estimatedDate);
+        input.valueAsDate = new Date(estimatedDate);
+      }
+
+
       //Utilities.Set_Value("projectEstimatedCompletionDate", estimatedDate);
     }
 
