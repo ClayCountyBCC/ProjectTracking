@@ -362,7 +362,7 @@
       tr.appendChild(funding);
 
       let milestones = document.createElement("td");
-      milestones.appendChild(Milestone.MilestonesView(project.milestones));
+      milestones.appendChild(Milestone.MilestonesView(project.milestones, project.completed));
       tr.appendChild(milestones);
 
       let timeline = document.createElement("td");

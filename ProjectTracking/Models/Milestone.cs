@@ -13,6 +13,7 @@ namespace ProjectTracking
     public int project_id { get; set; } = -1;
     public string name { get; set; } = "";
     public int display_order { get; set; } = -1;
+    public bool completed { get; set; } = false;
 
     public Milestone()
     {
@@ -27,7 +28,8 @@ namespace ProjectTracking
           id,
           project_id,
           name,
-          display_order
+          display_order,
+          completed
         FROM milestone
         ORDER BY project_id, display_order";
 
@@ -37,8 +39,8 @@ namespace ProjectTracking
     private bool Save()
     {
       string sql = @"
-        INSERT INTO milestone (project_id, name, display_order)
-        VALUES (@project_id, @name, @display_order);";
+        INSERT INTO milestone (project_id, name, display_order, completed)
+        VALUES (@project_id, @name, @display_order, @completed);";
       return Constants.Save_Data<Milestone>(sql, this);
     }
 

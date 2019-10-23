@@ -50,3 +50,17 @@ fieldset legend
 {
   background-color: lightyellow;
 }
+
+.completed_milestones_are_hidden_project_completed
+{
+  list-style: none;
+  color: white;
+  font-size: smaller;
+}
+
+.completed_milestones_are_hidden_project_incomplete
+{
+  list-style: none;
+  color: grey;
+  font-size: smaller;
+}

@@ -8,6 +8,7 @@
     project_id: number;
     name: string;
     display_order: number;
+    completed: boolean;
   }
 
   export class Milestone implements IMilestone
@@ -16,6 +17,7 @@
     public project_id: number = -1;
     public name: string = "";
     public display_order: number = -1;
+    public completed: boolean = false;
 
     constructor() { }
 
@@ -37,19 +39,36 @@
       tr.appendChild(count);
 
       let inputCell = document.createElement("td");
-      let field = document.createElement("div");
-      field.classList.add("field");
-      let control = document.createElement("div");
-      control.classList.add("control");
-      control.classList.add("is-medium");
+      let field_input = document.createElement("div");
+      field_input.classList.add("field");
+      let control_input = document.createElement("div");
+      control_input.classList.add("control");
+      control_input.classList.add("is-medium");
       let input = document.createElement("input");
       input.classList.add("input");
       input.classList.add("is-medium");
       input.type = "text";
       input.id = "projectMilestone" + nm;
-      control.appendChild(input);
-      field.appendChild(control);
-      inputCell.appendChild(field);
+      control_input.appendChild(input);
+      field_input.appendChild(control_input);
+      inputCell.appendChild(field_input);
+      let completedCell = document.createElement("td");
+      let field_completed = document.createElement("div");
+      field_completed.classList.add("field");
+      let control_completed = document.createElement("div");
+      control_completed.classList.add("control");
+      control_completed.classList.add("is-medium");
+      control_completed.classList.add("has-text-centered");
+      let completed_checkbox = document.createElement("input");
+      //completed_checkbox.classList.add("input");
+      //completed_checkbox.classList.add("is-medium");
+      completed_checkbox.type = "checkbox";
+      completed_checkbox.id = "projectMilestoneCompleted" + nm;
+      control_completed.appendChild(completed_checkbox);
+      field_completed.appendChild(control_completed);
+      completedCell.appendChild(field_completed);
+
+
       tr.appendChild(inputCell);
 
       let buttonCell = document.createElement("td");
@@ -134,6 +153,7 @@
       buttonCell.appendChild(buttonField);
 
       tr.appendChild(buttonCell);
+      tr.appendChild(completedCell);
       df.appendChild(tr);
       container.appendChild(df);
 
@@ -226,9 +246,11 @@
     public static UpdateMilestone(milestone: Milestone)
     {
       Utilities.Set_Value("projectMilestone" + milestone.display_order.toString(), milestone.name);
+      let completed_checkbox = <HTMLInputElement>document.getElementById("projectMilestoneCompleted" + milestone.display_order.toString());
+      completed_checkbox.checked = milestone.completed;
     }
 
-    public static MilestonesView(milestones: Array<Milestone>): DocumentFragment
+    public static MilestonesView(milestones: Array<Milestone>, project_completed: boolean): DocumentFragment
     {
       milestones.sort(function (a, b) { return a.display_order - b.display_order; });
 
@@ -236,11 +258,60 @@
       if (milestones.length === 0) return df;
       let ol = document.createElement("ol");
       ol.classList.add("comments");
+      let hidden: Array<HTMLElement> = [];
       for (let m of milestones)
       {
         let li = document.createElement("li");
-        li.appendChild(document.createTextNode(m.name));
+        li.appendChild(document.createTextNode(m.name));        
+        if (m.completed)
+        {
+          li.classList.add("hide");
+          li.classList.add("show-for-print");
+          hidden.push(li);
+        }
         ol.appendChild(li);
+      }
+      let completed_li = document.createElement("li");
+      if (hidden.length > 0)
+      {
+        completed_li.classList.add("hide-for-print");
+        if (project_completed)
+        {
+          completed_li.classList.add("completed_milestones_are_hidden_project_completed");
+        }
+        else
+        {
+          completed_li.classList.add("completed_milestones_are_hidden_project_incomplete");
+        }
+        
+        completed_li.appendChild(document.createTextNode("click to view completed milestones"));
+        ol.appendChild(completed_li);
+        ol.style.cursor = "pointer";
+      }
+      
+      ol.onclick = () =>
+      {
+        if (hidden.length === 0) return;
+        let is_hidden = hidden[0].classList.contains("hide");
+        for (let e of hidden)
+        {
+          if (is_hidden)
+          {
+            e.classList.remove("hide");
+          }
+          else
+          {
+            e.classList.add("hide");
+          }
+        }
+        if (is_hidden)
+        {
+          completed_li.classList.add("hide");
+        }
+        else
+        {
+          completed_li.classList.remove("hide");
+        }
       }
       df.appendChild(ol);
       return df;
@@ -268,7 +339,9 @@
         let m = new Milestone();
         m.display_order = i;
         m.name = Utilities.Get_Value("projectMilestone" + i.toString()).trim();
+        m.completed = (<HTMLInputElement>document.getElementById("projectMilestoneCompleted" + i.toString())).checked;
         milestones.push(m);
+        console.log('saving milestone', m);
       }
 
       return milestones;

@@ -251,7 +251,7 @@ var ProjectTracking;
             funding.appendChild(document.createTextNode(fundingName));
             tr.appendChild(funding);
             var milestones = document.createElement("td");
-            milestones.appendChild(ProjectTracking.Milestone.MilestonesView(project.milestones));
+            milestones.appendChild(ProjectTracking.Milestone.MilestonesView(project.milestones, project.completed));
             tr.appendChild(milestones);
             var timeline = document.createElement("td");
             timeline.appendChild(document.createTextNode(project.timeline));
