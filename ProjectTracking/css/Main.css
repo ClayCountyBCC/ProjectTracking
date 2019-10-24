@@ -44,3 +44,9 @@ fieldset legend {
   list-style: none;
   color: grey;
   font-size: smaller; }
+
+#projectSummary td img {
+  height: 23px;
+  width: 23px;
+  margin-right: 1em;
+  vertical-align: middle; }

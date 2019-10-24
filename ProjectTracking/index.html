@@ -9,8 +9,8 @@
   <link href="css/myBulma.min.css" rel="stylesheet" />
 
   <link href="css/Fontawesome/css/fontawesome-all.min.css" rel="stylesheet" />
-  <link href="css/Main.css?201907011449" rel="stylesheet" />
-  <link href="css/Utilities.min.css?201907011449" rel="stylesheet" />
+  <link href="css/Main.css?201910240537" rel="stylesheet" />
+  <link href="css/Utilities.min.css?201910240537" rel="stylesheet" />
 
 
 </head>
@@ -28,6 +28,16 @@
         <div class="navbar-start">
         </div>
         <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              <button id="toggleSummaryView"
+                      disabled
+                      class="button is-info is-loading"
+                      onclick="ProjectTracking.Project.ToggleSummaryView();">
+                <strong>Switch to Summary View</strong>
+              </button>
+            </div>
+          </div>
           <div class="navbar-item">
             <div class="buttons">
               <button id="addProjectButton"
@@ -145,7 +155,8 @@
       </div>
     </fieldset>
 
-    <table class="table is-fullwidth">
+    <table id="projectDefaultView"
+           class="table is-fullwidth">
       <thead>
         <tr>
           <th style="width: 15%;">
@@ -170,16 +181,14 @@
             Milestones
           </th>
           <th style="width: 15%;">
-            Timeline
+            Current Phase
           </th>
           <th style="width: 20%;">
             Comments
           </th>
           <th class="has-text-centered"
               style="width: 10%;">
-            Date Updated  
-            <br />
-            Estimated Completion
+            Date Updated
           </th>
         </tr>
       </thead>
@@ -191,6 +200,46 @@
         </tr>
       </tbody>
     </table>
+
+    <table id="projectSummaryView"
+           class="table is-fullwidth hide">
+      <thead>
+        <tr>
+          <th style="width: 30%;">
+            <div class="field">
+              <div class="control">
+                <input onkeyup="ProjectTracking.FilterProjectNames(this);"
+                       class="input"
+                       value=""
+                       placeholder="Project Name Filter" />
+              </div>
+
+            </div>
+
+          </th>
+          <th style="width: 20%;">
+            Department
+          </th>
+          <th style="width: 15%;">
+            Funding
+          </th>
+          <th style="width: 35%;">
+            Current Phase
+          </th>
+          <th style="width: 15%;">
+            Estimated Completion Date
+          </th>
+        </tr>
+      </thead>
+      <tbody id="projectSummary">
+        <tr>
+          <td colspan="6">
+            Loading Data, please wait...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
     <div id="addProject"
          class="modal">
       <div onclick="ProjectTracking.CloseModals();"
@@ -240,17 +289,7 @@
 
             </div>
           </div>
-          <div class="field">
-            <label class="label">Estimated Completion Date</label>
-            <div class="control">
-              <input id="projectEstimatedCompletionDate"
-                     autofocus
-                     class="input is-medium"
-                     maxlength="10"                     
-                     type="date" />
 
-            </div>
-          </div>
 
           <table class="table is-fullwidth">
             <thead>
@@ -281,6 +320,189 @@
                 </td>
               </tr>
             </tfoot>
+          </table>
+
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th class="has-text-left"
+                    style="width: 25%;">
+                  Phase
+                </th>
+                <th class="has-text-left"
+                    style="width: 25%;">
+                  Start Date
+                </th>
+                <th class="has-text-left"
+                    style="width: 25%;">
+                  Actual Completion Date
+                </th>
+                <th style="width: 25%; border-bottom: none;">
+
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Develop Specifications
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_1_start"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_1_completion"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+                <td style="border-left: 1px solid #dbdbdb; border-bottom: none;"
+                    rowspan="6">
+                  <ol style="list-style: disc; font-size: smaller; margin-left: 1em;">
+                    <li>The current phase is the first phase that doesn't have a completion date.</li>
+                    <li>The estimated completion date of each phase is the start date of the next phase.</li>
+                    <li>Aging is calculated based on the current phase's estimated completion date compared to today's date.</li>
+                    <li>The Actual Completion Date for a phase should be entered only when the phase is completed.</li>
+                    <li>If a phase doesn't apply to a project, make the start date and end date one day before the next phase start date.</li>
+                  </ol>
+                </td>
+
+              </tr>
+              <tr>
+                <td>
+                  Procurement
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_2_start"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_2_completion"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Design (Construction)
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_3_start"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_3_completion"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Bid (Construction)
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_4_start"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_4_completion"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Construction / Implementation
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_5_start"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="phase_5_completion"
+                             class="input is-medium"
+                             placeholder=""
+                             type="date" />
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Estimated Completion Date
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input id="projectEstimatedCompletionDate"
+                             class="input is-medium"
+                             maxlength="10"
+                             type="date" />
+
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4"
+                    class="has-text-left has-text-danger"
+                    id="phase_dates_error">
+                </td>
+              </tr>
+            </tbody>
+
           </table>
 
           <div class="field">
@@ -360,7 +582,7 @@
           </button>
           <button id="saveProject"
                   class="button is-success"
-                  onclick="ProjectTracking.Project.Save();"
+                  onclick="ProjectTracking.Project.Save(); return false;"
                   type="button">
             Save Changes
           </button>
@@ -383,7 +605,7 @@
   <script src="scripts/app/Milestone.js"></script>
   <script src="scripts/app/Project.js"></script>
   <script src="scripts/app/ProjectTracking.js"></script>-->
-  <script src="scripts/app/bundle.min.js?201907011449"></script>
+  <script src="scripts/app/bundle.min.js?201910240536"></script>
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function (event)
     {

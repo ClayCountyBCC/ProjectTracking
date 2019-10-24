@@ -10,6 +10,7 @@ var ProjectTracking;
     ProjectTracking.funding_sources = [];
     ProjectTracking.number_of_milestones = 0;
     ProjectTracking.project_name_filter = '';
+    ProjectTracking.default_view = true;
     function Start() {
         ProjectTracking.DataValue.GetDepartments();
         ProjectTracking.DataValue.GetFunding();
@@ -43,18 +44,23 @@ var ProjectTracking;
     }
     ProjectTracking.GetPath = GetPath;
     function FilterProjects() {
-        ProjectTracking.Project.BuildProjectTrackingList(ProjectTracking.Project.ApplyFilters(ProjectTracking.projects));
+        var projects = ProjectTracking.Project.ApplyFilters(ProjectTracking.projects);
+        ProjectTracking.Project.BuildProjectTrackingList(projects);
+        ProjectTracking.Project.BuildProjectSummaryList(projects);
     }
     ProjectTracking.FilterProjects = FilterProjects;
     function FilterProjectNames(input) {
         var v = input.value.trim();
         ProjectTracking.project_name_filter = v.length > 2 ? v : '';
-        ProjectTracking.Project.BuildProjectTrackingList(ProjectTracking.Project.ApplyFilters(ProjectTracking.projects));
+        var projects = ProjectTracking.Project.ApplyFilters(ProjectTracking.projects);
+        ProjectTracking.Project.BuildProjectTrackingList(projects);
+        ProjectTracking.Project.BuildProjectSummaryList(projects);
     }
     ProjectTracking.FilterProjectNames = FilterProjectNames;
     function FinishedLoading() {
         //let button = document.getElementById("addProjectButton");
         Utilities.Toggle_Loading_Button("addProjectButton", false);
+        Utilities.Toggle_Loading_Button("toggleSummaryView", false);
         Utilities.Show("filters");
     }
     ProjectTracking.FinishedLoading = FinishedLoading;

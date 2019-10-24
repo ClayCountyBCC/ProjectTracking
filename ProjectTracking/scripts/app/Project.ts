@@ -29,6 +29,16 @@
     needs_attention: boolean;
     priority: PriorityLevel;
     estimated_completion_date: any;
+    phase_1_start: Date;
+    phase_1_completion: Date;
+    phase_2_start: Date;
+    phase_2_completion: Date;
+    phase_3_start: Date;
+    phase_3_completion: Date;
+    phase_4_start: Date;
+    phase_4_completion: Date;
+    phase_5_start: Date;
+    phase_5_completion: Date;
   }
 
   export class Project implements IProject
@@ -51,6 +61,16 @@
     public needs_attention: boolean;
     public priority: PriorityLevel;
     public estimated_completion_date: any;
+    public phase_1_start: Date;
+    public phase_1_completion: Date;
+    public phase_2_start: Date;
+    public phase_2_completion: Date;
+    public phase_3_start: Date;
+    public phase_3_completion: Date;
+    public phase_4_start: Date;
+    public phase_4_completion: Date;
+    public phase_5_start: Date;
+    public phase_5_completion: Date;
 
     constructor()
     {
@@ -67,7 +87,9 @@
         {
           console.log("projects", projects);
           ProjectTracking.projects = projects;
-          Project.BuildProjectTrackingList(Project.ApplyFilters(projects));
+          let filtered = Project.ApplyFilters(projects);
+          Project.BuildProjectTrackingList(filtered);
+          Project.BuildProjectSummaryList(filtered);
           ProjectTracking.FinishedLoading();
           if (projects.length === 0)
           {
@@ -166,6 +188,7 @@
       Project.UpdateInfrastructureShare(false);
       Project.UpdateLegislativeTracking(false);
       Project.UpdateProjectEstimatedCompletionDate("");
+      Project.UpdatePhaseDates(null);
       let commentsContainer = document.getElementById("existingCommentsContainer");
       Utilities.Hide(commentsContainer);
       Utilities.Clear_Element(commentsContainer);
@@ -190,6 +213,7 @@
 
       Project.UpdateNeedsAttention(project.needs_attention);
       Project.UpdateProjectEstimatedCompletionDate(project.estimated_completion_date);
+      Project.UpdatePhaseDates(project);
       Project.UpdateProjectPriority(project.priority);
 
       let commentsContainer = document.getElementById("existingCommentsContainer");
@@ -205,6 +229,50 @@
       }
       Project.ClearComment();
       ProjectTracking.ShowAddProject();
+    }
+
+    public static UpdatePhaseDates(project: Project): void
+    {
+      if (project === null)
+      {
+        Utilities.Set_Value("phase_1_start", "");
+        Utilities.Set_Value("phase_2_start", "");
+        Utilities.Set_Value("phase_3_start", "");
+        Utilities.Set_Value("phase_4_start", "");
+        Utilities.Set_Value("phase_5_start", "");
+
+        Utilities.Set_Value("phase_1_completion", "");
+        Utilities.Set_Value("phase_2_completion", "");
+        Utilities.Set_Value("phase_3_completion", "");
+        Utilities.Set_Value("phase_4_completion", "");
+        Utilities.Set_Value("phase_5_completion", "");
+      }
+      else
+      {
+        Project.UpdateDateInput("phase_1_start", project.phase_1_start);
+        Project.UpdateDateInput("phase_2_start", project.phase_2_start);
+        Project.UpdateDateInput("phase_3_start", project.phase_3_start);
+        Project.UpdateDateInput("phase_4_start", project.phase_4_start);
+        Project.UpdateDateInput("phase_5_start", project.phase_5_start);
+        Project.UpdateDateInput("phase_1_completion", project.phase_1_completion);
+        Project.UpdateDateInput("phase_2_completion", project.phase_2_completion);
+        Project.UpdateDateInput("phase_3_completion", project.phase_3_completion);
+        Project.UpdateDateInput("phase_4_completion", project.phase_4_completion);
+        Project.UpdateDateInput("phase_5_completion", project.phase_5_completion);
+      }
+    }
+
+    private static UpdateDateInput(id: string, value: Date)
+    {
+      let input = <HTMLInputElement>document.getElementById(id);
+      input.value = "";
+      if (value === null) return;
+
+      let s = value.toString();
+      if (new Date(s).getFullYear() > 1000)
+      {
+        input.valueAsDate = new Date(s);
+      }
     }
 
     public static UpdateProjectName(projectName: string): void
@@ -293,6 +361,115 @@
       container.appendChild(df);
     }
 
+    public static BuildProjectSummaryList(projects: Array<Project>): void
+    {
+      let container = document.getElementById("projectSummary");
+      Utilities.Clear_Element(container);
+      let df = document.createDocumentFragment();
+      for (let p of projects)
+      {
+        df.appendChild(Project.CreateProjectSummaryRow(p));
+      }
+      container.appendChild(df);
+    }
+
+    public static CreateProjectSummaryRow(project: Project): HTMLTableRowElement
+    {
+      //project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
+
+      let tr = document.createElement("tr");
+      //if (project.needs_attention)
+      //{
+      //  tr.classList.add("needs-attention");
+      //}
+      //else
+      //{
+      //  if (project.completed)
+      //  {
+      //    tr.classList.add("completed");
+      //  }
+      //}
+      tr.classList.add("pagebreak");
+
+      let projectName = document.createElement("td");
+      let projectNameContainer = document.createElement("div");
+      projectName.appendChild(projectNameContainer);
+
+      if (project.can_edit)
+      {
+        let a = document.createElement("a");
+        a.appendChild(document.createTextNode(project.project_name))
+        a.onclick = function ()
+        {
+          ProjectTracking.selected_project = project; // this is the project we'll be attempting to update.
+          Project.LoadProject(project);
+          console.log('selected_project', ProjectTracking.selected_project);
+        }
+        projectNameContainer.appendChild(a);
+      }
+      else
+      {
+        projectNameContainer.appendChild(document.createTextNode(project.project_name));
+      }
+      //if (project.priority !== PriorityLevel.Normal)
+      //{
+      //  let p = document.createElement("p");
+      //  p.appendChild(document.createTextNode(PriorityLevel[project.priority].toString() + " priority"));
+      //  projectNameContainer.appendChild(p);
+      //}
+
+      //if (project.needs_attention)
+      //{
+      //  let p = document.createElement("p");
+      //  p.appendChild(document.createTextNode("Needs Attention"));
+      //  projectNameContainer.appendChild(p);
+      //}
+      //let comments = document.createElement("td");
+      //let dfComments = Comment.CommentsView(project.comments, false);
+      //comments.appendChild(dfComments);
+      tr.appendChild(projectName);
+
+      let department = document.createElement("td");
+      let departmentNames = ProjectTracking.departments.filter(function (d) { return d.Value === project.department_id.toString(); });
+      let departmentName = departmentNames.length > 0 ? departmentNames[0].Label : "";
+      department.appendChild(document.createTextNode(departmentName));
+      tr.appendChild(department);
+
+      let funding = document.createElement("td");
+      let fundingNames = ProjectTracking.funding_sources.filter(function (d) { return d.Value === project.funding_id.toString(); });
+      let fundingName = departmentNames.length > 0 && project.funding_id !== -1 ? fundingNames[0].Label : "";
+      funding.appendChild(document.createTextNode(fundingName));
+      tr.appendChild(funding);
+
+      //let milestones = document.createElement("td");
+      //milestones.appendChild(Milestone.MilestonesView(project.milestones, project.completed));
+      //tr.appendChild(milestones);
+
+      tr.appendChild(Project.GetCurrentPhase(project, true)); // get the current phase
+
+      //let timeline = document.createElement("td");
+      //timeline.appendChild(document.createTextNode(project.timeline));
+      //tr.appendChild(timeline);
+      //tr.appendChild(comments);
+
+      let dateUpdated = document.createElement("td");
+      let dateUpdatedContainer = document.createElement("div");
+      dateUpdatedContainer.classList.add("has-text-centered");
+      dateUpdated.appendChild(dateUpdatedContainer);
+      //dateUpdatedContainer.appendChild(document.createTextNode(Utilities.Format_Date(project.date_last_updated)));
+      if (new Date(project.estimated_completion_date.toString()).getFullYear() > 1000)
+      {
+      //  let hr = document.createElement("hr");
+      //  dateUpdatedContainer.appendChild(hr);
+      //  let p = document.createElement("p");
+        dateUpdatedContainer.appendChild(document.createTextNode(Utilities.Format_Date(project.estimated_completion_date)));
+
+      //  dateUpdatedContainer.appendChild(p);
+      }
+      tr.appendChild(dateUpdated);
+      return tr;
+    }
+
     public static CreateProjectRow(project: Project): HTMLTableRowElement
     {
       project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
@@ -365,9 +542,11 @@
       milestones.appendChild(Milestone.MilestonesView(project.milestones, project.completed));
       tr.appendChild(milestones);
 
-      let timeline = document.createElement("td");
-      timeline.appendChild(document.createTextNode(project.timeline));
-      tr.appendChild(timeline);
+      tr.appendChild(Project.GetCurrentPhase(project, false)); // get the current phase
+
+      //let timeline = document.createElement("td");
+      //timeline.appendChild(document.createTextNode(project.timeline));
+      //tr.appendChild(timeline);
       tr.appendChild(comments);
 
       let dateUpdated = document.createElement("td");      
@@ -375,17 +554,211 @@
       dateUpdatedContainer.classList.add("has-text-centered");
       dateUpdated.appendChild(dateUpdatedContainer);
       dateUpdatedContainer.appendChild(document.createTextNode(Utilities.Format_Date(project.date_last_updated)));
-      if (new Date(project.estimated_completion_date.toString()).getFullYear() > 1000)
-      {
-        let hr = document.createElement("hr");
-        dateUpdatedContainer.appendChild(hr);
-        let p = document.createElement("p");
-        p.appendChild(document.createTextNode(Utilities.Format_Date(project.estimated_completion_date)));
+      //if (new Date(project.estimated_completion_date.toString()).getFullYear() > 1000)
+      //{
+      //  let hr = document.createElement("hr");
+      //  dateUpdatedContainer.appendChild(hr);
+      //  let p = document.createElement("p");
+      //  p.appendChild(document.createTextNode(Utilities.Format_Date(project.estimated_completion_date)));
 
-        dateUpdatedContainer.appendChild(p);
-      }
+      //  dateUpdatedContainer.appendChild(p);
+      //}
       tr.appendChild(dateUpdated);
       return tr;
+    }
+
+    private static GetCurrentPhase(project: Project, add_aging_color: boolean): HTMLTableCellElement
+    {
+      let td = document.createElement("td");
+
+      let span = document.createElement("span");
+      let color = "";
+      if (project.completed)
+      {
+        let img = document.createElement("img");
+        img.src = "content/images/circle-green128.png";
+        td.appendChild(img);
+        span.appendChild(document.createTextNode("Project Completed"));
+        td.appendChild(span);
+        return td;
+      }
+
+      let current_phase = 0;
+      let current_phase_start: Date = null;
+      let current_phase_end: Date = null;
+      for (let i = 1; i < 6; i++)
+      {
+        if (project["phase_" + i.toString() + "_completion"] === null)
+        {
+          if (project["phase_" + i.toString() + "_start"] !== null)
+          {
+            current_phase = i;
+            current_phase_start = <Date>project["phase_" + i.toString() + "_start"];
+            if (i < 5)
+            {
+              current_phase_end = <Date>project["phase_" + (i + 1).toString() + "_start"];
+            }
+            else
+            {
+              current_phase_end = project.estimated_completion_date;
+            }
+          }
+          break;
+        }
+      }
+
+      if (current_phase === 0)
+      {
+        span.appendChild(document.createTextNode("Phases not entered."));
+        color = "black";
+        //return td;
+      }
+      else
+      {
+        let phase_name = Project.GetPhaseName(current_phase);
+        let text = phase_name + ":  " + Utilities.Format_Date(current_phase_start);
+        text += " - ";
+        if (current_phase_end === null)
+        {
+          text += "No Ending Date";
+        }
+        else
+        {
+          text += Utilities.Format_Date(current_phase_end);
+          let d = new Date();
+
+          let today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+          var diff = Math.round(Math.abs((new Date(<any>current_phase_end).getTime() - today.getTime()) / 86400000)); 
+          console.log('date diff', diff, today, current_phase_end);
+          if (diff > 30)
+          {
+            color = "red";
+          }
+          else
+          {
+            if (diff > 0)
+            {
+              color = "yellow";
+            }
+            else
+            {
+              color = "green";   
+            }
+          }
+        }
+        span.appendChild(document.createTextNode(text));
+      }
+      if (add_aging_color && color.length > 0)
+      {
+        let img = document.createElement("img");
+        img.src = "content/images/circle-" + color + "128.png";
+
+
+        td.appendChild(img);
+
+      }
+      td.appendChild(span);
+      //if (!add_aging_color) 
+      return td;
+    }
+
+    private static GetPhaseName(phase_number: number): string
+    {
+      switch (phase_number)
+      {
+        case 1:
+          return "Develop Specifications";
+        case 2:
+          return "Procurement";
+        case 3:
+          return "Design (Construction)";
+        case 4:
+          return "Bid (Construction)";
+        case 5:
+          return "Construction / Implementation";
+        case 6:
+          return "Completed";
+        default:
+          return "";
+      }
+    }
+    // summary view
+
+    private static ValidatePhaseDate(project: Project, phase_number: number): boolean
+    {
+      let start = <Date>project["phase_" + phase_number + "_start"];
+      let completion = <Date>project["phase_" + phase_number + "_completion"];
+      if (start !== null && completion !== null)
+      {
+        return (start <= completion);
+      }
+      return true;
+
+    }
+
+    private static ValidatePhaseDates(): boolean
+    {
+      
+
+      let error_text = "";
+      // get date values;
+      ProjectTracking.selected_project.phase_1_start = Utilities.Get_Date_Value("phase_1_start", true);
+      ProjectTracking.selected_project.phase_2_start = Utilities.Get_Date_Value("phase_2_start", true);
+      ProjectTracking.selected_project.phase_3_start = Utilities.Get_Date_Value("phase_3_start", true);
+      ProjectTracking.selected_project.phase_4_start = Utilities.Get_Date_Value("phase_4_start", true);
+      ProjectTracking.selected_project.phase_5_start = Utilities.Get_Date_Value("phase_5_start", true);
+
+      ProjectTracking.selected_project.phase_1_completion = Utilities.Get_Date_Value("phase_1_completion", true);
+      ProjectTracking.selected_project.phase_2_completion = Utilities.Get_Date_Value("phase_2_completion", true);
+      ProjectTracking.selected_project.phase_3_completion = Utilities.Get_Date_Value("phase_3_completion", true);
+      ProjectTracking.selected_project.phase_4_completion = Utilities.Get_Date_Value("phase_4_completion", true);
+      ProjectTracking.selected_project.phase_5_completion = Utilities.Get_Date_Value("phase_5_completion", true);
+
+      // check for error
+      // validation logic should be as follows:
+      // successive phase dates should be after or the same as previous phase dates.
+      // ie: phase 1 start date should be:
+      // less than or equal to phase 1 completion date
+      // less than or equal to phase 2 start date
+      // we only compare each phase's start date to it's completion date
+      // so that they can leave the start dates alone if a phase is completed late.
+      // and so on
+      // null values are ignored
+      let p = ProjectTracking.selected_project;
+      let date_compare: Array<Date> = [];
+      for (let i = 1; i < 6; i++)
+      {
+        let start = <Date>p["phase_" + i.toString() + "_start"];
+        if (start !== null) date_compare.push(start);
+        if (!Project.ValidatePhaseDate(p, i))
+        {
+          error_text = "Actual Completion Dates must be no earlier than the same date as the Start Date.";
+        }
+      }
+      if (date_compare.length > 0 && error_text.length === 0)
+      {
+        for (let i = 0; i < date_compare.length; i++)
+        {
+          if ((i + 1) < date_compare.length)
+          {
+            if (date_compare[i] > date_compare[i + 1])
+            {
+              error_text = "Phase dates must be in order.  An earlier phase cannot have a start date greater than a later phase.";
+              break;
+            }
+          }
+        }
+      }
+
+      // set error
+      Utilities.Set_Text("phase_dates_error", error_text);
+      if (error_text.length > 0)
+      {
+        let e = document.getElementById("phase_dates_error");
+        e.scrollTo();
+      }
+      // return true/false
+      return error_text.length === 0;
     }
 
     public static Save()
@@ -406,6 +779,12 @@
         Utilities.Toggle_Loading_Button("saveProject", false);
         return;
       }
+      if (!Project.ValidatePhaseDates())
+      {
+        
+        Utilities.Toggle_Loading_Button("saveProject", false);
+        return;
+      }
       ProjectTracking.selected_project.project_name = projectName;
       ProjectTracking.selected_project.milestones = Milestone.ReadMilestones();
       ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
@@ -415,6 +794,19 @@
       ProjectTracking.selected_project.priority = PriorityLevel[Utilities.Get_Value("projectPriority")];
       ProjectTracking.selected_project.estimated_completion_date = Utilities.Get_Value("projectEstimatedCompletionDate");
 
+      ProjectTracking.selected_project.phase_1_start = Utilities.Get_Date_Value("phase_1_start", true);
+      ProjectTracking.selected_project.phase_2_start = Utilities.Get_Date_Value("phase_2_start", true);
+      ProjectTracking.selected_project.phase_3_start = Utilities.Get_Date_Value("phase_3_start", true);
+      ProjectTracking.selected_project.phase_4_start = Utilities.Get_Date_Value("phase_4_start", true);
+      ProjectTracking.selected_project.phase_5_start = Utilities.Get_Date_Value("phase_5_start", true);
+
+      ProjectTracking.selected_project.phase_1_completion = Utilities.Get_Date_Value("phase_1_completion", true);
+      ProjectTracking.selected_project.phase_2_completion = Utilities.Get_Date_Value("phase_2_completion", true);
+      ProjectTracking.selected_project.phase_3_completion = Utilities.Get_Date_Value("phase_3_completion", true);
+      ProjectTracking.selected_project.phase_4_completion = Utilities.Get_Date_Value("phase_4_completion", true);
+      ProjectTracking.selected_project.phase_5_completion = Utilities.Get_Date_Value("phase_5_completion", true);
+
+      //return;
       let completed = <HTMLInputElement>document.getElementById("projectComplete");
       ProjectTracking.selected_project.completed = completed.checked;
       let share = <HTMLInputElement>document.getElementById("projectCommissionerShare");
@@ -472,6 +864,36 @@
           priorities.appendChild(option);
         }
       }
+    }
+
+    public static ToggleSummaryView(): void
+    {
+      let button = <HTMLButtonElement>document.getElementById("toggleSummaryView");
+      Utilities.Toggle_Loading_Button(button, true);
+      
+      let buttonText = document.createElement("strong");
+      Utilities.Clear_Element(button);
+      if (ProjectTracking.default_view)
+      {
+        
+        Utilities.Set_Text(buttonText, "Switch to Default View");
+        Utilities.Hide("projectDefaultView");
+        Utilities.Show("projectSummaryView");
+      }
+      else
+      {
+        Utilities.Set_Text(buttonText, "Switch to Summary View");
+        //Project.BuildProjectTrackingList(Project.ApplyFilters(projects));
+        Utilities.Show("projectDefaultView");
+        Utilities.Hide("projectSummaryView");
+      }
+      button.appendChild(buttonText);
+
+      
+
+
+      ProjectTracking.default_view = !ProjectTracking.default_view;
+      Utilities.Toggle_Loading_Button(button, false);
     }
 
   }

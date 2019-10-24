@@ -146,6 +146,24 @@ namespace Utilities
     return (<HTMLInputElement>e).value;
   }
 
+  export function Get_Date_Value(e: string, adjust_for_timezone: boolean): Date
+  export function Get_Date_Value(e: HTMLInputElement, adjust_for_timezone: boolean): Date
+  export function Get_Date_Value(e: any, adjust_for_timezone: boolean): Date
+  {
+    if (typeof e == "string")
+    {
+      e = document.getElementById(e);
+    }
+    let input_date = <HTMLInputElement>e;
+    var d = input_date.valueAsDate;
+
+    if (input_date.value.length === 0) return null;
+
+    if (adjust_for_timezone) d.setMinutes(d.getTimezoneOffset());
+
+    return d;
+  }
+
   export function Set_Value(e: string, value: string): void
   export function Set_Value(e: HTMLSelectElement, value: string): void
   export function Set_Value(e: HTMLInputElement, value: string): void

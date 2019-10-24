@@ -34,6 +34,18 @@ namespace ProjectTracking
     public string added_by { get; set; } = "";
     public bool can_edit { get; set; }
     public bool needs_attention { get; set; } = false;
+
+    public DateTime? phase_1_start { get; set; } = null;
+    public DateTime? phase_1_completion { get; set; } = null;
+    public DateTime? phase_2_start { get; set; } = null;
+    public DateTime? phase_2_completion { get; set; } = null;
+    public DateTime? phase_3_start { get; set; } = null;
+    public DateTime? phase_3_completion { get; set; } = null;
+    public DateTime? phase_4_start { get; set; } = null;
+    public DateTime? phase_4_completion { get; set; } = null;
+    public DateTime? phase_5_start { get; set; } = null;
+    public DateTime? phase_5_completion { get; set; } = null;
+
     public DateTime? estimated_completion_date { get; set; } = DateTime.MinValue;
     public PriorityLevel priority { get; set; } = PriorityLevel.Normal;
 
@@ -89,8 +101,19 @@ namespace ProjectTracking
           P.legislative_tracking,
           P.completed,
           P.date_completed,
+          PD.phase_1_start,
+          PD.phase_1_completion,
+          PD.phase_2_start,
+          PD.phase_2_completion,
+          PD.phase_3_start,
+          PD.phase_3_completion,
+          PD.phase_4_start,
+          PD.phase_4_completion,
+          PD.phase_5_start,
+          PD.phase_5_completion,
           ISNULL(D.date_last_updated, P.added_on) date_last_updated
         FROM project P
+        LEFT OUTER JOIN phase_dates PD ON P.id = PD.project_id
         LEFT OUTER JOIN user_department U ON 
           P.department_id = U.department_id
           AND U.employee_id = @employee_id
@@ -162,6 +185,16 @@ namespace ProjectTracking
       dp.Add("@legislative_tracking", legislative_tracking);
       dp.Add("@completed", completed);
       dp.Add("@added_by", added_by);
+      dp.Add("@phase_1_start", phase_1_start);
+      dp.Add("@phase_1_completion", phase_1_completion);
+      dp.Add("@phase_2_start", phase_2_start);
+      dp.Add("@phase_2_completion", phase_2_completion);
+      dp.Add("@phase_3_start", phase_3_start);
+      dp.Add("@phase_3_completion", phase_3_completion);
+      dp.Add("@phase_4_start", phase_4_start);
+      dp.Add("@phase_4_completion", phase_4_completion);
+      dp.Add("@phase_5_start", phase_5_start);
+      dp.Add("@phase_5_completion", phase_5_completion);
 
       string query = @"
         INSERT INTO project (
@@ -195,7 +228,34 @@ namespace ProjectTracking
           @added_by
         );
       
-        SET @project_id = @@IDENTITY;";
+        SET @project_id = SCOPE_IDENTITY();
+
+        INSERT INTO [dbo].[phase_dates]
+                   ([project_id]
+                   ,[phase_1_start]
+                   ,[phase_1_completion]
+                   ,[phase_2_start]
+                   ,[phase_2_completion]
+                   ,[phase_3_start]
+                   ,[phase_3_completion]
+                   ,[phase_4_start]
+                   ,[phase_4_completion]
+                   ,[phase_5_start]
+                   ,[phase_5_completion])
+         VALUES
+               (@project_id
+               ,@phase_1_start
+               ,@phase_1_completion
+               ,@phase_2_start
+               ,@phase_2_completion
+               ,@phase_3_start
+               ,@phase_3_completion
+               ,@phase_4_start
+               ,@phase_4_completion
+               ,@phase_5_start
+               ,@phase_5_completion);        
+
+";
       int i = Constants.Exec_Query(query, dp);
       if (i == -1) return false;
       id = dp.Get<int>("@project_id");
@@ -248,6 +308,38 @@ namespace ProjectTracking
         WHERE 
           id=@id";
       }
+      query += @"
+
+        DELETE 
+        FROM phase_dates
+        WHERE
+          project_id=@id;
+
+        INSERT INTO [dbo].[phase_dates]
+                   ([project_id]
+                   ,[phase_1_start]
+                   ,[phase_1_completion]
+                   ,[phase_2_start]
+                   ,[phase_2_completion]
+                   ,[phase_3_start]
+                   ,[phase_3_completion]
+                   ,[phase_4_start]
+                   ,[phase_4_completion]
+                   ,[phase_5_start]
+                   ,[phase_5_completion])
+         VALUES
+               (@id
+               ,@phase_1_start
+               ,@phase_1_completion
+               ,@phase_2_start
+               ,@phase_2_completion
+               ,@phase_3_start
+               ,@phase_3_completion
+               ,@phase_4_start
+               ,@phase_4_completion
+               ,@phase_5_start
+               ,@phase_5_completion);
+";
       // now let's add the comment / milestones
       Comment.Save(ua, id, comment);
 

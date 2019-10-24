@@ -12,6 +12,7 @@ namespace ProjectTracking
   export let funding_sources: Array<DataValue> = [];
   export let number_of_milestones: number = 0;
   export let project_name_filter = '';
+  export let default_view: boolean = true;
 
   export function Start(): void
   {
@@ -54,20 +55,25 @@ namespace ProjectTracking
 
   export function FilterProjects()
   {
-    Project.BuildProjectTrackingList(Project.ApplyFilters(ProjectTracking.projects));
+    let projects = Project.ApplyFilters(ProjectTracking.projects);
+    Project.BuildProjectTrackingList(projects);
+    Project.BuildProjectSummaryList(projects);
   }
 
   export function FilterProjectNames(input: HTMLInputElement)
   {
     let v = input.value.trim();
     project_name_filter = v.length > 2 ? v : '';    
-    Project.BuildProjectTrackingList(Project.ApplyFilters(ProjectTracking.projects));
+    let projects = Project.ApplyFilters(ProjectTracking.projects);
+    Project.BuildProjectTrackingList(projects);
+    Project.BuildProjectSummaryList(projects);
   }
 
   export function FinishedLoading()
   {
     //let button = document.getElementById("addProjectButton");
     Utilities.Toggle_Loading_Button("addProjectButton", false);
+    Utilities.Toggle_Loading_Button("toggleSummaryView", false);
     Utilities.Show("filters");
   }
 

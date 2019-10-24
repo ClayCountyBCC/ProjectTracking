@@ -265,7 +265,6 @@ var ProjectTracking;
                 m.name = Utilities.Get_Value("projectMilestone" + i.toString()).trim();
                 m.completed = document.getElementById("projectMilestoneCompleted" + i.toString()).checked;
                 milestones.push(m);
-                console.log('saving milestone', m);
             }
             return milestones;
         };

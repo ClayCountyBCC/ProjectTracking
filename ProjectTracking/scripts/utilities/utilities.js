@@ -104,6 +104,19 @@ var Utilities;
         return e.value;
     }
     Utilities.Get_Value = Get_Value;
+    function Get_Date_Value(e, adjust_for_timezone) {
+        if (typeof e == "string") {
+            e = document.getElementById(e);
+        }
+        var input_date = e;
+        var d = input_date.valueAsDate;
+        if (input_date.value.length === 0)
+            return null;
+        if (adjust_for_timezone)
+            d.setMinutes(d.getTimezoneOffset());
+        return d;
+    }
+    Utilities.Get_Date_Value = Get_Date_Value;
     function Set_Value(e, value) {
         if (typeof e == "string") {
             e = document.getElementById(e);

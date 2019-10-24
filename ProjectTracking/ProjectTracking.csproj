@@ -101,6 +101,22 @@
     <Content Include="bower_components\promise-polyfill\src\finally.js" />
     <Content Include="bower_components\promise-polyfill\src\index.js" />
     <Content Include="bower_components\promise-polyfill\src\polyfill.js" />
+    <Content Include="content\images\cd-top-arrow.svg" />
+    <Content Include="content\images\circle-base128.png" />
+    <Content Include="content\images\circle-black128.png" />
+    <Content Include="content\images\circle-cyan128.png" />
+    <Content Include="content\images\circle-fuchsia128.png" />
+    <Content Include="content\images\circle-green128.png" />
+    <Content Include="content\images\circle-lightgreen128.png" />
+    <Content Include="content\images\circle-orange128.png" />
+    <Content Include="content\images\circle-purple128.png" />
+    <Content Include="content\images\circle-red128.png" />
+    <Content Include="content\images\circle-yellow128.png" />
+    <Content Include="content\images\list_metro.png" />
+    <Content Include="content\images\original-circle-red128.png" />
+    <Content Include="content\images\original-circle-yellow128.png" />
+    <Content Include="content\images\red64.png" />
+    <Content Include="content\images\yellow64.png" />
     <Content Include="css\bulma.css" />
     <Content Include="css\bulma.min.css">
       <DependentUpon>bulma.css</DependentUpon>
@@ -261,7 +277,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="content\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="scripts\app\Comment.ts" />
