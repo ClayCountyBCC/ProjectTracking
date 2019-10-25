@@ -50,3 +50,6 @@ fieldset legend {
   width: 23px;
   margin-right: 1em;
   vertical-align: middle; }
+
+#projectList td img {
+  display: none; }

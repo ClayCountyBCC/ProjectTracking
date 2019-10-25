@@ -575,9 +575,12 @@
       let color = "";
       if (project.completed)
       {
-        let img = document.createElement("img");
-        img.src = "content/images/circle-green128.png";
-        td.appendChild(img);
+        if (add_aging_color)
+        {
+          let img = document.createElement("img");
+          img.src = "content/images/circle-green128.png";
+          td.appendChild(img);
+        }
         span.appendChild(document.createTextNode("Project Completed"));
         td.appendChild(span);
         return td;
@@ -628,7 +631,7 @@
           let d = new Date();
 
           let today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-          var diff = Math.round(Math.abs((new Date(<any>current_phase_end).getTime() - today.getTime()) / 86400000)); 
+          var diff = Math.round((today.getTime() - new Date(<any>current_phase_end).getTime()) / 86400000); 
           console.log('date diff', diff, today, current_phase_end);
           if (diff > 30)
           {

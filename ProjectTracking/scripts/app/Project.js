@@ -409,9 +409,11 @@ var ProjectTracking;
             var span = document.createElement("span");
             var color = "";
             if (project.completed) {
-                var img = document.createElement("img");
-                img.src = "content/images/circle-green128.png";
-                td.appendChild(img);
+                if (add_aging_color) {
+                    var img = document.createElement("img");
+                    img.src = "content/images/circle-green128.png";
+                    td.appendChild(img);
+                }
                 span.appendChild(document.createTextNode("Project Completed"));
                 td.appendChild(span);
                 return td;
@@ -450,7 +452,7 @@ var ProjectTracking;
                     text += Utilities.Format_Date(current_phase_end);
                     var d = new Date();
                     var today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-                    var diff = Math.round(Math.abs((new Date(current_phase_end).getTime() - today.getTime()) / 86400000));
+                    var diff = Math.round((today.getTime() - new Date(current_phase_end).getTime()) / 86400000);
                     console.log('date diff', diff, today, current_phase_end);
                     if (diff > 30) {
                         color = "red";
