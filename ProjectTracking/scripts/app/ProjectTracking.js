@@ -12,6 +12,7 @@ var ProjectTracking;
     ProjectTracking.project_name_filter = '';
     ProjectTracking.default_view = true;
     function Start() {
+        UpdatePhaseNameSelects();
         ProjectTracking.DataValue.GetDepartments();
         ProjectTracking.DataValue.GetFunding();
         ProjectTracking.DataValue.GetMyDepartments();
@@ -75,5 +76,24 @@ var ProjectTracking;
         container.appendChild(tr);
     }
     ProjectTracking.AddProjectResultsMessage = AddProjectResultsMessage;
+    function UpdatePhaseNameSelects() {
+        var phase_names = [
+            "Develop Specifications",
+            "Procurement",
+            "Design",
+            "Bid",
+            "Implementation",
+            "Construction",
+            "Ignore this Phase",
+        ];
+        for (var i = 1; i < 6; i++) {
+            var select = document.getElementById("phase_" + i.toString() + "_name");
+            select.add(Utilities.Create_Option("", "Select Phase Name", true));
+            for (var _i = 0, phase_names_1 = phase_names; _i < phase_names_1.length; _i++) {
+                var name_1 = phase_names_1[_i];
+                select.add(Utilities.Create_Option(name_1, name_1, false));
+            }
+        }
+    }
 })(ProjectTracking || (ProjectTracking = {}));
 //# sourceMappingURL=ProjectTracking.js.map

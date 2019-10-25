@@ -16,6 +16,7 @@ namespace ProjectTracking
 
   export function Start(): void
   {
+    UpdatePhaseNameSelects();
     DataValue.GetDepartments();
     DataValue.GetFunding();
     DataValue.GetMyDepartments();
@@ -87,6 +88,28 @@ namespace ProjectTracking
     td.appendChild(document.createTextNode(message));
     tr.appendChild(td);
     container.appendChild(tr);
+  }
+
+  function UpdatePhaseNameSelects()
+  {
+    let phase_names = [      
+      "Develop Specifications",
+      "Procurement",
+      "Design",
+      "Bid",
+      "Implementation",
+      "Construction",
+      "Ignore this Phase",
+    ]
+    for (let i = 1; i < 6; i++) 
+    {
+      let select = <HTMLSelectElement>document.getElementById("phase_" + i.toString() + "_name");
+      select.add(Utilities.Create_Option("", "Select Phase Name", true));
+      for (let name of phase_names)
+      {
+        select.add(Utilities.Create_Option(name, name, false));
+      }
+    }
   }
 
 }
