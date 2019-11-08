@@ -836,6 +836,7 @@ var ProjectTracking;
     ProjectTracking.Milestone = Milestone;
 })(ProjectTracking || (ProjectTracking = {}));
 //# sourceMappingURL=Milestone.js.map
+var google;
 var ProjectTracking;
 (function (ProjectTracking) {
     "use strict";
@@ -868,6 +869,7 @@ var ProjectTracking;
             this.phase_5_name = "";
         }
         Project.GetProjects = function () {
+            ProjectTracking.charts = {};
             var buttonId = "filterRefreshButton";
             Utilities.Toggle_Loading_Button(buttonId, true);
             var path = ProjectTracking.GetPath();
@@ -1097,11 +1099,24 @@ var ProjectTracking;
             var df = document.createDocumentFragment();
             for (var _i = 0, projects_2 = projects; _i < projects_2.length; _i++) {
                 var p = projects_2[_i];
-                df.appendChild(Project.CreateProjectSummaryRow(p));
+                var phase_rows = Project.CreateGanttChartRows(p);
+                df.appendChild(Project.CreateProjectSummaryRow(p, phase_rows));
+                if (phase_rows.length > 0) {
+                    var tr = document.createElement("tr");
+                    tr.classList.add("hide");
+                    var td = document.createElement("td");
+                    td.colSpan = 5;
+                    var chart_container = document.createElement("div");
+                    chart_container.id = "chart_" + p.id.toString();
+                    chart_container.style.width = "100%";
+                    td.appendChild(chart_container);
+                    tr.appendChild(td);
+                    df.appendChild(tr);
+                }
             }
             container.appendChild(df);
         };
-        Project.CreateProjectSummaryRow = function (project) {
+        Project.CreateProjectSummaryRow = function (project, phase_rows) {
             //project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
             var tr = document.createElement("tr");
             //if (project.needs_attention)
@@ -1161,7 +1176,7 @@ var ProjectTracking;
             //let milestones = document.createElement("td");
             //milestones.appendChild(Milestone.MilestonesView(project.milestones, project.completed));
             //tr.appendChild(milestones);
-            tr.appendChild(Project.GetCurrentPhase(project, true)); // get the current phase
+            tr.appendChild(Project.GetCurrentPhase(project, true, phase_rows)); // get the current phase
             //let timeline = document.createElement("td");
             //timeline.appendChild(document.createTextNode(project.timeline));
             //tr.appendChild(timeline);
@@ -1236,7 +1251,7 @@ var ProjectTracking;
             var milestones = document.createElement("td");
             milestones.appendChild(ProjectTracking.Milestone.MilestonesView(project.milestones, project.completed));
             tr.appendChild(milestones);
-            tr.appendChild(Project.GetCurrentPhase(project, false)); // get the current phase
+            tr.appendChild(Project.GetCurrentPhase(project, false, [])); // get the current phase
             //let timeline = document.createElement("td");
             //timeline.appendChild(document.createTextNode(project.timeline));
             //tr.appendChild(timeline);
@@ -1257,7 +1272,7 @@ var ProjectTracking;
             tr.appendChild(dateUpdated);
             return tr;
         };
-        Project.GetCurrentPhase = function (project, add_aging_color) {
+        Project.GetCurrentPhase = function (project, add_aging_color, phase_rows) {
             var ignore = "Ignore this Phase";
             var td = document.createElement("td");
             var span = document.createElement("span");
@@ -1331,7 +1346,6 @@ var ProjectTracking;
                     var d = new Date();
                     var today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
                     var diff = Math.round((today.getTime() - new Date(current_phase_end).getTime()) / 86400000);
-                    console.log('date diff', diff, today, current_phase_end);
                     if (diff > 30) {
                         color = "red";
                     }
@@ -1352,6 +1366,12 @@ var ProjectTracking;
                 td.appendChild(img);
             }
             td.appendChild(span);
+            if (phase_rows.length > 0) {
+                span.onclick = function () {
+                    Project.DrawGanttChart(project.id, phase_rows);
+                };
+                span.style.cursor = "pointer";
+            }
             //if (!add_aging_color) 
             return td;
         };
@@ -1571,6 +1591,80 @@ var ProjectTracking;
             ProjectTracking.default_view = !ProjectTracking.default_view;
             Utilities.Toggle_Loading_Button(button, false);
         };
+        Project.CreateGanttChartRows = function (project) {
+            if (project.completed)
+                return [];
+            var phase_dates = [];
+            for (var i = 1; i < 6; i++) {
+                var name_3 = project["phase_" + i.toString() + "_name"];
+                var start = project["phase_" + i.toString() + "_start"];
+                var end = project["phase_" + i.toString() + "_completion"];
+                if (name_3.length > 0 && name_3 !== "Ignore this Phase") {
+                    phase_dates.push({
+                        name: name_3,
+                        start: new Date(start),
+                        end: end === null ? null : new Date(end)
+                    });
+                }
+            }
+            var estimated_completion = new Date(project.estimated_completion_date);
+            if (estimated_completion.getFullYear() < 1000)
+                estimated_completion = null;
+            if (phase_dates.length === 0)
+                return phase_dates;
+            for (var i = 0; i < phase_dates.length; i++) {
+                var pd = phase_dates[i];
+                if (pd.end === null) {
+                    if (i === phase_dates.length - 1) {
+                        pd.end = estimated_completion;
+                    }
+                    else {
+                        pd.end = phase_dates[i + 1].start;
+                    }
+                }
+            }
+            var ganttrows = [];
+            for (var _i = 0, phase_dates_1 = phase_dates; _i < phase_dates_1.length; _i++) {
+                var pd = phase_dates_1[_i];
+                ganttrows.push([pd.name, pd.name, null, pd.start, pd.end, null, 100, null]);
+            }
+            return ganttrows;
+        };
+        Project.DrawGanttChart = function (project_id, rows) {
+            var chart_container = document.getElementById('chart_' + project_id.toString());
+            var generate_chart = false;
+            if (ProjectTracking.charts[project_id] === undefined) {
+                ProjectTracking.charts[project_id] = new google.visualization.Gantt(chart_container);
+                generate_chart = true;
+            }
+            var grandparent = chart_container.parentElement.parentElement;
+            grandparent.classList.toggle("hide");
+            if (rows.length === 0 || !generate_chart)
+                return;
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Task ID');
+            data.addColumn('string', 'Task Name');
+            data.addColumn('string', 'Resource');
+            data.addColumn('date', 'Start Date');
+            data.addColumn('date', 'End Date');
+            data.addColumn('number', 'Duration');
+            data.addColumn('number', 'Percent Complete');
+            data.addColumn('string', 'Dependencies');
+            data.addRows(rows);
+            var options = {
+                height: (rows.length * 50) + 50,
+                gantt: {
+                    percentEnabled: false,
+                    criticalPathEnabled: false,
+                    labelStyle: {
+                        fontName: "Segoe UI",
+                        fontSize: 16,
+                        color: '#363636'
+                    }
+                }
+            };
+            ProjectTracking.charts[project_id].draw(data, options);
+        };
         return Project;
     }());
     ProjectTracking.Project = Project;
@@ -1580,6 +1674,7 @@ var ProjectTracking;
 var ProjectTracking;
 (function (ProjectTracking) {
     "use strict";
+    ProjectTracking.charts = {};
     ProjectTracking.selected_project = new ProjectTracking.Project();
     ProjectTracking.projects = [];
     ProjectTracking.filtered_projects = [];

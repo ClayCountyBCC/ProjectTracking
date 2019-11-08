@@ -217,16 +217,17 @@
             </div>
 
           </th>
-          <th style="width: 20%;">
+          <th style="width: 15%;">
             Department
           </th>
           <th style="width: 15%;">
             Funding
           </th>
-          <th style="width: 35%;">
+          <th style="width: 30%;">
             Current Phase
           </th>
-          <th style="width: 15%;">
+          <th class="has-text-centered is-vcentered"
+              style="width: 10%;">
             Estimated Completion Date
           </th>
         </tr>
@@ -346,11 +347,11 @@
               <tr>
                 <td>
                   <div class="field">
-                    <div class="control">                      
+                    <div class="control">
                       <div class="select">
                         <select id="phase_1_name"
                                 class="is-medium">
-                          </select>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -644,10 +645,12 @@
   <script src="scripts/app/Milestone.js"></script>
   <script src="scripts/app/Project.js"></script>
   <script src="scripts/app/ProjectTracking.js"></script>-->
-  <script src="scripts/app/bundle.js?201910251302"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="scripts/app/bundle.js?201910251302"></script>
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function (event)
     {
+      google.charts.load('current', {'packages':['gantt']});
       ProjectTracking.Start();
     });
   </script>

@@ -1,4 +1,5 @@
-﻿namespace ProjectTracking
+﻿var google: any;
+namespace ProjectTracking
 {
   "use strict";
 
@@ -89,6 +90,7 @@
 
     public static GetProjects(): void
     {
+      ProjectTracking.charts = {};
       let buttonId = "filterRefreshButton";
       Utilities.Toggle_Loading_Button(buttonId, true);
       let path = ProjectTracking.GetPath();
@@ -390,12 +392,27 @@
       let df = document.createDocumentFragment();
       for (let p of projects)
       {
-        df.appendChild(Project.CreateProjectSummaryRow(p));
+        let phase_rows = Project.CreateGanttChartRows(p);
+        df.appendChild(Project.CreateProjectSummaryRow(p, phase_rows));
+        
+        if (phase_rows.length > 0)
+        {
+          let tr = document.createElement("tr");
+          tr.classList.add("hide");
+          let td = document.createElement("td");
+          td.colSpan = 5;
+          let chart_container = document.createElement("div");
+          chart_container.id = "chart_" + p.id.toString();
+          chart_container.style.width = "100%";
+          td.appendChild(chart_container);
+          tr.appendChild(td);
+          df.appendChild(tr);
+        }
       }
       container.appendChild(df);
     }
 
-    public static CreateProjectSummaryRow(project: Project): HTMLTableRowElement
+    public static CreateProjectSummaryRow(project: Project, phase_rows: Array<any>): HTMLTableRowElement
     {
       //project.comments = project.comments.filter(function (j) { return j.comment.length > 0; });
 
@@ -467,7 +484,7 @@
       //milestones.appendChild(Milestone.MilestonesView(project.milestones, project.completed));
       //tr.appendChild(milestones);
 
-      tr.appendChild(Project.GetCurrentPhase(project, true)); // get the current phase
+      tr.appendChild(Project.GetCurrentPhase(project, true, phase_rows)); // get the current phase
 
       //let timeline = document.createElement("td");
       //timeline.appendChild(document.createTextNode(project.timeline));
@@ -564,7 +581,7 @@
       milestones.appendChild(Milestone.MilestonesView(project.milestones, project.completed));
       tr.appendChild(milestones);
 
-      tr.appendChild(Project.GetCurrentPhase(project, false)); // get the current phase
+      tr.appendChild(Project.GetCurrentPhase(project, false, [])); // get the current phase
 
       //let timeline = document.createElement("td");
       //timeline.appendChild(document.createTextNode(project.timeline));
@@ -589,7 +606,7 @@
       return tr;
     }
 
-    private static GetCurrentPhase(project: Project, add_aging_color: boolean): HTMLTableCellElement
+    private static GetCurrentPhase(project: Project, add_aging_color: boolean, phase_rows: Array<any>): HTMLTableCellElement
     {
       let ignore = "Ignore this Phase";
       let td = document.createElement("td");
@@ -686,7 +703,6 @@
 
           let today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
           var diff = Math.round((today.getTime() - new Date(<any>current_phase_end).getTime()) / 86400000); 
-          console.log('date diff', diff, today, current_phase_end);
           if (diff > 30)
           {
             color = "red";
@@ -715,6 +731,14 @@
 
       }
       td.appendChild(span);
+      if (phase_rows.length > 0)
+      {
+        span.onclick = () =>
+        {
+          Project.DrawGanttChart(project.id, phase_rows);
+        }
+        span.style.cursor = "pointer";
+      }
       //if (!add_aging_color) 
       return td;
     }
@@ -982,6 +1006,100 @@
 
       ProjectTracking.default_view = !ProjectTracking.default_view;
       Utilities.Toggle_Loading_Button(button, false);
+    }
+
+    public static CreateGanttChartRows(project: Project): Array<any>
+    {
+      if (project.completed) return [];
+      let phase_dates: Array<any> = [];
+      for (let i = 1; i < 6; i++)
+      {
+        let name = <string>project["phase_" + i.toString() + "_name"];
+        let start = <string>project["phase_" + i.toString() + "_start"];
+        let end = <string>project["phase_" + i.toString() + "_completion"];
+        
+        if (name.length > 0 && name !== "Ignore this Phase")
+        {
+          phase_dates.push(
+            {
+              name: name,
+              start: new Date(start),
+              end: end === null ? null : new Date(end)
+            });
+        }
+
+
+      }
+      let estimated_completion = new Date(project.estimated_completion_date);
+      if (estimated_completion.getFullYear() < 1000) estimated_completion = null;
+
+      if (phase_dates.length === 0) return phase_dates;
+
+      for (let i = 0; i < phase_dates.length; i++)
+      {
+        let pd = phase_dates[i];
+        if (pd.end === null)
+        {
+          if (i === phase_dates.length - 1)
+          {
+            pd.end = estimated_completion;
+          }
+          else
+          {
+            pd.end = phase_dates[i + 1].start;
+          }
+        }
+      }
+      let ganttrows = [];
+      for (let pd of phase_dates)
+      {
+        ganttrows.push([pd.name, pd.name, null, pd.start, pd.end, null, 100, null]);
+      }
+      return ganttrows;
+
+    }
+
+    public static DrawGanttChart(project_id: number, rows: Array<any>): void
+    {
+      let chart_container = document.getElementById('chart_' + project_id.toString());
+      let generate_chart = false;
+      if (ProjectTracking.charts[project_id] === undefined)
+      {
+        ProjectTracking.charts[project_id] = new google.visualization.Gantt(chart_container);
+        generate_chart = true;
+      }
+      let grandparent = chart_container.parentElement.parentElement;
+      grandparent.classList.toggle("hide");
+      
+      if (rows.length === 0 || !generate_chart) return;
+      let data = new google.visualization.DataTable();
+      data.addColumn('string', 'Task ID');
+      data.addColumn('string', 'Task Name');
+      data.addColumn('string', 'Resource');
+      data.addColumn('date', 'Start Date');
+      data.addColumn('date', 'End Date');
+      data.addColumn('number', 'Duration');
+      data.addColumn('number', 'Percent Complete');
+      data.addColumn('string', 'Dependencies');
+
+      data.addRows(rows);
+      let options =
+      {
+        height: (rows.length * 50) + 50,        
+        gantt:
+        {
+          percentEnabled: false,
+          criticalPathEnabled: false,
+          labelStyle:
+          {
+            fontName: "Segoe UI",
+            fontSize: 16,
+            color: '#363636'
+
+          }
+        }
+      }
+      ProjectTracking.charts[project_id].draw(data, options);
     }
 
   }

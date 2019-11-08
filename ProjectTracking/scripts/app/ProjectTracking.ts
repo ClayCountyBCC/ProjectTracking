@@ -3,7 +3,7 @@
 namespace ProjectTracking
 {
   "use strict";
-
+  export let charts = {};
   export let selected_project: Project = new Project();
   export let projects: Array<Project> = [];
   export let filtered_projects: Array<Project> = [];
@@ -26,7 +26,7 @@ namespace ProjectTracking
 
   export function ShowAddProject(): void
   {
-    document.getElementById("addProject").classList.add("is-active");
+    document.getElementById("addProject").classList.add("is-active");   
   }
 
   export function CloseModals(): void

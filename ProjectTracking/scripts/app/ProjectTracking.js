@@ -2,6 +2,7 @@
 var ProjectTracking;
 (function (ProjectTracking) {
     "use strict";
+    ProjectTracking.charts = {};
     ProjectTracking.selected_project = new ProjectTracking.Project();
     ProjectTracking.projects = [];
     ProjectTracking.filtered_projects = [];
