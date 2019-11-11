@@ -1755,6 +1755,7 @@ var ProjectTracking;
             "Procurement",
             "Design",
             "Bid",
+            "Regulatory Approval",
             "Implementation",
             "Construction",
             "Ignore this Phase",
