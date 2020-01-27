@@ -34,21 +34,22 @@ namespace ProjectTracking
     public string added_by { get; set; } = "";
     public bool can_edit { get; set; }
     public bool needs_attention { get; set; } = false;
-    public string phase_1_name { get; set; } = "";
-    public string phase_2_name { get; set; } = "";
-    public string phase_3_name { get; set; } = "";
-    public string phase_4_name { get; set; } = "";
-    public string phase_5_name { get; set; } = "";
-    public DateTime? phase_1_start { get; set; } = null;
-    public DateTime? phase_1_completion { get; set; } = null;
-    public DateTime? phase_2_start { get; set; } = null;
-    public DateTime? phase_2_completion { get; set; } = null;
-    public DateTime? phase_3_start { get; set; } = null;
-    public DateTime? phase_3_completion { get; set; } = null;
-    public DateTime? phase_4_start { get; set; } = null;
-    public DateTime? phase_4_completion { get; set; } = null;
-    public DateTime? phase_5_start { get; set; } = null;
-    public DateTime? phase_5_completion { get; set; } = null;
+    //public string phase_1_name { get; set; } = "";
+    //public string phase_2_name { get; set; } = "";
+    //public string phase_3_name { get; set; } = "";
+    //public string phase_4_name { get; set; } = "";
+    //public string phase_5_name { get; set; } = "";
+    //public DateTime? phase_1_start { get; set; } = null;
+    //public DateTime? phase_1_completion { get; set; } = null;
+    //public DateTime? phase_2_start { get; set; } = null;
+    //public DateTime? phase_2_completion { get; set; } = null;
+    //public DateTime? phase_3_start { get; set; } = null;
+    //public DateTime? phase_3_completion { get; set; } = null;
+    //public DateTime? phase_4_start { get; set; } = null;
+    //public DateTime? phase_4_completion { get; set; } = null;
+    //public DateTime? phase_5_start { get; set; } = null;
+    //public DateTime? phase_5_completion { get; set; } = null;
+    public List<Phase> phases { get; set; } = new List<Phase>();
 
     public DateTime? estimated_completion_date { get; set; } = DateTime.MinValue;
     public PriorityLevel priority { get; set; } = PriorityLevel.Normal;
@@ -60,10 +61,15 @@ namespace ProjectTracking
     public static List<Project> GetProjects(int employee_id)
     {
       var projects  = GetAllProjects(employee_id);
+      var phases = Phase.GetAll();
       var comments = Comment.GetAllComments();
       var milestones = Milestone.GetAllMilestones();
       foreach(var p in projects)
       {
+        p.phases = (from ph in phases
+                    where ph.project_id == p.id
+                    orderby ph.phase_order ascending
+                    select ph).ToList();
         p.milestones = (from m in milestones
                         where m.project_id == p.id
                         select m).ToList();
@@ -194,21 +200,21 @@ namespace ProjectTracking
       dp.Add("@legislative_tracking", legislative_tracking);
       dp.Add("@completed", completed);
       dp.Add("@added_by", added_by);
-      dp.Add("@phase_1_name", phase_1_name);
-      dp.Add("@phase_2_name", phase_2_name);
-      dp.Add("@phase_3_name", phase_3_name);
-      dp.Add("@phase_4_name", phase_4_name);
-      dp.Add("@phase_5_name", phase_5_name);
-      dp.Add("@phase_1_start", phase_1_start);
-      dp.Add("@phase_1_completion", phase_1_completion);
-      dp.Add("@phase_2_start", phase_2_start);
-      dp.Add("@phase_2_completion", phase_2_completion);
-      dp.Add("@phase_3_start", phase_3_start);
-      dp.Add("@phase_3_completion", phase_3_completion);
-      dp.Add("@phase_4_start", phase_4_start);
-      dp.Add("@phase_4_completion", phase_4_completion);
-      dp.Add("@phase_5_start", phase_5_start);
-      dp.Add("@phase_5_completion", phase_5_completion);
+      //dp.Add("@phase_1_name", phase_1_name);
+      //dp.Add("@phase_2_name", phase_2_name);
+      //dp.Add("@phase_3_name", phase_3_name);
+      //dp.Add("@phase_4_name", phase_4_name);
+      //dp.Add("@phase_5_name", phase_5_name);
+      //dp.Add("@phase_1_start", phase_1_start);
+      //dp.Add("@phase_1_completion", phase_1_completion);
+      //dp.Add("@phase_2_start", phase_2_start);
+      //dp.Add("@phase_2_completion", phase_2_completion);
+      //dp.Add("@phase_3_start", phase_3_start);
+      //dp.Add("@phase_3_completion", phase_3_completion);
+      //dp.Add("@phase_4_start", phase_4_start);
+      //dp.Add("@phase_4_completion", phase_4_completion);
+      //dp.Add("@phase_5_start", phase_5_start);
+      //dp.Add("@phase_5_completion", phase_5_completion);
 
       string query = @"
         INSERT INTO project (
@@ -240,46 +246,44 @@ namespace ProjectTracking
           @completed, 
           GETDATE(), 
           @added_by
-        );
+        );";
       
-        SET @project_id = SCOPE_IDENTITY();
+        //SET @project_id = SCOPE_IDENTITY();
 
-        INSERT INTO [dbo].[phase_dates]
-          ([project_id]
-          ,[phase_1_name]
-          ,[phase_2_name]
-          ,[phase_3_name]
-          ,[phase_4_name]
-          ,[phase_5_name]
-          ,[phase_1_start]
-          ,[phase_1_completion]
-          ,[phase_2_start]
-          ,[phase_2_completion]
-          ,[phase_3_start]
-          ,[phase_3_completion]
-          ,[phase_4_start]
-          ,[phase_4_completion]
-          ,[phase_5_start]
-          ,[phase_5_completion])
-         VALUES
-          (@project_id
-          ,@phase_1_name
-          ,@phase_2_name
-          ,@phase_3_name
-          ,@phase_4_name
-          ,@phase_5_name
-          ,@phase_1_start
-          ,@phase_1_completion
-          ,@phase_2_start
-          ,@phase_2_completion
-          ,@phase_3_start
-          ,@phase_3_completion
-          ,@phase_4_start
-          ,@phase_4_completion
-          ,@phase_5_start
-          ,@phase_5_completion);        
-
-";
+        //INSERT INTO [dbo].[phase_dates]
+        //  ([project_id]
+        //  ,[phase_1_name]
+        //  ,[phase_2_name]
+        //  ,[phase_3_name]
+        //  ,[phase_4_name]
+        //  ,[phase_5_name]
+        //  ,[phase_1_start]
+        //  ,[phase_1_completion]
+        //  ,[phase_2_start]
+        //  ,[phase_2_completion]
+        //  ,[phase_3_start]
+        //  ,[phase_3_completion]
+        //  ,[phase_4_start]
+        //  ,[phase_4_completion]
+        //  ,[phase_5_start]
+        //  ,[phase_5_completion])
+        // VALUES
+        //  (@project_id
+        //  ,@phase_1_name
+        //  ,@phase_2_name
+        //  ,@phase_3_name
+        //  ,@phase_4_name
+        //  ,@phase_5_name
+        //  ,@phase_1_start
+        //  ,@phase_1_completion
+        //  ,@phase_2_start
+        //  ,@phase_2_completion
+        //  ,@phase_3_start
+        //  ,@phase_3_completion
+        //  ,@phase_4_start
+        //  ,@phase_4_completion
+        //  ,@phase_5_start
+        //  ,@phase_5_completion); ";
       int i = Constants.Exec_Query(query, dp);
       if (i == -1) return false;
       id = dp.Get<int>("@project_id");
@@ -287,6 +291,7 @@ namespace ProjectTracking
       Comment.Save(ua, id, comment);
 
       Milestone.SaveAll(id, milestones);
+      Phase.SaveAll(id, phases);
       return true;
     }
 
@@ -332,53 +337,53 @@ namespace ProjectTracking
         WHERE 
           id=@id";
       }
-      query += @"
+//      query += @"
 
-        DELETE 
-        FROM phase_dates
-        WHERE
-          project_id=@id;
+//        DELETE 
+//        FROM phase_dates
+//        WHERE
+//          project_id=@id;
 
-        INSERT INTO [dbo].[phase_dates]
-          ([project_id]
-          ,[phase_1_name]
-          ,[phase_2_name]
-          ,[phase_3_name]
-          ,[phase_4_name]
-          ,[phase_5_name]
-          ,[phase_1_start]
-          ,[phase_1_completion]
-          ,[phase_2_start]
-          ,[phase_2_completion]
-          ,[phase_3_start]
-          ,[phase_3_completion]
-          ,[phase_4_start]
-          ,[phase_4_completion]
-          ,[phase_5_start]
-          ,[phase_5_completion])
-         VALUES
-          (@id
-          ,@phase_1_name
-          ,@phase_2_name
-          ,@phase_3_name
-          ,@phase_4_name
-          ,@phase_5_name
-          ,@phase_1_start
-          ,@phase_1_completion
-          ,@phase_2_start
-          ,@phase_2_completion
-          ,@phase_3_start
-          ,@phase_3_completion
-          ,@phase_4_start
-          ,@phase_4_completion
-          ,@phase_5_start
-          ,@phase_5_completion);
-";
+//        INSERT INTO [dbo].[phase_dates]
+//          ([project_id]
+//          ,[phase_1_name]
+//          ,[phase_2_name]
+//          ,[phase_3_name]
+//          ,[phase_4_name]
+//          ,[phase_5_name]
+//          ,[phase_1_start]
+//          ,[phase_1_completion]
+//          ,[phase_2_start]
+//          ,[phase_2_completion]
+//          ,[phase_3_start]
+//          ,[phase_3_completion]
+//          ,[phase_4_start]
+//          ,[phase_4_completion]
+//          ,[phase_5_start]
+//          ,[phase_5_completion])
+//         VALUES
+//          (@id
+//          ,@phase_1_name
+//          ,@phase_2_name
+//          ,@phase_3_name
+//          ,@phase_4_name
+//          ,@phase_5_name
+//          ,@phase_1_start
+//          ,@phase_1_completion
+//          ,@phase_2_start
+//          ,@phase_2_completion
+//          ,@phase_3_start
+//          ,@phase_3_completion
+//          ,@phase_4_start
+//          ,@phase_4_completion
+//          ,@phase_5_start
+//          ,@phase_5_completion);
+//";
       // now let's add the comment / milestones
       Comment.Save(ua, id, comment);
 
       Milestone.SaveAll(id, milestones);
-
+      Phase.SaveAll(id, phases);
 
       return Constants.Save_Data<Project>(query, this);
     }

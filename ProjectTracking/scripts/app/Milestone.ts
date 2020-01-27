@@ -138,7 +138,7 @@
       removeButton.classList.add("is-warning");
       removeButton.classList.add("button");
       removeButton.classList.add("is-medium");
-      removeButton.disabled = ProjectTracking.number_of_milestones === 1;
+      //removeButton.disabled = ProjectTracking.number_of_milestones === 1;
       removeButton.appendChild(document.createTextNode("Remove"));
       removeButton.onclick = function ()
       {
@@ -214,7 +214,7 @@
         let moveDown = <HTMLButtonElement>document.getElementById("milestoneDown" + i.toString());
         moveDown.disabled = (i === ProjectTracking.number_of_milestones);
         let remove = <HTMLButtonElement>document.getElementById("milestoneRemove" + i.toString());
-        remove.disabled = (ProjectTracking.number_of_milestones === 1);
+        //remove.disabled = (ProjectTracking.number_of_milestones === 1);
       }
     }
 

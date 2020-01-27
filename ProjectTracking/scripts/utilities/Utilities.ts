@@ -154,7 +154,7 @@ namespace Utilities
     {
       e = document.getElementById(e);
     }
-    let input_date = <HTMLInputElement>e;
+    let input_date = <HTMLInputElement>e;    
     var d = input_date.valueAsDate;
 
     if (input_date.value.length === 0) return null;
@@ -174,6 +174,36 @@ namespace Utilities
       e = document.getElementById(e);
     }
     (<HTMLInputElement>e).value = value;
+  }
+
+  export function Set_Date_Value(e: HTMLInputElement, value: Date): void
+  export function Set_Date_Value(e: HTMLInputElement, value: string): void
+  export function Set_Date_Value(e: string, value: string): void
+  export function Set_Date_Value(e: string, value: Date): void
+  export function Set_Date_Value(e: any, value: any): void
+  {
+    let input;
+    if (typeof e == "string")
+    {
+      input = document.getElementById(e);
+    }
+    else
+    {
+      input = e;
+    }
+    input.value = "";
+    if (typeof value == "string")
+    {
+      if (new Date(value).getFullYear() > 1000)
+      {
+        (<HTMLInputElement>input).valueAsDate = new Date(value);
+      }
+      return;
+    }
+    if (value instanceof Date)
+    {
+      (<HTMLInputElement>input).valueAsDate = value;
+    }    
   }
 
   export function Set_Text(e: string, value: string): void

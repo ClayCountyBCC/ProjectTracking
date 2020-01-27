@@ -201,6 +201,26 @@ var Utilities;
         e.value = value;
     }
     Utilities.Set_Value = Set_Value;
+    function Set_Date_Value(e, value) {
+        var input;
+        if (typeof e == "string") {
+            input = document.getElementById(e);
+        }
+        else {
+            input = e;
+        }
+        input.value = "";
+        if (typeof value == "string") {
+            if (new Date(value).getFullYear() > 1000) {
+                input.valueAsDate = new Date(value);
+            }
+            return;
+        }
+        if (value instanceof Date) {
+            input.valueAsDate = value;
+        }
+    }
+    Utilities.Set_Date_Value = Set_Date_Value;
     function Set_Text(e, value) {
         if (typeof e == "string") {
             e = document.getElementById(e);
@@ -563,6 +583,476 @@ var ProjectTracking;
 //# sourceMappingURL=Comment.js.map
 var ProjectTracking;
 (function (ProjectTracking) {
+    var Phase = /** @class */ (function () {
+        function Phase() {
+            this.project_id = -1;
+            this.phase_order = -1;
+            this.name = "";
+        }
+        Phase.AddPhase = function () {
+            var phase_names = [
+                "Develop Specifications",
+                "Procurement",
+                "Design",
+                "Bid - Contract Development",
+                "Bid",
+                "Right of Way - Property Acquisition",
+                "RFQ - Contract Development",
+                "Regulatory Approval",
+                "Implementation",
+                "Construction"
+            ];
+            ProjectTracking.number_of_phases++;
+            var nm = ProjectTracking.number_of_phases.toString();
+            var container = Phase.GetContainer();
+            var df = document.createDocumentFragment();
+            var tr = document.createElement("tr");
+            tr.id = "phase" + nm;
+            var count = document.createElement("td");
+            count.style.textAlign = "center";
+            count.style.verticalAlign = "middle";
+            count.appendChild(document.createTextNode(nm));
+            tr.appendChild(count);
+            var inputCell = document.createElement("td");
+            var field_input = document.createElement("div");
+            field_input.classList.add("field");
+            var control_input = document.createElement("div");
+            control_input.classList.add("control");
+            control_input.classList.add("is-medium");
+            var control_select = document.createElement("div");
+            control_select.classList.add("select");
+            control_input.appendChild(control_select);
+            var phase_select = document.createElement("select");
+            phase_select.classList.add("is-medium");
+            phase_select.id = "projectPhase" + nm;
+            phase_select.add(Utilities.Create_Option("", "Select Phase Name", true));
+            for (var _i = 0, phase_names_1 = phase_names; _i < phase_names_1.length; _i++) {
+                var name_1 = phase_names_1[_i];
+                phase_select.add(Utilities.Create_Option(name_1, name_1, false));
+            }
+            control_select.appendChild(phase_select);
+            //let input = document.createElement("input");
+            //input.classList.add("input");
+            //input.classList.add("is-medium");
+            //input.type = "text";
+            //input.id = "projectPhase" + nm;
+            //control_input.appendChild(input);
+            field_input.appendChild(control_input);
+            inputCell.appendChild(field_input);
+            tr.appendChild(inputCell);
+            var start_cell = document.createElement("td");
+            var start_field_input = document.createElement("div");
+            start_field_input.classList.add("field");
+            var start_control_input = document.createElement("div");
+            start_control_input.classList.add("control");
+            start_control_input.classList.add("is-medium");
+            var start_input = document.createElement("input");
+            start_input.classList.add("input");
+            start_input.classList.add("is-medium");
+            start_input.type = "date";
+            start_input.id = "projectPhaseStart" + nm;
+            start_control_input.appendChild(start_input);
+            start_field_input.appendChild(start_control_input);
+            start_cell.appendChild(start_field_input);
+            tr.appendChild(start_cell);
+            var est_cell = document.createElement("td");
+            var est_field_input = document.createElement("div");
+            est_field_input.classList.add("field");
+            var est_control_input = document.createElement("div");
+            est_control_input.classList.add("control");
+            est_control_input.classList.add("is-medium");
+            var est_input = document.createElement("input");
+            est_input.classList.add("input");
+            est_input.classList.add("is-medium");
+            est_input.type = "Date";
+            est_input.id = "projectPhaseEst" + nm;
+            est_control_input.appendChild(est_input);
+            est_field_input.appendChild(est_control_input);
+            est_cell.appendChild(est_field_input);
+            tr.appendChild(est_cell);
+            var completion_cell = document.createElement("td");
+            var completion_field_input = document.createElement("div");
+            completion_field_input.classList.add("field");
+            var completion_control_input = document.createElement("div");
+            completion_control_input.classList.add("control");
+            completion_control_input.classList.add("is-medium");
+            var completion_input = document.createElement("input");
+            completion_input.classList.add("input");
+            completion_input.classList.add("is-medium");
+            completion_input.type = "Date";
+            completion_input.id = "projectPhaseCompletion" + nm;
+            completion_control_input.appendChild(completion_input);
+            completion_field_input.appendChild(completion_control_input);
+            completion_cell.appendChild(completion_field_input);
+            tr.appendChild(completion_cell);
+            var buttonCell = document.createElement("td");
+            var buttonField = document.createElement("div");
+            buttonField.classList.add("field");
+            buttonField.classList.add("is-grouped");
+            var controlUp = document.createElement("div");
+            controlUp.classList.add("control");
+            var moveUp = document.createElement("button");
+            moveUp.id = "phaseUp" + nm;
+            moveUp.type = "button";
+            moveUp.style.borderRadius = "99px";
+            moveUp.setAttribute("aria-label", "Move Phase Up");
+            moveUp.setAttribute("title", "Move Phase Up");
+            moveUp.classList.add("button");
+            moveUp.classList.add("is-medium");
+            moveUp.disabled = ProjectTracking.number_of_phases === 1;
+            moveUp.onclick = function () {
+                Phase.MoveUp(nm);
+            };
+            var moveUpIconspan = document.createElement("span");
+            moveUpIconspan.classList.add("icon");
+            moveUpIconspan.classList.add("is-medium");
+            var moveUpIcon = document.createElement("i");
+            moveUpIcon.classList.add("fas");
+            moveUpIcon.classList.add("fa-arrow-circle-up");
+            moveUpIcon.classList.add("fa-2x");
+            moveUpIconspan.appendChild(moveUpIcon);
+            moveUp.appendChild(moveUpIconspan);
+            controlUp.appendChild(moveUp);
+            var controlDown = document.createElement("div");
+            controlDown.classList.add("control");
+            var moveDown = document.createElement("button");
+            moveDown.id = "phaseDown" + nm;
+            moveDown.type = "button";
+            moveDown.style.borderRadius = "99px";
+            moveDown.setAttribute("aria-label", "Move Phase Down");
+            moveDown.classList.add("button");
+            moveDown.classList.add("is-medium");
+            moveDown.disabled = true;
+            moveDown.onclick = function () {
+                Phase.MoveDown(nm);
+            };
+            var moveDownIconspan = document.createElement("span");
+            moveDownIconspan.classList.add("icon");
+            moveDownIconspan.classList.add("is-large");
+            var moveDownIcon = document.createElement("i");
+            moveDownIcon.classList.add("fas");
+            moveDownIcon.classList.add("fa-arrow-circle-down");
+            moveDownIcon.classList.add("fa-2x");
+            moveDownIconspan.appendChild(moveDownIcon);
+            moveDown.appendChild(moveDownIconspan);
+            controlUp.appendChild(moveDown);
+            var controlRemove = document.createElement("div");
+            controlRemove.classList.add("control");
+            var removeButton = document.createElement("button");
+            removeButton.id = "phaseRemove" + nm;
+            removeButton.classList.add("is-warning");
+            removeButton.classList.add("button");
+            removeButton.classList.add("is-medium");
+            //removeButton.disabled = ProjectTracking.number_of_phases === 1;
+            removeButton.appendChild(document.createTextNode("Remove"));
+            removeButton.onclick = function () {
+                Phase.Remove(nm);
+            };
+            controlRemove.appendChild(removeButton);
+            buttonField.appendChild(controlUp);
+            buttonField.appendChild(controlDown);
+            buttonField.appendChild(controlRemove);
+            buttonCell.appendChild(buttonField);
+            tr.appendChild(buttonCell);
+            //tr.appendChild(completedCell);
+            df.appendChild(tr);
+            container.appendChild(df);
+            Phase.UpdatePhaseButtons();
+        };
+        Phase.MoveUp = function (rowId) {
+            var row = parseInt(rowId);
+            if (row > 1) {
+                var currentId = "projectPhase" + rowId;
+                var upId = "projectPhase" + (row - 1).toString();
+                var current = Utilities.Get_Value(currentId);
+                var up = Utilities.Get_Value(upId);
+                Utilities.Set_Value(currentId, up);
+                Utilities.Set_Value(upId, current);
+            }
+        };
+        Phase.MoveDown = function (rowId) {
+            var row = parseInt(rowId);
+            if (row < ProjectTracking.number_of_phases) {
+                var currentId = "projectPhase" + rowId;
+                var downId = "projectPhase" + (row + 1).toString();
+                var current = Utilities.Get_Value(currentId);
+                var down = Utilities.Get_Value(downId);
+                Utilities.Set_Value(currentId, down);
+                Utilities.Set_Value(downId, current);
+            }
+        };
+        Phase.Remove = function (rowId) {
+            // what we'll do here is move all of the phase above this one up one and then remove
+            // the last one.
+            var row = parseInt(rowId);
+            if (row < ProjectTracking.number_of_phases) {
+                for (var m = row; m <= ProjectTracking.number_of_phases; m++) {
+                    Phase.MoveDown(m.toString());
+                }
+            }
+            var e = document.getElementById("phase" + ProjectTracking.number_of_phases.toString());
+            e.parentNode.removeChild(e);
+            ProjectTracking.number_of_phases--;
+            Phase.UpdatePhaseButtons();
+        };
+        Phase.UpdatePhaseButtons = function () {
+            for (var i = 1; i <= ProjectTracking.number_of_phases; i++) {
+                var moveDown = document.getElementById("phaseDown" + i.toString());
+                moveDown.disabled = (i === ProjectTracking.number_of_phases);
+                var remove = document.getElementById("phaseRemove" + i.toString());
+                //remove.disabled = (ProjectTracking.number_of_phases === 1);
+            }
+        };
+        Phase.GetContainer = function () {
+            return document.getElementById("projectPhases");
+        };
+        Phase.ClearPhases = function () {
+            ProjectTracking.number_of_phases = 0;
+            Utilities.Clear_Element(Phase.GetContainer());
+            Utilities.Clear_Element(document.getElementById("phase_entry_errors"));
+        };
+        Phase.LoadPhases = function (phase) {
+            Phase.ClearPhases();
+            for (var _i = 0, phase_1 = phase; _i < phase_1.length; _i++) {
+                var p = phase_1[_i];
+                Phase.AddPhase();
+            }
+            for (var _a = 0, phase_2 = phase; _a < phase_2.length; _a++) {
+                var p = phase_2[_a];
+                Phase.UpdatePhase(p);
+            }
+            Phase.UpdatePhaseButtons();
+        };
+        Phase.UpdatePhase = function (phase) {
+            Utilities.Set_Value("projectPhase" + phase.phase_order.toString(), phase.name);
+            Utilities.Set_Date_Value("projectPhaseStart" + phase.phase_order.toString(), phase.started_on);
+            Utilities.Set_Date_Value("projectPhaseEst" + phase.phase_order.toString(), phase.estimated_completion);
+            Utilities.Set_Date_Value("projectPhaseCompletion" + phase.phase_order.toString(), phase.completed_on);
+        };
+        Phase.PhaseView = function (phases) {
+            phases.sort(function (a, b) { return a.phase_order - b.phase_order; });
+            var df = document.createDocumentFragment();
+            if (phases.length === 0)
+                return df;
+            var ol = document.createElement("ol");
+            ol.classList.add("comments");
+            for (var _i = 0, phases_1 = phases; _i < phases_1.length; _i++) {
+                var p = phases_1[_i];
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(p.name));
+                ol.appendChild(li);
+            }
+            return df;
+        };
+        Phase.ReadPhases = function () {
+            var phases = [];
+            // first let's remove any phases that are blank
+            // in order to do this we have to work backwards
+            //for (var i = 50; i > 0; i--)
+            //{
+            //  let e = <HTMLInputElement>document.getElementById("projectPhase" + i.toString());
+            //  if (e !== null)
+            //  {
+            //    if (Utilities.Get_Value(e).trim().length === 0)
+            //    {
+            //      Phase.Remove(i.toString());
+            //    }
+            //  }
+            //}
+            for (var i = 1; i <= ProjectTracking.number_of_phases; i++) {
+                var p = new Phase();
+                p.phase_order = i;
+                p.name = Utilities.Get_Value("projectPhase" + i.toString()).trim();
+                p.started_on = Utilities.Get_Date_Value("projectPhaseStart" + i.toString(), true);
+                p.estimated_completion = Utilities.Get_Date_Value("projectPhaseEst" + i.toString(), true);
+                p.completed_on = Utilities.Get_Date_Value("projectPhaseCompletion" + i.toString(), true);
+                phases.push(p);
+            }
+            console.log('phases read', phases);
+            return phases;
+        };
+        Phase.ValidatePhases = function (phases) {
+            var error_text = [];
+            // if they picked a name, they should also pick a start date
+            // if they picked any dates but didn't pick a name, they should have to pick a name too.
+            // estimated completion date should be after on or after start date
+            // completion date can't be greater than today
+            for (var _i = 0, phases_2 = phases; _i < phases_2.length; _i++) {
+                var phase = phases_2[_i];
+                var current_phase = "Phase " + phase.phase_order.toString() + " ";
+                var has_name = phase.name.length > 0;
+                var has_start_date = phase.started_on !== null;
+                var has_estimated_date = phase.estimated_completion !== null;
+                var has_completion_date = phase.completed_on !== null;
+                var has_any_date = phase.completed_on !== null || phase.started_on !== null || phase.estimated_completion !== null;
+                if (!has_name && !has_any_date)
+                    error_text.push(current_phase + "has no information entered.  You must either remove it or add a phase name and a start date.");
+                if (has_name && !has_start_date)
+                    error_text.push(current_phase + "is missing a start date.");
+                if (has_start_date && has_estimated_date) {
+                    if (phase.started_on > phase.estimated_completion) {
+                        error_text.push(current_phase + "has an estimated completion date set prior to it's start date.");
+                    }
+                }
+                if (has_start_date && has_completion_date) {
+                    if (phase.started_on > phase.completed_on) {
+                        error_text.push(current_phase + "has an completion date set prior to it's start date.");
+                    }
+                }
+                if (has_completion_date && phase.completed_on > new Date()) {
+                    error_text.push(current_phase + "has an completion date set in the future.");
+                }
+                for (var _a = 0, phases_3 = phases; _a < phases_3.length; _a++) {
+                    var duplicate = phases_3[_a];
+                    if (phase.phase_order !== duplicate.phase_order && duplicate.phase_order > phase.phase_order) {
+                        if (has_name && duplicate.name.length > 0 && duplicate.name === phase.name) {
+                            error_text.push(current_phase + " and " + duplicate.phase_order.toString() + " are set to the same phase.");
+                        }
+                    }
+                }
+            }
+            if (error_text.length > 0) {
+                // set error
+                Utilities.Error_Show("phase_entry_errors", error_text, false);
+                var e = document.getElementById("phase_entry_errors");
+                e.scrollTo();
+            }
+            else {
+                Utilities.Clear_Element(document.getElementById("phase_entry_errors"));
+            }
+            // return true/false
+            return error_text.length === 0;
+        };
+        Phase.GetCurrentPhases = function (project, show_images, gant_rows) {
+            var container = document.createElement("ul");
+            if (project.completed) {
+                var completed = document.createElement("li");
+                if (show_images)
+                    completed.appendChild(Phase.GetImage("green"));
+                completed.appendChild(document.createTextNode("Project Completed"));
+                container.appendChild(completed);
+                return container;
+            }
+            if (project.phases.length === 0) {
+                var not_entered = document.createElement("li");
+                if (show_images)
+                    not_entered.appendChild(Phase.GetImage("black"));
+                not_entered.appendChild(document.createTextNode("Phases not entered"));
+                container.appendChild(not_entered);
+                return container;
+            }
+            var incomplete = project.phases.filter(function (ic) { return ic.completed_on === null; });
+            if (incomplete.length === 0) {
+                var project_incomplete = document.createElement("li");
+                if (show_images)
+                    project_incomplete.appendChild(Phase.GetImage("green"));
+                project_incomplete.appendChild(document.createTextNode("Phases completed; Project is not marked as completed"));
+                container.appendChild(project_incomplete);
+                return container;
+            }
+            var first_incomplete_phase = null;
+            var d = new Date();
+            var today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            var phases_added = 0;
+            for (var _i = 0, _a = project.phases; _i < _a.length; _i++) {
+                var phase = _a[_i];
+                var has_start = phase.started_on !== null;
+                var has_est = phase.estimated_completion !== null;
+                var has_completion = phase.completed_on !== null;
+                if (!has_completion) {
+                    if (first_incomplete_phase === null)
+                        first_incomplete_phase = phase;
+                    if (has_start) {
+                        var start = new Date(phase.started_on.toString());
+                        if (start <= today) {
+                            var phase_name = phase.name.replace("Select Phase Name", "Phase Name not entered");
+                            var phase_text = phase_name + ": ";
+                            if (start.getFullYear() < 1970) {
+                                phase_text += "No dates entered";
+                            }
+                            else {
+                                phase_text += Utilities.Format_Date(phase.started_on);
+                                if (has_est) {
+                                    phase_text += " - " + Utilities.Format_Date(phase.estimated_completion);
+                                }
+                            }
+                            var li = document.createElement("li");
+                            if (show_images)
+                                li.appendChild(Phase.GetImage(Phase.GetImageColor(phase.started_on, phase.estimated_completion)));
+                            li.appendChild(document.createTextNode(phase_text));
+                            container.appendChild(li);
+                            phases_added++;
+                        }
+                    }
+                }
+            }
+            if (phases_added === 0) {
+                var phase_text = "";
+                if (first_incomplete_phase !== null) {
+                    var phase_name = first_incomplete_phase.name.replace("Select Phase Name", "Phase Name not entered");
+                    phase_text = phase_name + ": ";
+                    //let start = new Date(first_incomplete_phase.started_on.toString());
+                    if (first_incomplete_phase.started_on === null) {
+                        phase_text += "No dates entered";
+                    }
+                    else {
+                        phase_text += Utilities.Format_Date(first_incomplete_phase.started_on);
+                        if (first_incomplete_phase.estimated_completion !== null) {
+                            phase_text += " - " + Utilities.Format_Date(first_incomplete_phase.estimated_completion);
+                        }
+                    }
+                }
+                else {
+                    phase_text = "No phase is in progress Today";
+                }
+                var li = document.createElement("li");
+                if (show_images)
+                    li.appendChild(Phase.GetImage(Phase.GetImageColor(first_incomplete_phase.started_on, first_incomplete_phase.estimated_completion)));
+                li.appendChild(document.createTextNode(phase_text));
+                container.appendChild(li);
+            }
+            if (show_images) {
+                container.onclick = function () {
+                    console.log('');
+                    ProjectTracking.Project.DrawGanttChart(project.id, gant_rows);
+                };
+                container.style.cursor = "pointer";
+            }
+            return container;
+        };
+        Phase.GetImage = function (color) {
+            var img = document.createElement("img");
+            img.src = "content/images/circle-" + color + "128.png";
+            return img;
+        };
+        Phase.GetImageColor = function (started_on, estimated_completion) {
+            var d = new Date();
+            var today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            var start = new Date(started_on);
+            if (start > today)
+                return "green";
+            if (estimated_completion === null)
+                return "black";
+            var diff = Math.round((today.getTime() - new Date(estimated_completion).getTime()) / 86400000);
+            if (diff > 30) {
+                return "red";
+            }
+            else {
+                if (diff > 0) {
+                    return "yellow";
+                }
+                else {
+                    return "green";
+                }
+            }
+        };
+        return Phase;
+    }());
+    ProjectTracking.Phase = Phase;
+})(ProjectTracking || (ProjectTracking = {}));
+//# sourceMappingURL=phase.js.map
+var ProjectTracking;
+(function (ProjectTracking) {
     "use strict";
     var Milestone = /** @class */ (function () {
         function Milestone() {
@@ -671,7 +1161,7 @@ var ProjectTracking;
             removeButton.classList.add("is-warning");
             removeButton.classList.add("button");
             removeButton.classList.add("is-medium");
-            removeButton.disabled = ProjectTracking.number_of_milestones === 1;
+            //removeButton.disabled = ProjectTracking.number_of_milestones === 1;
             removeButton.appendChild(document.createTextNode("Remove"));
             removeButton.onclick = function () {
                 Milestone.Remove(nm);
@@ -728,7 +1218,7 @@ var ProjectTracking;
                 var moveDown = document.getElementById("milestoneDown" + i.toString());
                 moveDown.disabled = (i === ProjectTracking.number_of_milestones);
                 var remove = document.getElementById("milestoneRemove" + i.toString());
-                remove.disabled = (ProjectTracking.number_of_milestones === 1);
+                //remove.disabled = (ProjectTracking.number_of_milestones === 1);
             }
         };
         Milestone.GetContainer = function () {
@@ -862,11 +1352,22 @@ var ProjectTracking;
             this.can_edit = false;
             this.milestones = [];
             this.comments = [];
-            this.phase_1_name = "";
-            this.phase_2_name = "";
-            this.phase_3_name = "";
-            this.phase_4_name = "";
-            this.phase_5_name = "";
+            //public phase_1_name: string = "";
+            //public phase_2_name: string = "";
+            //public phase_3_name: string = "";
+            //public phase_4_name: string = "";
+            //public phase_5_name: string = "";
+            //public phase_1_start: Date;
+            //public phase_1_completion: Date;
+            //public phase_2_start: Date;
+            //public phase_2_completion: Date;
+            //public phase_3_start: Date;
+            //public phase_3_completion: Date;
+            //public phase_4_start: Date;
+            //public phase_4_completion: Date;
+            //public phase_5_start: Date;
+            //public phase_5_completion: Date;
+            this.phases = [];
         }
         Project.GetProjects = function () {
             ProjectTracking.charts = {};
@@ -947,6 +1448,7 @@ var ProjectTracking;
             Project.UpdateProjectDepartment("");
             Project.UpdateProjectFunding("0");
             ProjectTracking.Milestone.ClearMilestones();
+            ProjectTracking.Phase.ClearPhases();
             Project.UpdateProjectTimeline("");
             Project.UpdateProjectCompleted(false);
             Project.UpdateNeedsAttention(false);
@@ -955,7 +1457,7 @@ var ProjectTracking;
             Project.UpdateInfrastructureShare(false);
             Project.UpdateLegislativeTracking(false);
             Project.UpdateProjectEstimatedCompletionDate("");
-            Project.UpdatePhaseDates(null);
+            //Project.UpdatePhaseDates(null);
             var commentsContainer = document.getElementById("existingCommentsContainer");
             Utilities.Hide(commentsContainer);
             Utilities.Clear_Element(commentsContainer);
@@ -969,6 +1471,7 @@ var ProjectTracking;
             Project.UpdateProjectDepartment(project.department_id.toString());
             Project.UpdateProjectFunding(project.funding_id.toString());
             ProjectTracking.Milestone.LoadMilestones(project.milestones);
+            ProjectTracking.Phase.LoadPhases(project.phases);
             Project.UpdateProjectTimeline(project.timeline);
             Project.UpdateProjectCompleted(project.completed);
             Project.UpdateCommissionerShare(project.commissioner_share);
@@ -976,7 +1479,7 @@ var ProjectTracking;
             Project.UpdateLegislativeTracking(project.legislative_tracking);
             Project.UpdateNeedsAttention(project.needs_attention);
             Project.UpdateProjectEstimatedCompletionDate(project.estimated_completion_date);
-            Project.UpdatePhaseDates(project);
+            //Project.UpdatePhaseDates(project);
             Project.UpdateProjectPriority(project.priority);
             var commentsContainer = document.getElementById("existingCommentsContainer");
             Utilities.Clear_Element(commentsContainer);
@@ -990,42 +1493,45 @@ var ProjectTracking;
             Project.ClearComment();
             ProjectTracking.ShowAddProject();
         };
-        Project.UpdatePhaseDates = function (project) {
-            if (project === null) {
-                Utilities.Set_Value("phase_1_name", "");
-                Utilities.Set_Value("phase_2_name", "");
-                Utilities.Set_Value("phase_3_name", "");
-                Utilities.Set_Value("phase_4_name", "");
-                Utilities.Set_Value("phase_5_name", "");
-                Utilities.Set_Value("phase_1_start", "");
-                Utilities.Set_Value("phase_2_start", "");
-                Utilities.Set_Value("phase_3_start", "");
-                Utilities.Set_Value("phase_4_start", "");
-                Utilities.Set_Value("phase_5_start", "");
-                Utilities.Set_Value("phase_1_completion", "");
-                Utilities.Set_Value("phase_2_completion", "");
-                Utilities.Set_Value("phase_3_completion", "");
-                Utilities.Set_Value("phase_4_completion", "");
-                Utilities.Set_Value("phase_5_completion", "");
-            }
-            else {
-                Utilities.Set_Value("phase_1_name", project.phase_1_name);
-                Utilities.Set_Value("phase_2_name", project.phase_2_name);
-                Utilities.Set_Value("phase_3_name", project.phase_3_name);
-                Utilities.Set_Value("phase_4_name", project.phase_4_name);
-                Utilities.Set_Value("phase_5_name", project.phase_5_name);
-                Project.UpdateDateInput("phase_1_start", project.phase_1_start);
-                Project.UpdateDateInput("phase_2_start", project.phase_2_start);
-                Project.UpdateDateInput("phase_3_start", project.phase_3_start);
-                Project.UpdateDateInput("phase_4_start", project.phase_4_start);
-                Project.UpdateDateInput("phase_5_start", project.phase_5_start);
-                Project.UpdateDateInput("phase_1_completion", project.phase_1_completion);
-                Project.UpdateDateInput("phase_2_completion", project.phase_2_completion);
-                Project.UpdateDateInput("phase_3_completion", project.phase_3_completion);
-                Project.UpdateDateInput("phase_4_completion", project.phase_4_completion);
-                Project.UpdateDateInput("phase_5_completion", project.phase_5_completion);
-            }
-        };
+        //public static UpdatePhaseDates(project: Project): void
+        //{
+        //  if (project === null)
+        //  {
+        //    Utilities.Set_Value("phase_1_name", "");
+        //    Utilities.Set_Value("phase_2_name", "");
+        //    Utilities.Set_Value("phase_3_name", "");
+        //    Utilities.Set_Value("phase_4_name", "");
+        //    Utilities.Set_Value("phase_5_name", "");
+        //    Utilities.Set_Value("phase_1_start", "");
+        //    Utilities.Set_Value("phase_2_start", "");
+        //    Utilities.Set_Value("phase_3_start", "");
+        //    Utilities.Set_Value("phase_4_start", "");
+        //    Utilities.Set_Value("phase_5_start", "");
+        //    Utilities.Set_Value("phase_1_completion", "");
+        //    Utilities.Set_Value("phase_2_completion", "");
+        //    Utilities.Set_Value("phase_3_completion", "");
+        //    Utilities.Set_Value("phase_4_completion", "");
+        //    Utilities.Set_Value("phase_5_completion", "");
+        //  }
+        //  else
+        //  {
+        //    Utilities.Set_Value("phase_1_name", project.phase_1_name);
+        //    Utilities.Set_Value("phase_2_name", project.phase_2_name);
+        //    Utilities.Set_Value("phase_3_name", project.phase_3_name);
+        //    Utilities.Set_Value("phase_4_name", project.phase_4_name);
+        //    Utilities.Set_Value("phase_5_name", project.phase_5_name);
+        //    Project.UpdateDateInput("phase_1_start", project.phase_1_start);
+        //    Project.UpdateDateInput("phase_2_start", project.phase_2_start);
+        //    Project.UpdateDateInput("phase_3_start", project.phase_3_start);
+        //    Project.UpdateDateInput("phase_4_start", project.phase_4_start);
+        //    Project.UpdateDateInput("phase_5_start", project.phase_5_start);
+        //    Project.UpdateDateInput("phase_1_completion", project.phase_1_completion);
+        //    Project.UpdateDateInput("phase_2_completion", project.phase_2_completion);
+        //    Project.UpdateDateInput("phase_3_completion", project.phase_3_completion);
+        //    Project.UpdateDateInput("phase_4_completion", project.phase_4_completion);
+        //    Project.UpdateDateInput("phase_5_completion", project.phase_5_completion);
+        //  }
+        //}
         Project.UpdateDateInput = function (id, value) {
             var input = document.getElementById(id);
             input.value = "";
@@ -1099,7 +1605,7 @@ var ProjectTracking;
             var df = document.createDocumentFragment();
             for (var _i = 0, projects_2 = projects; _i < projects_2.length; _i++) {
                 var p = projects_2[_i];
-                var phase_rows = Project.CreateGanttChartRows(p);
+                var phase_rows = Project.CreateNewGanttChartRows(p);
                 df.appendChild(Project.CreateProjectSummaryRow(p, phase_rows));
                 if (phase_rows.length > 0) {
                     var tr = document.createElement("tr");
@@ -1176,7 +1682,13 @@ var ProjectTracking;
             //let milestones = document.createElement("td");
             //milestones.appendChild(Milestone.MilestonesView(project.milestones, project.completed));
             //tr.appendChild(milestones);
-            tr.appendChild(Project.GetCurrentPhase(project, true, phase_rows)); // get the current phase
+            //let oldCurrentPhase = Project.GetCurrentPhase(project, true, phase_rows);
+            //oldCurrentPhase.style.backgroundColor = "#00FFFF";
+            var newCurrentPhase = ProjectTracking.Phase.GetCurrentPhases(project, true, phase_rows);
+            var phase_td = document.createElement("td");
+            //phase_td.appendChild(oldCurrentPhase);
+            phase_td.appendChild(newCurrentPhase);
+            tr.appendChild(phase_td); // get the current phase
             //let timeline = document.createElement("td");
             //timeline.appendChild(document.createTextNode(project.timeline));
             //tr.appendChild(timeline);
@@ -1251,7 +1763,14 @@ var ProjectTracking;
             var milestones = document.createElement("td");
             milestones.appendChild(ProjectTracking.Milestone.MilestonesView(project.milestones, project.completed));
             tr.appendChild(milestones);
-            tr.appendChild(Project.GetCurrentPhase(project, false, [])); // get the current phase
+            //let oldCurrentPhase = Project.GetCurrentPhase(project, false, []);
+            //oldCurrentPhase.style.backgroundColor = "#00FFFF";
+            var newCurrentPhase = ProjectTracking.Phase.GetCurrentPhases(project, false, []);
+            var phase_td = document.createElement("td");
+            //phase_td.appendChild(oldCurrentPhase);
+            phase_td.appendChild(newCurrentPhase);
+            tr.appendChild(phase_td); // get the current phase
+            //tr.appendChild(Project.GetCurrentPhase(project, false, [])); // get the current phase
             //let timeline = document.createElement("td");
             //timeline.appendChild(document.createTextNode(project.timeline));
             //tr.appendChild(timeline);
@@ -1272,213 +1791,311 @@ var ProjectTracking;
             tr.appendChild(dateUpdated);
             return tr;
         };
-        Project.GetCurrentPhase = function (project, add_aging_color, phase_rows) {
-            var ignore = "Ignore this Phase";
-            var td = document.createElement("td");
-            var span = document.createElement("span");
-            var color = "";
-            var has_been_completed = false;
-            if (project.completed) {
-                if (add_aging_color) {
-                    var img = document.createElement("img");
-                    img.src = "content/images/circle-green128.png";
-                    td.appendChild(img);
-                }
-                span.appendChild(document.createTextNode("Project Completed"));
-                td.appendChild(span);
-                return td;
-            }
-            var current_phase = 0;
-            var current_phase_start = null;
-            var current_phase_end = null;
-            for (var i = 1; i < 6; i++) {
-                var name_1 = project["phase_" + i.toString() + "_name"];
-                var start = project["phase_" + i.toString() + "_start"];
-                var completion = project["phase_" + i.toString() + "_completion"];
-                if (completion !== null)
-                    has_been_completed = true;
-                if (completion === null && name_1 !== ignore && name_1.length > 0) {
-                    if (start !== null && name_1 !== ignore && name_1.length > 0) {
-                        current_phase = i;
-                        current_phase_start = project["phase_" + i.toString() + "_start"];
-                        for (var j = i + 1; j < 6; j++) {
-                            var name_end = project["phase_" + j.toString() + "_name"];
-                            var start_end = project["phase_" + j.toString() + "_start"];
-                            if (name_end !== ignore && start_end !== null) {
-                                current_phase_end = start_end;
-                                break;
-                            }
-                        }
-                        if (current_phase_end === null) {
-                            current_phase_end = project.estimated_completion_date;
-                        }
-                        //if (i < 5)
-                        //{
-                        //  current_phase_end = <Date>project["phase_" + (i + 1).toString() + "_start"];
-                        //}
-                        //else
-                        //{
-                        //}
-                    }
-                    break;
-                }
-            }
-            if (current_phase === 0) {
-                if (has_been_completed) {
-                    span.appendChild(document.createTextNode("Phases Completed, Project not marked as completed."));
-                    color = "green";
-                }
-                else {
-                    span.appendChild(document.createTextNode("Phases not entered."));
-                    color = "black";
-                }
-                //return td;
-            }
-            else {
-                var phase_name = Project.GetPhaseName(current_phase, project);
-                var text = phase_name + ":  " + Utilities.Format_Date(current_phase_start);
-                text += " - ";
-                if (current_phase_end === null) {
-                    text += "No Ending Date";
-                }
-                else {
-                    text += Utilities.Format_Date(current_phase_end);
-                    var d = new Date();
-                    var today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-                    var diff = Math.round((today.getTime() - new Date(current_phase_end).getTime()) / 86400000);
-                    if (diff > 30) {
-                        color = "red";
-                    }
-                    else {
-                        if (diff > 0) {
-                            color = "yellow";
-                        }
-                        else {
-                            color = "green";
-                        }
-                    }
-                }
-                span.appendChild(document.createTextNode(text));
-            }
-            if (add_aging_color && color.length > 0) {
-                var img = document.createElement("img");
-                img.src = "content/images/circle-" + color + "128.png";
-                td.appendChild(img);
-            }
-            td.appendChild(span);
-            if (phase_rows.length > 0) {
-                span.onclick = function () {
-                    Project.DrawGanttChart(project.id, phase_rows);
-                };
-                span.style.cursor = "pointer";
-            }
-            //if (!add_aging_color) 
-            return td;
-        };
-        Project.GetPhaseName = function (phase_number, project) {
-            if (phase_number === 6)
-                return "Completed";
-            return project["phase_" + phase_number.toString() + "_name"];
-            //return Utilities.Get_Value("phase_" + phase_number.toString() + "_name");
-            //switch (phase_number)
-            //{
-            //  case 1:
-            //    return "Develop Specifications";
-            //  case 2:
-            //    return "Procurement";
-            //  case 3:
-            //    return "Design (Construction)";
-            //  case 4:
-            //    return "Bid (Construction)";
-            //  case 5:
-            //    return "Construction / Implementation";
-            //  case 6:
-            //    return "Completed";
-            //  default:
-            //    return "";
-            //}
-        };
+        //private static GetCurrentPhase(project: Project, add_aging_color: boolean, phase_rows: Array<any>): HTMLDivElement
+        //{
+        //  let ignore = "Ignore this Phase";
+        //  //let td = document.createElement("td");
+        //  let container = document.createElement("div");
+        //  let span = document.createElement("span");
+        //  let color = "";
+        //  let has_been_completed: boolean = false;
+        //  if (project.completed)
+        //  {
+        //    if (add_aging_color)
+        //    {
+        //      let img = document.createElement("img");
+        //      img.src = "content/images/circle-green128.png";
+        //      container.appendChild(img);
+        //    }
+        //    span.appendChild(document.createTextNode("Project Completed"));
+        //    container.appendChild(span);
+        //    return container;
+        //  }
+        //  let current_phase = 0;
+        //  let current_phase_start: Date = null;
+        //  let current_phase_end: Date = null;
+        //  for (let i = 1; i < 6; i++)
+        //  {
+        //    let name = <string>project["phase_" + i.toString() + "_name"];
+        //    let start = <Date>project["phase_" + i.toString() + "_start"];
+        //    let completion = <Date>project["phase_" + i.toString() + "_completion"];
+        //    if (completion !== null) has_been_completed = true;
+        //    if (completion === null && name !== ignore && name.length > 0)
+        //    {
+        //      if (start !== null && name !== ignore && name.length > 0)
+        //      {
+        //        current_phase = i;
+        //        current_phase_start = <Date>project["phase_" + i.toString() + "_start"];
+        //        for (let j = i + 1; j < 6; j++)
+        //        {
+        //          let name_end = <string>project["phase_" + j.toString() + "_name"];
+        //          let start_end = <Date>project["phase_" + j.toString() + "_start"];
+        //          if (name_end !== ignore && start_end !== null)
+        //          {
+        //            current_phase_end = start_end;
+        //            break;
+        //          }
+        //        }
+        //        if (current_phase_end === null)
+        //        {
+        //          current_phase_end = project.estimated_completion_date;
+        //        }
+        //        //if (i < 5)
+        //        //{
+        //        //  current_phase_end = <Date>project["phase_" + (i + 1).toString() + "_start"];
+        //        //}
+        //        //else
+        //        //{
+        //        //}
+        //      }
+        //      break;
+        //    }
+        //  }
+        //  if (current_phase === 0)
+        //  {
+        //    if (has_been_completed)
+        //    {
+        //      span.appendChild(document.createTextNode("Phases Completed, Project not marked as completed."));
+        //      color = "green";
+        //    }
+        //    else
+        //    {
+        //      span.appendChild(document.createTextNode("Phases not entered."));
+        //      color = "black";
+        //    }
+        //    //return td;
+        //  }
+        //  else
+        //  {
+        //    let phase_name = Project.GetPhaseName(current_phase, project);
+        //    let text = phase_name + ":  " + Utilities.Format_Date(current_phase_start);
+        //    text += " - ";
+        //    if (current_phase_end === null)
+        //    {
+        //      text += "No Ending Date";
+        //    }
+        //    else
+        //    {
+        //      text += Utilities.Format_Date(current_phase_end);
+        //      let d = new Date();
+        //      let today = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        //      var diff = Math.round((today.getTime() - new Date(<any>current_phase_end).getTime()) / 86400000); 
+        //      if (diff > 30)
+        //      {
+        //        color = "red";
+        //      }
+        //      else
+        //      {
+        //        if (diff > 0)
+        //        {
+        //          color = "yellow";
+        //        }
+        //        else
+        //        {
+        //          color = "green";   
+        //        }
+        //      }
+        //    }
+        //    span.appendChild(document.createTextNode(text));
+        //  }
+        //  if (add_aging_color && color.length > 0)
+        //  {
+        //    let img = document.createElement("img");
+        //    img.src = "content/images/circle-" + color + "128.png";
+        //    container.appendChild(img);
+        //  }
+        //  container.appendChild(span);
+        //  if (phase_rows.length > 0)
+        //  {
+        //    span.onclick = () =>
+        //    {
+        //      Project.DrawGanttChart(project.id, phase_rows);
+        //    }
+        //    span.style.cursor = "pointer";
+        //  }
+        //  //if (!add_aging_color) 
+        //  return container;
+        //}
+        //private static GetPhaseName(phase_number: number, project: Project): string
+        //{
+        //  if (phase_number === 6) return "Completed";
+        //  return <string>project["phase_" + phase_number.toString() + "_name"];
+        //  //return Utilities.Get_Value("phase_" + phase_number.toString() + "_name");
+        //  //switch (phase_number)
+        //  //{
+        //  //  case 1:
+        //  //    return "Develop Specifications";
+        //  //  case 2:
+        //  //    return "Procurement";
+        //  //  case 3:
+        //  //    return "Design (Construction)";
+        //  //  case 4:
+        //  //    return "Bid (Construction)";
+        //  //  case 5:
+        //  //    return "Construction / Implementation";
+        //  //  case 6:
+        //  //    return "Completed";
+        //  //  default:
+        //  //    return "";
+        //  //}
+        //}
         // summary view
-        Project.ValidatePhaseDate = function (project, phase_number) {
-            var ignore = "Ignore this Phase";
-            if (project["phase_" + phase_number.toString() + "_name"] === ignore)
-                return true;
-            var start = project["phase_" + phase_number + "_start"];
-            var completion = project["phase_" + phase_number + "_completion"];
-            if (start !== null && completion !== null) {
-                return (start <= completion);
-            }
-            return true;
-        };
-        Project.ValidatePhaseDates = function () {
-            var ignore = "Ignore this Phase";
-            var error_text = "";
-            ProjectTracking.selected_project.estimated_completion_date = Utilities.Get_Date_Value("projectEstimatedCompletionDate", true);
-            ProjectTracking.selected_project.phase_1_name = Utilities.Get_Value("phase_1_name");
-            ProjectTracking.selected_project.phase_2_name = Utilities.Get_Value("phase_2_name");
-            ProjectTracking.selected_project.phase_3_name = Utilities.Get_Value("phase_3_name");
-            ProjectTracking.selected_project.phase_4_name = Utilities.Get_Value("phase_4_name");
-            ProjectTracking.selected_project.phase_5_name = Utilities.Get_Value("phase_5_name");
-            // get date values;
-            ProjectTracking.selected_project.phase_1_start = Utilities.Get_Date_Value("phase_1_start", true);
-            ProjectTracking.selected_project.phase_2_start = Utilities.Get_Date_Value("phase_2_start", true);
-            ProjectTracking.selected_project.phase_3_start = Utilities.Get_Date_Value("phase_3_start", true);
-            ProjectTracking.selected_project.phase_4_start = Utilities.Get_Date_Value("phase_4_start", true);
-            ProjectTracking.selected_project.phase_5_start = Utilities.Get_Date_Value("phase_5_start", true);
-            ProjectTracking.selected_project.phase_1_completion = Utilities.Get_Date_Value("phase_1_completion", true);
-            ProjectTracking.selected_project.phase_2_completion = Utilities.Get_Date_Value("phase_2_completion", true);
-            ProjectTracking.selected_project.phase_3_completion = Utilities.Get_Date_Value("phase_3_completion", true);
-            ProjectTracking.selected_project.phase_4_completion = Utilities.Get_Date_Value("phase_4_completion", true);
-            ProjectTracking.selected_project.phase_5_completion = Utilities.Get_Date_Value("phase_5_completion", true);
-            // check for error
-            // validation logic should be as follows:
-            // successive phase dates should be after or the same as previous phase dates.
-            // ie: phase 1 start date should be:
-            // less than or equal to phase 1 completion date
-            // less than or equal to phase 2 start date
-            // we only compare each phase's start date to it's completion date
-            // so that they can leave the start dates alone if a phase is completed late.
-            // and so on
-            // null values are ignored
-            var p = ProjectTracking.selected_project;
-            var date_compare = [];
-            for (var i = 1; i < 6; i++) {
-                var start = p["phase_" + i.toString() + "_start"];
-                var name_2 = p["phase_" + i.toString() + "_name"];
-                if (name_2 !== ignore && name_2.length > 0 && start === null) {
-                    error_text = "You have selected a phase name but not put in a start date.";
-                    break;
-                }
-                if (start !== null)
-                    date_compare.push(start);
-                if (!Project.ValidatePhaseDate(p, i)) {
-                    error_text = "Actual Completion Dates must be no earlier than the same date as the Start Date.";
-                }
-            }
-            if (date_compare.length > 0 && error_text.length === 0) {
-                if (p.estimated_completion_date === null) {
-                    error_text = "The Estimated Project Completion date is required if the phase dates are utilized.";
-                }
-                else {
-                    for (var i = 0; i < date_compare.length; i++) {
-                        if ((i + 1) < date_compare.length) {
-                            if (date_compare[i] > date_compare[i + 1] || date_compare[i] > p.estimated_completion_date) {
-                                error_text = "Phase dates must be in order.  An earlier phase cannot have a start date greater than a later phase or the project's estimated completion date.";
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            // set error
-            Utilities.Set_Text("phase_dates_error", error_text);
-            if (error_text.length > 0) {
-                var e = document.getElementById("phase_dates_error");
-                e.scrollTo();
-            }
-            // return true/false
-            return error_text.length === 0;
-        };
+        //private static ValidatePhaseDate(project: Project, phase_number: number): boolean
+        //{
+        //  let ignore = "Ignore this Phase";
+        //  if (<string>project["phase_" + phase_number.toString() + "_name"] === ignore) return true;
+        //  let start = <Date>project["phase_" + phase_number + "_start"];
+        //  let completion = <Date>project["phase_" + phase_number + "_completion"];
+        //  if (start !== null && completion !== null)
+        //  {
+        //    return (start <= completion);
+        //  }
+        //  return true;
+        //}
+        //private static ValidatePhaseDates(): boolean
+        //{
+        //  let ignore = "Ignore this Phase";
+        //  let error_text = "";
+        //  ProjectTracking.selected_project.estimated_completion_date = Utilities.Get_Date_Value("projectEstimatedCompletionDate", true);
+        //  ProjectTracking.selected_project.phase_1_name = Utilities.Get_Value("phase_1_name");
+        //  ProjectTracking.selected_project.phase_2_name = Utilities.Get_Value("phase_2_name");
+        //  ProjectTracking.selected_project.phase_3_name = Utilities.Get_Value("phase_3_name");
+        //  ProjectTracking.selected_project.phase_4_name = Utilities.Get_Value("phase_4_name");
+        //  ProjectTracking.selected_project.phase_5_name = Utilities.Get_Value("phase_5_name");
+        //  // get date values;
+        //  ProjectTracking.selected_project.phase_1_start = Utilities.Get_Date_Value("phase_1_start", true);
+        //  ProjectTracking.selected_project.phase_2_start = Utilities.Get_Date_Value("phase_2_start", true);
+        //  ProjectTracking.selected_project.phase_3_start = Utilities.Get_Date_Value("phase_3_start", true);
+        //  ProjectTracking.selected_project.phase_4_start = Utilities.Get_Date_Value("phase_4_start", true);
+        //  ProjectTracking.selected_project.phase_5_start = Utilities.Get_Date_Value("phase_5_start", true);
+        //  ProjectTracking.selected_project.phase_1_completion = Utilities.Get_Date_Value("phase_1_completion", true);
+        //  ProjectTracking.selected_project.phase_2_completion = Utilities.Get_Date_Value("phase_2_completion", true);
+        //  ProjectTracking.selected_project.phase_3_completion = Utilities.Get_Date_Value("phase_3_completion", true);
+        //  ProjectTracking.selected_project.phase_4_completion = Utilities.Get_Date_Value("phase_4_completion", true);
+        //  ProjectTracking.selected_project.phase_5_completion = Utilities.Get_Date_Value("phase_5_completion", true);
+        //  // check for error
+        //  // validation logic should be as follows:
+        //  // successive phase dates should be after or the same as previous phase dates.
+        //  // ie: phase 1 start date should be:
+        //  // less than or equal to phase 1 completion date
+        //  // less than or equal to phase 2 start date
+        //  // we only compare each phase's start date to it's completion date
+        //  // so that they can leave the start dates alone if a phase is completed late.
+        //  // and so on
+        //  // null values are ignored
+        //  let p = ProjectTracking.selected_project;
+        //  let date_compare: Array<Date> = [];
+        //  for (let i = 1; i < 6; i++)
+        //  {
+        //    let start = <Date>p["phase_" + i.toString() + "_start"];
+        //    let name = <string>p["phase_" + i.toString() + "_name"];
+        //    if (name !== ignore && name.length > 0 && start === null)
+        //    {
+        //      error_text = "You have selected a phase name but not put in a start date.";
+        //      break;
+        //    }
+        //    if (start !== null) date_compare.push(start);
+        //    if (!Project.ValidatePhaseDate(p, i))
+        //    {
+        //      error_text = "Actual Completion Dates must be no earlier than the same date as the Start Date.";
+        //    }
+        //  }
+        //  if (date_compare.length > 0 && error_text.length === 0)
+        //  {
+        //    if (p.estimated_completion_date === null)
+        //    {
+        //      error_text = "The Estimated Project Completion date is required if the phase dates are utilized.";
+        //    }
+        //    else
+        //    {
+        //      for (let i = 0; i < date_compare.length; i++)
+        //      {
+        //        if ((i + 1) < date_compare.length)
+        //        {
+        //          if (date_compare[i] > date_compare[i + 1] || date_compare[i] > p.estimated_completion_date)
+        //          {
+        //            error_text = "Phase dates must be in order.  An earlier phase cannot have a start date greater than a later phase or the project's estimated completion date.";
+        //            break;
+        //          }
+        //        }
+        //      }
+        //    }
+        //  }
+        //  // set error
+        //  Utilities.Set_Text("phase_dates_error", error_text);
+        //  if (error_text.length > 0)
+        //  {
+        //    let e = document.getElementById("phase_dates_error");
+        //    e.scrollTo();
+        //  }
+        //  // return true/false
+        //  return error_text.length === 0;
+        //}
+        //private static ValidatePhases(): boolean
+        //{
+        //  let ignore = "Ignore this Phase";
+        //  let error_text = "";
+        //  // check for error
+        //  // validation logic should be as follows:
+        //  // successive phase dates should be after or the same as previous phase dates.
+        //  // ie: phase 1 start date should be:
+        //  // less than or equal to phase 1 completion date
+        //  // less than or equal to phase 2 start date
+        //  // we only compare each phase's start date to it's completion date
+        //  // so that they can leave the start dates alone if a phase is completed late.
+        //  // and so on
+        //  // null values are ignored
+        //  let p = ProjectTracking.selected_project;
+        //  for (let phase of p.phases)
+        //  {
+        //  }
+        //  let date_compare: Array<Date> = [];
+        //  for (let i = 1; i < 6; i++)
+        //  {
+        //    let start = <Date>p["phase_" + i.toString() + "_start"];
+        //    let name = <string>p["phase_" + i.toString() + "_name"];
+        //    if (name !== ignore && name.length > 0 && start === null)
+        //    {
+        //      error_text = "You have selected a phase name but not put in a start date.";
+        //      break;
+        //    }
+        //    if (start !== null) date_compare.push(start);
+        //    if (!Project.ValidatePhaseDate(p, i))
+        //    {
+        //      error_text = "Actual Completion Dates must be no earlier than the same date as the Start Date.";
+        //    }
+        //  }
+        //  if (date_compare.length > 0 && error_text.length === 0)
+        //  {
+        //    if (p.estimated_completion_date === null)
+        //    {
+        //      error_text = "The Estimated Project Completion date is required if the phase dates are utilized.";
+        //    }
+        //    else
+        //    {
+        //      for (let i = 0; i < date_compare.length; i++)
+        //      {
+        //        if ((i + 1) < date_compare.length)
+        //        {
+        //          if (date_compare[i] > date_compare[i + 1] || date_compare[i] > p.estimated_completion_date)
+        //          {
+        //            error_text = "Phase dates must be in order.  An earlier phase cannot have a start date greater than a later phase or the project's estimated completion date.";
+        //            break;
+        //          }
+        //        }
+        //      }
+        //    }
+        //  }
+        //  // set error
+        //  Utilities.Set_Text("phase_dates_error", error_text);
+        //  if (error_text.length > 0)
+        //  {
+        //    let e = document.getElementById("phase_dates_error");
+        //    e.scrollTo();
+        //  }
+        //  // return true/false
+        //  return error_text.length === 0;
+        //}
         Project.Save = function () {
             // let's lock the button down so the user can't click it multiple times
             // we'll also want to update it to show that it's loading
@@ -1495,33 +2112,39 @@ var ProjectTracking;
                 Utilities.Toggle_Loading_Button("saveProject", false);
                 return;
             }
-            if (!Project.ValidatePhaseDates()) {
+            //if (!Project.ValidatePhaseDates())
+            //{
+            //  Utilities.Toggle_Loading_Button("saveProject", false);
+            //  return;
+            //}
+            ProjectTracking.selected_project.project_name = projectName;
+            ProjectTracking.selected_project.milestones = ProjectTracking.Milestone.ReadMilestones();
+            ProjectTracking.selected_project.phases = ProjectTracking.Phase.ReadPhases();
+            if (!ProjectTracking.Phase.ValidatePhases(ProjectTracking.selected_project.phases)) {
                 Utilities.Toggle_Loading_Button("saveProject", false);
                 return;
             }
-            ProjectTracking.selected_project.project_name = projectName;
-            ProjectTracking.selected_project.milestones = ProjectTracking.Milestone.ReadMilestones();
             ProjectTracking.selected_project.department_id = parseInt(Utilities.Get_Value("projectDepartment"));
             ProjectTracking.selected_project.funding_id = parseInt(Utilities.Get_Value("projectFunding"));
             ProjectTracking.selected_project.timeline = Utilities.Get_Value("projectTimeline");
             ProjectTracking.selected_project.comment = Utilities.Get_Value("projectComment");
             ProjectTracking.selected_project.priority = PriorityLevel[Utilities.Get_Value("projectPriority")];
             ProjectTracking.selected_project.estimated_completion_date = Utilities.Get_Value("projectEstimatedCompletionDate");
-            ProjectTracking.selected_project.phase_1_name = Utilities.Get_Value("phase_1_name");
-            ProjectTracking.selected_project.phase_2_name = Utilities.Get_Value("phase_2_name");
-            ProjectTracking.selected_project.phase_3_name = Utilities.Get_Value("phase_3_name");
-            ProjectTracking.selected_project.phase_4_name = Utilities.Get_Value("phase_4_name");
-            ProjectTracking.selected_project.phase_5_name = Utilities.Get_Value("phase_5_name");
-            ProjectTracking.selected_project.phase_1_start = Utilities.Get_Date_Value("phase_1_start", true);
-            ProjectTracking.selected_project.phase_2_start = Utilities.Get_Date_Value("phase_2_start", true);
-            ProjectTracking.selected_project.phase_3_start = Utilities.Get_Date_Value("phase_3_start", true);
-            ProjectTracking.selected_project.phase_4_start = Utilities.Get_Date_Value("phase_4_start", true);
-            ProjectTracking.selected_project.phase_5_start = Utilities.Get_Date_Value("phase_5_start", true);
-            ProjectTracking.selected_project.phase_1_completion = Utilities.Get_Date_Value("phase_1_completion", true);
-            ProjectTracking.selected_project.phase_2_completion = Utilities.Get_Date_Value("phase_2_completion", true);
-            ProjectTracking.selected_project.phase_3_completion = Utilities.Get_Date_Value("phase_3_completion", true);
-            ProjectTracking.selected_project.phase_4_completion = Utilities.Get_Date_Value("phase_4_completion", true);
-            ProjectTracking.selected_project.phase_5_completion = Utilities.Get_Date_Value("phase_5_completion", true);
+            //ProjectTracking.selected_project.phase_1_name = Utilities.Get_Value("phase_1_name");
+            //ProjectTracking.selected_project.phase_2_name = Utilities.Get_Value("phase_2_name");
+            //ProjectTracking.selected_project.phase_3_name = Utilities.Get_Value("phase_3_name");
+            //ProjectTracking.selected_project.phase_4_name = Utilities.Get_Value("phase_4_name");
+            //ProjectTracking.selected_project.phase_5_name = Utilities.Get_Value("phase_5_name");
+            //ProjectTracking.selected_project.phase_1_start = Utilities.Get_Date_Value("phase_1_start", true);
+            //ProjectTracking.selected_project.phase_2_start = Utilities.Get_Date_Value("phase_2_start", true);
+            //ProjectTracking.selected_project.phase_3_start = Utilities.Get_Date_Value("phase_3_start", true);
+            //ProjectTracking.selected_project.phase_4_start = Utilities.Get_Date_Value("phase_4_start", true);
+            //ProjectTracking.selected_project.phase_5_start = Utilities.Get_Date_Value("phase_5_start", true);
+            //ProjectTracking.selected_project.phase_1_completion = Utilities.Get_Date_Value("phase_1_completion", true);
+            //ProjectTracking.selected_project.phase_2_completion = Utilities.Get_Date_Value("phase_2_completion", true);
+            //ProjectTracking.selected_project.phase_3_completion = Utilities.Get_Date_Value("phase_3_completion", true);
+            //ProjectTracking.selected_project.phase_4_completion = Utilities.Get_Date_Value("phase_4_completion", true);
+            //ProjectTracking.selected_project.phase_5_completion = Utilities.Get_Date_Value("phase_5_completion", true);
             //return;
             var completed = document.getElementById("projectComplete");
             ProjectTracking.selected_project.completed = completed.checked;
@@ -1596,12 +2219,12 @@ var ProjectTracking;
                 return [];
             var phase_dates = [];
             for (var i = 1; i < 6; i++) {
-                var name_3 = project["phase_" + i.toString() + "_name"];
+                var name_1 = project["phase_" + i.toString() + "_name"];
                 var start = project["phase_" + i.toString() + "_start"];
                 var end = project["phase_" + i.toString() + "_completion"];
-                if (name_3.length > 0 && name_3 !== "Ignore this Phase") {
+                if (name_1.length > 0 && name_1 !== "Ignore this Phase") {
                     phase_dates.push({
-                        name: name_3,
+                        name: name_1,
                         start: new Date(start),
                         end: end === null ? null : new Date(end)
                     });
@@ -1626,6 +2249,53 @@ var ProjectTracking;
             var ganttrows = [];
             for (var _i = 0, phase_dates_1 = phase_dates; _i < phase_dates_1.length; _i++) {
                 var pd = phase_dates_1[_i];
+                ganttrows.push([pd.name, pd.name, null, pd.start, pd.end, null, 100, null]);
+            }
+            return ganttrows;
+        };
+        Project.CreateNewGanttChartRows = function (project) {
+            if (project.completed)
+                return [];
+            var phase_dates = [];
+            for (var _i = 0, _a = project.phases; _i < _a.length; _i++) 
+            //for (let i = 1; i < 6; i++)
+            {
+                var phase = _a[_i];
+                //let name = <string>project["phase_" + i.toString() + "_name"];
+                //let start = <string>project["phase_" + i.toString() + "_start"];
+                //let end = <string>project["phase_" + i.toString() + "_completion"];
+                var name_2 = phase.name.replace("Select Phase Name", "Phase Name not entered");
+                var start = phase.started_on;
+                var end = phase.completed_on !== null ? phase.completed_on : phase.estimated_completion;
+                if (name_2.length > 0 && name_2 !== "Ignore this Phase" && start !== null && end !== null) {
+                    phase_dates.push({
+                        name: name_2,
+                        start: new Date(start.toString()),
+                        end: new Date(end.toString())
+                    });
+                }
+            }
+            //let estimated_completion = new Date(project.estimated_completion_date);
+            //if (estimated_completion.getFullYear() < 1000) estimated_completion = null;
+            //if (phase_dates.length === 0) return phase_dates;
+            //for (let i = 0; i < phase_dates.length; i++)
+            //{
+            //  let pd = phase_dates[i];
+            //  if (pd.end === null)
+            //  {
+            //    if (i === phase_dates.length - 1)
+            //    {
+            //      pd.end = estimated_completion;
+            //    }
+            //    else
+            //    {
+            //      pd.end = phase_dates[i + 1].start;
+            //    }
+            //  }
+            //}
+            var ganttrows = [];
+            for (var _b = 0, phase_dates_2 = phase_dates; _b < phase_dates_2.length; _b++) {
+                var pd = phase_dates_2[_b];
                 ganttrows.push([pd.name, pd.name, null, pd.start, pd.end, null, 100, null]);
             }
             return ganttrows;
@@ -1682,10 +2352,11 @@ var ProjectTracking;
     ProjectTracking.my_departments = [];
     ProjectTracking.funding_sources = [];
     ProjectTracking.number_of_milestones = 0;
+    ProjectTracking.number_of_phases = 0;
     ProjectTracking.project_name_filter = '';
     ProjectTracking.default_view = true;
     function Start() {
-        UpdatePhaseNameSelects();
+        //UpdatePhaseNameSelects();
         ProjectTracking.DataValue.GetDepartments();
         ProjectTracking.DataValue.GetFunding();
         ProjectTracking.DataValue.GetMyDepartments();
@@ -1749,28 +2420,30 @@ var ProjectTracking;
         container.appendChild(tr);
     }
     ProjectTracking.AddProjectResultsMessage = AddProjectResultsMessage;
-    function UpdatePhaseNameSelects() {
-        var phase_names = [
-            "Develop Specifications",
-            "Procurement",
-            "Design",
-            "Bid - Contract Development",
-            "Bid",
-            "Right of Way - Property Acquisition",
-            "RFQ - Contract Development",
-            "Regulatory Approval",
-            "Implementation",
-            "Construction",
-            "Ignore this Phase",
-        ];
-        for (var i = 1; i < 6; i++) {
-            var select = document.getElementById("phase_" + i.toString() + "_name");
-            select.add(Utilities.Create_Option("", "Select Phase Name", true));
-            for (var _i = 0, phase_names_1 = phase_names; _i < phase_names_1.length; _i++) {
-                var name_1 = phase_names_1[_i];
-                select.add(Utilities.Create_Option(name_1, name_1, false));
-            }
-        }
-    }
+    //function UpdatePhaseNameSelects()
+    //{
+    //  let phase_names = [      
+    //    "Develop Specifications",
+    //    "Procurement",
+    //    "Design",
+    //    "Bid - Contract Development", 
+    //    "Bid",
+    //    "Right of Way - Property Acquisition",
+    //    "RFQ - Contract Development",      
+    //    "Regulatory Approval",
+    //    "Implementation",
+    //    "Construction",
+    //    "Ignore this Phase",
+    //  ]
+    //  for (let i = 1; i < 6; i++) 
+    //  {
+    //    let select = <HTMLSelectElement>document.getElementById("phase_" + i.toString() + "_name");
+    //    select.add(Utilities.Create_Option("", "Select Phase Name", true));
+    //    for (let name of phase_names)
+    //    {
+    //      select.add(Utilities.Create_Option(name, name, false));
+    //    }
+    //  }
+    //}
 })(ProjectTracking || (ProjectTracking = {}));
 //# sourceMappingURL=ProjectTracking.js.map

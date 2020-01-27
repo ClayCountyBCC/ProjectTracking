@@ -11,6 +11,7 @@
       "scripts/app/DataValue.js",
       "scripts/utilities/utilities.js",
       "scripts/app/Comment.js",
+      "scripts/app/Phase.js",
       "scripts/app/Milestone.js",
       "scripts/app/Project.js",
       "scripts/app/ProjectTracking.js"

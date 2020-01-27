@@ -312,7 +312,7 @@
             <tfoot>
               <tr>
                 <td colspan="2"></td>
-                <td>
+                <td colspan="2">
                   <button onclick="ProjectTracking.Milestone.AddMilestone(); return false;"
                           class="button is-primary is-medium"
                           type="button">
@@ -324,6 +324,47 @@
           </table>
 
           <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th style="width: 5%;">
+                  Order
+                </th>
+                <th style="width: 25%;">
+                  Phase
+                </th>
+                <th style="width: 15%;">
+                  Start Date
+                </th>
+                <th style="width: 15%;">
+                  Est. Completion
+                </th>
+                <th style="width: 15%;">
+                  Completion Date
+                </th>
+                <th style="width: 25%;">
+                </th>
+              </tr>
+            </thead>
+            <tbody id="projectPhases"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="5">
+                  <div id="phase_entry_errors">
+
+                  </div>
+                </td>
+                <td>
+                  <button onclick="ProjectTracking.Phase.AddPhase(); return false;"
+                          class="button is-primary is-medium"
+                          type="button">
+                    Add Phase
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!--<table class="table is-fullwidth hide">
             <thead>
               <tr>
                 <th class="has-text-left"
@@ -524,16 +565,9 @@
                   Estimated Completion Date
                 </td>
                 <td>
-                  <div class="field">
-                    <div class="control">
-                      <input id="projectEstimatedCompletionDate"
-                             class="input is-medium"
-                             maxlength="10"
-                             type="date" />
 
-                    </div>
-                  </div>
                 </td>
+                <td></td>
               </tr>
               <tr>
                 <td colspan="4"
@@ -543,9 +577,9 @@
               </tr>
             </tbody>
 
-          </table>
+          </table>-->
 
-          <div class="field">
+          <div class="field hide">
             <label class="label">Timeline *** Will be removed soon, cannot edit.</label>
             <div class="control">
               <textarea rows="2"
@@ -557,6 +591,16 @@
             </div>
           </div>
           <form>
+            <div class="field">
+              <label class="label">Estimated Completion Date</label>
+              <div class="control">
+                <input id="projectEstimatedCompletionDate"
+                       class="input is-medium"
+                       maxlength="10"
+                       type="date" />
+
+              </div>
+            </div>
             <div class="field">
               <label class="checkbox is-medium">
                 <input id="projectCommissionerShare"

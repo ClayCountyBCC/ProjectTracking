@@ -124,6 +124,26 @@ var Utilities;
         e.value = value;
     }
     Utilities.Set_Value = Set_Value;
+    function Set_Date_Value(e, value) {
+        var input;
+        if (typeof e == "string") {
+            input = document.getElementById(e);
+        }
+        else {
+            input = e;
+        }
+        input.value = "";
+        if (typeof value == "string") {
+            if (new Date(value).getFullYear() > 1000) {
+                input.valueAsDate = new Date(value);
+            }
+            return;
+        }
+        if (value instanceof Date) {
+            input.valueAsDate = value;
+        }
+    }
+    Utilities.Set_Date_Value = Set_Date_Value;
     function Set_Text(e, value) {
         if (typeof e == "string") {
             e = document.getElementById(e);

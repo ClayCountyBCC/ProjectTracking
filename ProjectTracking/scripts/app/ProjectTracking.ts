@@ -11,12 +11,13 @@ namespace ProjectTracking
   export let my_departments: Array<DataValue> = [];
   export let funding_sources: Array<DataValue> = [];
   export let number_of_milestones: number = 0;
+  export let number_of_phases: number = 0;
   export let project_name_filter = '';
   export let default_view: boolean = true;
 
   export function Start(): void
   {
-    UpdatePhaseNameSelects();
+    //UpdatePhaseNameSelects();
     DataValue.GetDepartments();
     DataValue.GetFunding();
     DataValue.GetMyDepartments();
@@ -90,30 +91,30 @@ namespace ProjectTracking
     container.appendChild(tr);
   }
 
-  function UpdatePhaseNameSelects()
-  {
-    let phase_names = [      
-      "Develop Specifications",
-      "Procurement",
-      "Design",
-      "Bid - Contract Development", 
-      "Bid",
-      "Right of Way - Property Acquisition",
-      "RFQ - Contract Development",      
-      "Regulatory Approval",
-      "Implementation",
-      "Construction",
-      "Ignore this Phase",
-    ]
-    for (let i = 1; i < 6; i++) 
-    {
-      let select = <HTMLSelectElement>document.getElementById("phase_" + i.toString() + "_name");
-      select.add(Utilities.Create_Option("", "Select Phase Name", true));
-      for (let name of phase_names)
-      {
-        select.add(Utilities.Create_Option(name, name, false));
-      }
-    }
-  }
+  //function UpdatePhaseNameSelects()
+  //{
+  //  let phase_names = [      
+  //    "Develop Specifications",
+  //    "Procurement",
+  //    "Design",
+  //    "Bid - Contract Development", 
+  //    "Bid",
+  //    "Right of Way - Property Acquisition",
+  //    "RFQ - Contract Development",      
+  //    "Regulatory Approval",
+  //    "Implementation",
+  //    "Construction",
+  //    "Ignore this Phase",
+  //  ]
+  //  for (let i = 1; i < 6; i++) 
+  //  {
+  //    let select = <HTMLSelectElement>document.getElementById("phase_" + i.toString() + "_name");
+  //    select.add(Utilities.Create_Option("", "Select Phase Name", true));
+  //    for (let name of phase_names)
+  //    {
+  //      select.add(Utilities.Create_Option(name, name, false));
+  //    }
+  //  }
+  //}
 
 }
